@@ -13,7 +13,9 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -93,35 +95,49 @@ public class BookCsvService {
 
             }
 
+            List<Edition> editionsToSave = new ArrayList<>();
             for (String editionName : uniqueEditions) {
                 Edition edition = editionRepository.findByName(editionName).orElse(new Edition());
                 edition.setName(editionName);
-                editionRepository.save(edition);
+                editionsToSave.add(edition);
             }
+            editionRepository.saveAll(editionsToSave);
 
+            // Batch process Languages
+            List<Language> languagesToSave = new ArrayList<>();
             for (String languageName : uniqueLanguages) {
                 Language language = languageRepository.findByName(languageName).orElse(new Language());
                 language.setName(languageName);
-                languageRepository.save(language);
+                languagesToSave.add(language);
             }
+            languageRepository.saveAll(languagesToSave);
 
+            // Batch process Publishers
+            List<Publisher> publishersToSave = new ArrayList<>();
             for (String publisherName : uniquePublishers) {
                 Publisher publisher = publisherRepository.findByName(publisherName).orElse(new Publisher());
                 publisher.setName(publisherName);
-                publisherRepository.save(publisher);
+                publishersToSave.add(publisher);
             }
+            publisherRepository.saveAll(publishersToSave);
 
+            // Batch process BookFormats
+            List<BookFormat> formatsToSave = new ArrayList<>();
             for (String bookFormat : uniqueBookFormats) {
                 BookFormat format = bookFormatRepository.findByFormat(bookFormat).orElse(new BookFormat());
                 format.setFormat(bookFormat);
-                bookFormatRepository.save(format);
+                formatsToSave.add(format);
             }
+            bookFormatRepository.saveAll(formatsToSave);
 
+            // Batch process Series
+            List<Series> seriesToSave = new ArrayList<>();
             for (String seriesName : uniqueSeries) {
                 Series series = seriesRepository.findByName(seriesName).orElse(new Series());
                 series.setName(seriesName);
-                seriesRepository.save(series);
+                seriesToSave.add(series);
             }
+            seriesRepository.saveAll(seriesToSave);
 
         } catch (Exception e) {
             throw new RuntimeException("error processing csv", e);
