@@ -1,6 +1,7 @@
 package com.martin.bookstore.service;
 
 import com.martin.bookstore.persistence.entity.*;
+import com.martin.bookstore.persistence.entity.Character;
 import com.martin.bookstore.persistence.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -77,6 +78,8 @@ public class BookCsvService {
             Set<String> uniqueBookFormats = new HashSet<>();
             Set<String> uniqueSeries = new HashSet<>();
             Set<String> uniqueGenres = new HashSet<>();
+            Set<String> uniqueCharacters = new HashSet<>();
+
 
 
             for (CSVRecord record : csvParser) {
@@ -117,6 +120,23 @@ public class BookCsvService {
                         genreStr = genreStr.replace("'", "").replace("\"", "").trim();
                         if (!genreStr.isEmpty()) {
                             uniqueGenres.add(genreStr);
+                        }
+
+                    }
+                }
+
+                String characterColumn = record.get("characters").trim();
+                if (!characterColumn.isEmpty()) {
+                    if (characterColumn.startsWith("[") && characterColumn.endsWith("]")) {
+                        characterColumn = characterColumn.substring(1, characterColumn.length() - 1);
+                    }
+
+                    String[] charactersArray = characterColumn.split(",");
+                    for (String characterStr : charactersArray) {
+
+                        characterStr = characterStr.replace("'", "").trim();
+                        if (!characterStr.isEmpty()) {
+                            uniqueCharacters.add(characterStr);
                         }
 
                     }
@@ -171,6 +191,16 @@ public class BookCsvService {
                 genresToSave.add(genre);
             }
             batchSave(genresToSave, genreRepository);
+
+            List<Character> charactersToSave = new ArrayList<>();
+            for (String characterName : uniqueCharacters) {
+                Character character = characterRepository.findByName(characterName).orElse(new Character());
+                character.setName(characterName);
+                charactersToSave.add(character);
+            }
+            batchSave(charactersToSave, characterRepository);
+
+
 
         } catch (Exception e) {
             throw new RuntimeException("error processing csv", e);
