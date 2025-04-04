@@ -3,6 +3,7 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.persistence.entity.*;
 import com.martin.bookstore.persistence.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,8 @@ import java.util.Set;
 
 @Service
 public class BookCsvService {
+
+    private static final int BATCH_SIZE = 1000;
 
     private final BookRepository bookRepository;
     private final BookAuthorRepository bookAuthorRepository;
@@ -52,6 +55,13 @@ public class BookCsvService {
         this.publisherRepository = publisherRepository;
         this.seriesRepository = seriesRepository;
         this.settingRepository = settingRepository;
+    }
+
+    private <T> void batchSave(List<T> entities, JpaRepository<T, ?> repository) {
+        for (int i = 0; i < entities.size(); i += BATCH_SIZE) {
+            int endIndex = Math.min(i + BATCH_SIZE, entities.size());
+            repository.saveAll(entities.subList(i, endIndex));
+        }
     }
 
     public void processCsvFile(MultipartFile file) {
