@@ -76,6 +76,8 @@ public class BookCsvService {
             Set<String> uniquePublishers = new HashSet<>();
             Set<String> uniqueBookFormats = new HashSet<>();
             Set<String> uniqueSeries = new HashSet<>();
+            Set<String> uniqueGenres = new HashSet<>();
+
 
             for (CSVRecord record : csvParser) {
                 String editionName = record.get("edition").trim();
@@ -101,6 +103,23 @@ public class BookCsvService {
                 String seriesName = record.get("series").trim();
                 if (!seriesName.isEmpty()) {
                     uniqueSeries.add(seriesName);
+                }
+
+                String genresColumn = record.get("genres").trim();
+                if (!genresColumn.isEmpty()) {
+                    if (genresColumn.startsWith("[") && genresColumn.endsWith("]")) {
+                        genresColumn = genresColumn.substring(1, genresColumn.length() - 1);
+                    }
+
+                    String[] genresArray = genresColumn.split(",");
+                    for (String genreStr : genresArray) {
+
+                        genreStr = genreStr.replace("'", "").replace("\"", "").trim();
+                        if (!genreStr.isEmpty()) {
+                            uniqueGenres.add(genreStr);
+                        }
+
+                    }
                 }
 
             }
@@ -144,6 +163,14 @@ public class BookCsvService {
                 seriesToSave.add(series);
             }
             batchSave(seriesToSave, seriesRepository);
+
+            List<Genre> genresToSave = new ArrayList<>();
+            for (String genreName : uniqueGenres) {
+                Genre genre = genreRepository.findByName(genreName).orElse(new Genre());
+                genre.setName(genreName);
+                genresToSave.add(genre);
+            }
+            batchSave(genresToSave, genreRepository);
 
         } catch (Exception e) {
             throw new RuntimeException("error processing csv", e);
