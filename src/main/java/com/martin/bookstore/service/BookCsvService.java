@@ -23,7 +23,7 @@ import java.util.Set;
 @Service
 public class BookCsvService {
 
-    private static final int BATCH_SIZE = 1000;
+    private static final int BATCH_SIZE = 5000;
 
     private final BookRepository bookRepository;
     private final BookAuthorRepository bookAuthorRepository;
@@ -111,43 +111,39 @@ public class BookCsvService {
                 edition.setName(editionName);
                 editionsToSave.add(edition);
             }
-            editionRepository.saveAll(editionsToSave);
+            batchSave(editionsToSave, editionRepository);
 
-            // Batch process Languages
             List<Language> languagesToSave = new ArrayList<>();
             for (String languageName : uniqueLanguages) {
                 Language language = languageRepository.findByName(languageName).orElse(new Language());
                 language.setName(languageName);
                 languagesToSave.add(language);
             }
-            languageRepository.saveAll(languagesToSave);
+            batchSave(languagesToSave, languageRepository);
 
-            // Batch process Publishers
             List<Publisher> publishersToSave = new ArrayList<>();
             for (String publisherName : uniquePublishers) {
                 Publisher publisher = publisherRepository.findByName(publisherName).orElse(new Publisher());
                 publisher.setName(publisherName);
                 publishersToSave.add(publisher);
             }
-            publisherRepository.saveAll(publishersToSave);
+            batchSave(publishersToSave, publisherRepository);
 
-            // Batch process BookFormats
             List<BookFormat> formatsToSave = new ArrayList<>();
             for (String bookFormat : uniqueBookFormats) {
                 BookFormat format = bookFormatRepository.findByFormat(bookFormat).orElse(new BookFormat());
                 format.setFormat(bookFormat);
                 formatsToSave.add(format);
             }
-            bookFormatRepository.saveAll(formatsToSave);
+            batchSave(formatsToSave, bookFormatRepository);
 
-            // Batch process Series
             List<Series> seriesToSave = new ArrayList<>();
             for (String seriesName : uniqueSeries) {
                 Series series = seriesRepository.findByName(seriesName).orElse(new Series());
                 series.setName(seriesName);
                 seriesToSave.add(series);
             }
-            seriesRepository.saveAll(seriesToSave);
+            batchSave(seriesToSave, seriesRepository);
 
         } catch (Exception e) {
             throw new RuntimeException("error processing csv", e);
