@@ -113,6 +113,18 @@ public class BookCsvService {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
+            Set<String> requiredHeaders = Set.of(
+                    "title", "series", "author", "rating", "description", "language",
+                    "isbn", "genres", "characters", "bookFormat", "edition", "pages", "publisher", "publishDate",
+                    "firstPublishDate", "awards", "numRatings", "ratingsByStars", "likedPercent", "setting",
+                    "coverImg", "bbeScore", "bbeVotes", "price"
+            );
+            for (String header : requiredHeaders) {
+                if (!csvParser.getHeaderMap().containsKey(header)) {
+                    throw new RuntimeException("csv file is missing required header: " + header);
+                }
+            }
+
             Set<String> uniqueEditions = new HashSet<>();
             Set<String> uniqueLanguages = new HashSet<>();
             Set<String> uniquePublishers = new HashSet<>();
