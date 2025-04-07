@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -65,6 +67,20 @@ public class BookCsvService {
         }
     }
 
+    private List<String> parseSettings(String input) {
+        List<String> settings = new ArrayList<>();
+        // Pattern to match values inside single or double quotes.
+        Pattern pattern = Pattern.compile("'([^']*)'|\"([^\"]*)\"");
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String setting = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+            if (setting != null && !setting.trim().isEmpty()){
+                settings.add(setting.trim());
+            }
+        }
+        return settings;
+    }
+
     public void processCsvFile(MultipartFile file) {
 
         // process many to one relations (editions, series, languages, publishers, book_formats)
@@ -79,6 +95,7 @@ public class BookCsvService {
             Set<String> uniqueSeries = new HashSet<>();
             Set<String> uniqueGenres = new HashSet<>();
             Set<String> uniqueCharacters = new HashSet<>();
+            Set<String> uniqueSettings = new HashSet<>();
 
 
 
@@ -142,6 +159,15 @@ public class BookCsvService {
                     }
                 }
 
+                String settingsColumn = record.get("setting").trim();
+                if (!settingsColumn.isEmpty()) {
+                    if (settingsColumn.startsWith("[") && settingsColumn.endsWith("]")) {
+                        settingsColumn = settingsColumn.substring(1, settingsColumn.length() - 1);
+                    }
+                    List<String> settingsList = parseSettings(settingsColumn);
+                    uniqueSettings.addAll(settingsList);
+                }
+
             }
 
             List<Edition> editionsToSave = new ArrayList<>();
@@ -199,6 +225,14 @@ public class BookCsvService {
                 charactersToSave.add(character);
             }
             batchSave(charactersToSave, characterRepository);
+
+            List<Setting> settingsToSave = new ArrayList<>();
+            for (String settingName : uniqueSettings) {
+                Setting setting = settingRepository.findByName(settingName).orElse(new Setting());
+                setting.setName(settingName);
+                settingsToSave.add(setting);
+            }
+            batchSave(settingsToSave, settingRepository);
 
 
 
