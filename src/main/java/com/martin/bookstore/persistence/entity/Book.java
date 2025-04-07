@@ -76,11 +76,6 @@ public class Book {
     @Column(name = "cover_image_url")
     private String coverImageUrl;
 
-    // one to many
-
-    @OneToMany(mappedBy = "book")
-    private List<Award> awards;
-
     // many to one
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -117,5 +112,8 @@ public class Book {
 
     @OneToMany(mappedBy = "book")
     private List<BookSetting> bookSetting;
+
+    @OneToMany(mappedBy = "book")
+    private List<BookAward> bookAwards;
 
 }

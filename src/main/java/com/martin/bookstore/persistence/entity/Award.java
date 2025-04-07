@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Table(name = "awards")
 @Entity
@@ -21,10 +22,6 @@ public class Award {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "year", nullable = false)
-    private LocalDate year;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    private Book book;
+    @OneToMany(mappedBy = "award")
+    private List<BookAward> bookAwards;
 }
