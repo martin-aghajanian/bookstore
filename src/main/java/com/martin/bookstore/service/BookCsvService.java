@@ -26,6 +26,8 @@ import static com.martin.bookstore.service.util.CsvUtils.*;
 @Service
 public class BookCsvService {
 
+    private final CsvUtils csvUtils;
+
     private final BookRepository bookRepository;
     private final BookAuthorRepository bookAuthorRepository;
     private final BookCharacterRepository bookCharacterRepository;
@@ -43,7 +45,8 @@ public class BookCsvService {
 
 
     @Autowired
-    public BookCsvService(BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository) {
+    public BookCsvService(CsvUtils csvUtils, BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository) {
+        this.csvUtils = csvUtils;
         this.bookRepository = bookRepository;
         this.bookAuthorRepository = bookAuthorRepository;
         this.bookCharacterRepository = bookCharacterRepository;
@@ -158,13 +161,13 @@ public class BookCsvService {
                     if (settingsColumn.startsWith("[") && settingsColumn.endsWith("]")) {
                         settingsColumn = settingsColumn.substring(1, settingsColumn.length() - 1);
                     }
-                    List<String> settingsList = parseSettings(settingsColumn);
+                    List<String> settingsList = csvUtils.parseSettings(settingsColumn);
                     uniqueSettings.addAll(settingsList);
                 }
 
                 String authorsColumn = record.get("author").trim();
                 if (!authorsColumn.isEmpty()) {
-                    List<String> authorEntries = splitAuthors(authorsColumn);
+                    List<String> authorEntries = csvUtils.splitAuthors(authorsColumn);
                     for (String authorEntry : authorEntries) {
                         boolean isGoodreads = false;
                         String namePart = authorEntry;
@@ -203,7 +206,7 @@ public class BookCsvService {
                 edition.setName(editionName);
                 editionsToSave.add(edition);
             }
-            batchSave(editionsToSave, editionRepository);
+            csvUtils.batchSave(editionsToSave, editionRepository);
 
             List<Language> languagesToSave = new ArrayList<>();
             for (String languageName : uniqueLanguages) {
@@ -211,7 +214,7 @@ public class BookCsvService {
                 language.setName(languageName);
                 languagesToSave.add(language);
             }
-            batchSave(languagesToSave, languageRepository);
+            csvUtils.batchSave(languagesToSave, languageRepository);
 
             List<Publisher> publishersToSave = new ArrayList<>();
             for (String publisherName : uniquePublishers) {
@@ -219,7 +222,7 @@ public class BookCsvService {
                 publisher.setName(publisherName);
                 publishersToSave.add(publisher);
             }
-            batchSave(publishersToSave, publisherRepository);
+            csvUtils.batchSave(publishersToSave, publisherRepository);
 
             List<BookFormat> formatsToSave = new ArrayList<>();
             for (String bookFormat : uniqueBookFormats) {
@@ -227,7 +230,7 @@ public class BookCsvService {
                 format.setFormat(bookFormat);
                 formatsToSave.add(format);
             }
-            batchSave(formatsToSave, bookFormatRepository);
+            csvUtils.batchSave(formatsToSave, bookFormatRepository);
 
             List<Series> seriesToSave = new ArrayList<>();
             for (String seriesName : uniqueSeries) {
@@ -235,7 +238,7 @@ public class BookCsvService {
                 series.setName(seriesName);
                 seriesToSave.add(series);
             }
-            batchSave(seriesToSave, seriesRepository);
+            csvUtils.batchSave(seriesToSave, seriesRepository);
 
             List<Genre> genresToSave = new ArrayList<>();
             for (String genreName : uniqueGenres) {
@@ -243,7 +246,7 @@ public class BookCsvService {
                 genre.setName(genreName);
                 genresToSave.add(genre);
             }
-            batchSave(genresToSave, genreRepository);
+            csvUtils.batchSave(genresToSave, genreRepository);
 
             List<Character> charactersToSave = new ArrayList<>();
             for (String characterName : uniqueCharacters) {
@@ -251,7 +254,7 @@ public class BookCsvService {
                 character.setName(characterName);
                 charactersToSave.add(character);
             }
-            batchSave(charactersToSave, characterRepository);
+            csvUtils.batchSave(charactersToSave, characterRepository);
 
             List<Setting> settingsToSave = new ArrayList<>();
             for (String settingName : uniqueSettings) {
@@ -259,10 +262,10 @@ public class BookCsvService {
                 setting.setName(settingName);
                 settingsToSave.add(setting);
             }
-            batchSave(settingsToSave, settingRepository);
+            csvUtils.batchSave(settingsToSave, settingRepository);
 
             List<Author> authorsToSave = new ArrayList<>(authorsMap.values());
-            batchSave(authorsToSave, authorRepository);
+            csvUtils.batchSave(authorsToSave, authorRepository);
 
 
         } catch (Exception e) {
