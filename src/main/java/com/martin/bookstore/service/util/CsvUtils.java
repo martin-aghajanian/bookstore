@@ -1,23 +1,29 @@
 package com.martin.bookstore.service.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class CsvUtils {
 
-    private static final int BATCH_SIZE = 5000;
+    @Value("${batch.size:5000}")
+    private int batchSize;
 
-    public static <T> void batchSave(List<T> entities, JpaRepository<T, ?> repository) {
-        for (int i = 0; i < entities.size(); i += BATCH_SIZE) {
-            int endIndex = Math.min(i + BATCH_SIZE, entities.size());
+
+    public <T> void batchSave(List<T> entities, JpaRepository<T, ?> repository) {
+        for (int i = 0; i < entities.size(); i += batchSize) {
+            int endIndex = Math.min(i + batchSize, entities.size());
             repository.saveAll(entities.subList(i, endIndex));
         }
     }
 
-    public static List<String> parseSettings(String input) {
+    public List<String> parseSettings(String input) {
         List<String> settings = new ArrayList<>();
         Pattern pattern = Pattern.compile("'([^']*)'|\"([^\"]*)\"");
         Matcher matcher = pattern.matcher(input);
@@ -30,7 +36,7 @@ public class CsvUtils {
         return settings;
     }
 
-    public static List<String> splitAuthors(String authorsColumn) {
+    public List<String> splitAuthors(String authorsColumn) {
         List<String> authors = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         int parenthesesLevel = 0;
