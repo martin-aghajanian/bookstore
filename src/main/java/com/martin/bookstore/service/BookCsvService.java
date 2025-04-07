@@ -15,10 +15,7 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,10 +38,11 @@ public class BookCsvService {
     private final PublisherRepository publisherRepository;
     private final SeriesRepository seriesRepository;
     private final SettingRepository settingRepository;
+    private final AuthorRepository authorRepository;
 
 
     @Autowired
-    public BookCsvService(BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository) {
+    public BookCsvService(BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
         this.bookAuthorRepository = bookAuthorRepository;
         this.bookCharacterRepository = bookCharacterRepository;
@@ -58,6 +56,7 @@ public class BookCsvService {
         this.publisherRepository = publisherRepository;
         this.seriesRepository = seriesRepository;
         this.settingRepository = settingRepository;
+        this.authorRepository = authorRepository;
     }
 
     private <T> void batchSave(List<T> entities, JpaRepository<T, ?> repository) {
@@ -69,7 +68,6 @@ public class BookCsvService {
 
     private List<String> parseSettings(String input) {
         List<String> settings = new ArrayList<>();
-        // Pattern to match values inside single or double quotes.
         Pattern pattern = Pattern.compile("'([^']*)'|\"([^\"]*)\"");
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
@@ -79,6 +77,33 @@ public class BookCsvService {
             }
         }
         return settings;
+    }
+
+    private List<String> splitAuthors(String authorsColumn) {
+        List<String> authors = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        int parenthesesLevel = 0;
+        for (int i = 0; i < authorsColumn.length(); i++) {
+            char ch = authorsColumn.charAt(i);
+            if (ch == '(') {
+                parenthesesLevel++;
+            } else if (ch == ')') {
+                if (parenthesesLevel > 0) {
+                    parenthesesLevel--;
+                }
+            }
+            // Only split on comma if we are not inside parentheses.
+            if (ch == ',' && parenthesesLevel == 0) {
+                authors.add(current.toString().trim());
+                current.setLength(0);
+            } else {
+                current.append(ch);
+            }
+        }
+        if (current.length() > 0) {
+            authors.add(current.toString().trim());
+        }
+        return authors;
     }
 
     public void processCsvFile(MultipartFile file) {
@@ -96,6 +121,7 @@ public class BookCsvService {
             Set<String> uniqueGenres = new HashSet<>();
             Set<String> uniqueCharacters = new HashSet<>();
             Set<String> uniqueSettings = new HashSet<>();
+            Map<String, Author> authorsMap = new HashMap<>();
 
 
 
@@ -168,6 +194,39 @@ public class BookCsvService {
                     uniqueSettings.addAll(settingsList);
                 }
 
+                String authorsColumn = record.get("author").trim();
+                if (!authorsColumn.isEmpty()) {
+                    List<String> authorEntries = splitAuthors(authorsColumn);
+                    for (String authorEntry : authorEntries) {
+                        boolean isGoodreads = false;
+                        String namePart = authorEntry;
+                        Pattern pattern = Pattern.compile("^(.*?)\\s*\\((.*?)\\)$");
+                        Matcher matcher = pattern.matcher(authorEntry);
+                        if (matcher.find()) {
+                            namePart = matcher.group(1).trim();
+                            String contributionsStr = matcher.group(2).trim();
+                            String[] contributions = contributionsStr.split(",");
+                            for (String contribution : contributions) {
+                                if ("Goodreads Author".equalsIgnoreCase(contribution.trim())) {
+                                    isGoodreads = true;
+                                    break;
+                                }
+                            }
+                        }
+                        String key = namePart;
+                        if (authorsMap.containsKey(key)) {
+                            if (isGoodreads) {
+                                authorsMap.get(key).setGoodReadsAuthor(true);
+                            }
+                        } else {
+                            Author author = new Author();
+                            author.setFullName(namePart);
+                            author.setGoodReadsAuthor(isGoodreads);
+                            authorsMap.put(key, author);
+                        }
+                    }
+                }
+
             }
 
             List<Edition> editionsToSave = new ArrayList<>();
@@ -234,6 +293,8 @@ public class BookCsvService {
             }
             batchSave(settingsToSave, settingRepository);
 
+            List<Author> authorsToSave = new ArrayList<>(authorsMap.values());
+            batchSave(authorsToSave, authorRepository);
 
 
         } catch (Exception e) {
