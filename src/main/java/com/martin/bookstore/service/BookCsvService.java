@@ -3,6 +3,7 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.persistence.entity.*;
 import com.martin.bookstore.persistence.entity.Character;
 import com.martin.bookstore.persistence.repository.*;
+import com.martin.bookstore.service.util.CsvUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.martin.bookstore.service.util.CsvUtils.*;
+
 
 @Service
 public class BookCsvService {
-
-    private static final int BATCH_SIZE = 5000;
 
     private final BookRepository bookRepository;
     private final BookAuthorRepository bookAuthorRepository;
@@ -59,52 +60,6 @@ public class BookCsvService {
         this.authorRepository = authorRepository;
     }
 
-    private <T> void batchSave(List<T> entities, JpaRepository<T, ?> repository) {
-        for (int i = 0; i < entities.size(); i += BATCH_SIZE) {
-            int endIndex = Math.min(i + BATCH_SIZE, entities.size());
-            repository.saveAll(entities.subList(i, endIndex));
-        }
-    }
-
-    private List<String> parseSettings(String input) {
-        List<String> settings = new ArrayList<>();
-        Pattern pattern = Pattern.compile("'([^']*)'|\"([^\"]*)\"");
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String setting = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
-            if (setting != null && !setting.trim().isEmpty()){
-                settings.add(setting.trim());
-            }
-        }
-        return settings;
-    }
-
-    private List<String> splitAuthors(String authorsColumn) {
-        List<String> authors = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        int parenthesesLevel = 0;
-        for (int i = 0; i < authorsColumn.length(); i++) {
-            char ch = authorsColumn.charAt(i);
-            if (ch == '(') {
-                parenthesesLevel++;
-            } else if (ch == ')') {
-                if (parenthesesLevel > 0) {
-                    parenthesesLevel--;
-                }
-            }
-            // Only split on comma if we are not inside parentheses.
-            if (ch == ',' && parenthesesLevel == 0) {
-                authors.add(current.toString().trim());
-                current.setLength(0);
-            } else {
-                current.append(ch);
-            }
-        }
-        if (current.length() > 0) {
-            authors.add(current.toString().trim());
-        }
-        return authors;
-    }
 
     public void processCsvFile(MultipartFile file) {
 
@@ -119,6 +74,7 @@ public class BookCsvService {
                     "firstPublishDate", "awards", "numRatings", "ratingsByStars", "likedPercent", "setting",
                     "coverImg", "bbeScore", "bbeVotes", "price"
             );
+
             for (String header : requiredHeaders) {
                 if (!csvParser.getHeaderMap().containsKey(header)) {
                     throw new RuntimeException("csv file is missing required header: " + header);
