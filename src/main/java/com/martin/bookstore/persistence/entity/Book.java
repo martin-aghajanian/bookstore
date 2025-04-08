@@ -25,7 +25,7 @@ public class Book {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "pages")
@@ -45,9 +45,6 @@ public class Book {
 
     @Column(name = "price")
     private Double price;
-
-    @Column(name = "series_order")
-    private Integer seriesOrder;
 
     @Column(name = "num_ratings")
     private Long numRatings;

@@ -1,6 +1,5 @@
 package com.martin.bookstore.controller;
 
-
 import com.martin.bookstore.service.BookCsvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,7 @@ public class BookCsvController {
         this.bookCsvService = bookCsvService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {
 
         if (file.isEmpty()) {
