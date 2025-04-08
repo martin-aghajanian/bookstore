@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.service.BookCsvService;
+import com.martin.bookstore.service.CsvImport.BookImportService;
+import com.martin.bookstore.service.CsvImport.ManyToOneImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("api/v1/csv-upload")
 public class BookCsvController {
 
-    private final BookCsvService bookCsvService;
+    private final ManyToOneImportService manyToOneImportService;
+    private final BookImportService bookImportService;
 
     @Autowired
-    public BookCsvController(BookCsvService bookCsvService) {
-        this.bookCsvService = bookCsvService;
+    public BookCsvController(ManyToOneImportService manyToOneImportService, BookImportService bookImportService) {
+        this.manyToOneImportService = manyToOneImportService;
+        this.bookImportService = bookImportService;
     }
 
     @PostMapping(consumes = "multipart/form-data")
@@ -30,7 +33,8 @@ public class BookCsvController {
         }
         try {
             long start = System.currentTimeMillis();
-            bookCsvService.processCsvFile(file);
+            manyToOneImportService.processCsvFile(file);
+            bookImportService.processCsv(file);
             long total = System.currentTimeMillis() - start;
             return ResponseEntity.ok("csv file processed in " + total + " ms.");
 

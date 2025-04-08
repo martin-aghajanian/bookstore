@@ -1,18 +1,15 @@
-package com.martin.bookstore.service;
+package com.martin.bookstore.service.CsvImport;
 
 import com.martin.bookstore.persistence.entity.*;
 import com.martin.bookstore.persistence.repository.*;
 import com.martin.bookstore.service.util.CsvUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.LocalDate;
@@ -21,194 +18,39 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.*;
 
-
 @Service
-public class BookCsvService {
+public class BookImportService {
 
     private final CsvUtils csvUtils;
 
     private final BookRepository bookRepository;
-    private final BookAuthorRepository bookAuthorRepository;
-    private final BookCharacterRepository bookCharacterRepository;
     private final BookFormatRepository bookFormatRepository;
-    private final BookGenreRepository bookGenreRepository;
-    private final BookSettingRepository bookSettingRepository;
-    private final CharacterRepository characterRepository;
     private final EditionRepository editionRepository;
-    private final GenreRepository genreRepository;
     private final LanguageRepository languageRepository;
     private final PublisherRepository publisherRepository;
     private final SeriesRepository seriesRepository;
-    private final SettingRepository settingRepository;
-    private final AuthorRepository authorRepository;
-    private final AwardRepository awardRepository;
-    private final BookAwardRepository bookAwardRepository;
 
-
-    @Autowired
-    public BookCsvService(CsvUtils csvUtils, BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository, AwardRepository awardRepository, BookAwardRepository bookAwardRepository) {
+    public BookImportService(CsvUtils csvUtils, BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository, AwardRepository awardRepository, BookAwardRepository bookAwardRepository) {
         this.csvUtils = csvUtils;
         this.bookRepository = bookRepository;
-        this.bookAuthorRepository = bookAuthorRepository;
-        this.bookCharacterRepository = bookCharacterRepository;
         this.bookFormatRepository = bookFormatRepository;
-        this.bookGenreRepository = bookGenreRepository;
-        this.bookSettingRepository = bookSettingRepository;
-        this.characterRepository = characterRepository;
         this.editionRepository = editionRepository;
-        this.genreRepository = genreRepository;
         this.languageRepository = languageRepository;
         this.publisherRepository = publisherRepository;
         this.seriesRepository = seriesRepository;
-        this.settingRepository = settingRepository;
-        this.authorRepository = authorRepository;
-        this.awardRepository = awardRepository;
-        this.bookAwardRepository = bookAwardRepository;
     }
 
+    public void processCsv(MultipartFile file) {
 
-    public void processCsvFile(MultipartFile file) {
-
-        byte[] fileBytes;
-        try {
-            fileBytes = file.getBytes();
-        } catch (Exception e) {
-            throw new RuntimeException("Error reading file bytes", e);
-        }
-
-        // Process many-to-one relations (editions, series, languages, publishers, book_formats)
-
-        try (Reader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(fileBytes)));
+        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
-
-            Set<String> requiredHeaders = Set.of(
-                    "title", "series", "author", "rating", "description", "language",
-                    "isbn", "genres", "characters", "bookFormat", "edition", "pages", "publisher", "publishDate",
-                    "firstPublishDate", "awards", "numRatings", "ratingsByStars", "likedPercent", "setting",
-                    "coverImg", "bbeScore", "bbeVotes", "price"
-            );
-
-            for (String header : requiredHeaders) {
-                if (!csvParser.getHeaderMap().containsKey(header)) {
-                    throw new RuntimeException("csv file is missing required header: " + header);
-                }
-            }
-
-            Set<String> uniqueEditions = new HashSet<>();
-            Set<String> uniqueLanguages = new HashSet<>();
-            Set<String> uniquePublishers = new HashSet<>();
-            Set<String> uniqueBookFormats = new HashSet<>();
-            Set<String> uniqueSeries = new HashSet<>();
-
-            for (CSVRecord record : csvParser) {
-
-                // editions
-
-                String editionName = record.get("edition").trim();
-                if (!editionName.isEmpty()) {
-                    uniqueEditions.add(editionName);
-                }
-
-                // languages
-
-                String languageName = record.get("language").trim();
-                if (!languageName.isEmpty()) {
-                    uniqueLanguages.add(languageName);
-                }
-
-                // publishers
-
-                String publisherName = record.get("publisher").trim();
-                if (!publisherName.isEmpty()) {
-                    uniquePublishers.add(publisherName);
-                }
-
-                // book formats
-
-                String bookFormat = record.get("bookFormat").trim();
-                if (!bookFormat.isEmpty()) {
-                    uniqueBookFormats.add(bookFormat);
-                }
-
-                // series
-
-                String seriesName = record.get("series").trim();
-                if (!seriesName.isEmpty()) {
-                    int hashIndex = seriesName.indexOf("#");
-                    if (hashIndex != -1) {
-                        seriesName = seriesName.substring(0, hashIndex).trim();
-                    }
-                    if (!seriesName.isEmpty()) {
-                        uniqueSeries.add(seriesName);
-                    }
-                }
-
-            }
-
-            // save editions
-
-            List<Edition> editionsToSave = new ArrayList<>();
-            for (String editionName : uniqueEditions) {
-                Edition edition = editionRepository.findByName(editionName).orElse(new Edition());
-                edition.setName(editionName);
-                editionsToSave.add(edition);
-            }
-            csvUtils.batchSave(editionsToSave, editionRepository);
-
-            // save languages
-
-            List<Language> languagesToSave = new ArrayList<>();
-            for (String languageName : uniqueLanguages) {
-                Language language = languageRepository.findByName(languageName).orElse(new Language());
-                language.setName(languageName);
-                languagesToSave.add(language);
-            }
-            csvUtils.batchSave(languagesToSave, languageRepository);
-
-            // save publishers
-
-            List<Publisher> publishersToSave = new ArrayList<>();
-            for (String publisherName : uniquePublishers) {
-                Publisher publisher = publisherRepository.findByName(publisherName).orElse(new Publisher());
-                publisher.setName(publisherName);
-                publishersToSave.add(publisher);
-            }
-            csvUtils.batchSave(publishersToSave, publisherRepository);
-
-            // save book formats
-
-            List<BookFormat> formatsToSave = new ArrayList<>();
-            for (String bookFormat : uniqueBookFormats) {
-                BookFormat format = bookFormatRepository.findByFormat(bookFormat).orElse(new BookFormat());
-                format.setFormat(bookFormat);
-                formatsToSave.add(format);
-            }
-            csvUtils.batchSave(formatsToSave, bookFormatRepository);
-
-            // save series
-
-            List<Series> seriesToSave = new ArrayList<>();
-            for (String seriesName : uniqueSeries) {
-                Series series = seriesRepository.findByName(seriesName).orElse(new Series());
-                series.setName(seriesName);
-                seriesToSave.add(series);
-            }
-            csvUtils.batchSave(seriesToSave, seriesRepository);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error processing CSV for many-to-one relations", e);
-        }
-
-        // Process books
-        try (Reader bookReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(fileBytes)));
-             CSVParser bookParser = new CSVParser(bookReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
             List<Book> booksToSave = new ArrayList<>();
             Set<Long> processedIsbns = new HashSet<>();
 
 
             int recordCount = 0;
-            for (CSVRecord record : bookParser) {
+            for (CSVRecord record : csvParser) {
                 recordCount++;
                 try {
                     Book book = new Book();
@@ -406,7 +248,6 @@ public class BookCsvService {
             throw new RuntimeException("Error processing CSV for books", e);
         }
 
-
-        // Process many-to-many relations if needed...
     }
+
 }
