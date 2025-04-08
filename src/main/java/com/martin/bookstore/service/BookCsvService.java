@@ -5,7 +5,6 @@ import com.martin.bookstore.persistence.entity.Character;
 import com.martin.bookstore.persistence.repository.*;
 import com.martin.bookstore.service.util.CsvUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,8 +18,6 @@ import java.io.Reader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.martin.bookstore.service.util.CsvUtils.*;
 
 
 @Service
@@ -42,10 +39,12 @@ public class BookCsvService {
     private final SeriesRepository seriesRepository;
     private final SettingRepository settingRepository;
     private final AuthorRepository authorRepository;
+    private final AwardRepository awardRepository;
+    private final BookAwardRepository bookAwardRepository;
 
 
     @Autowired
-    public BookCsvService(CsvUtils csvUtils, BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository) {
+    public BookCsvService(CsvUtils csvUtils, BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository, AwardRepository awardRepository, BookAwardRepository bookAwardRepository) {
         this.csvUtils = csvUtils;
         this.bookRepository = bookRepository;
         this.bookAuthorRepository = bookAuthorRepository;
@@ -61,6 +60,8 @@ public class BookCsvService {
         this.seriesRepository = seriesRepository;
         this.settingRepository = settingRepository;
         this.authorRepository = authorRepository;
+        this.awardRepository = awardRepository;
+        this.bookAwardRepository = bookAwardRepository;
     }
 
 
@@ -170,18 +171,25 @@ public class BookCsvService {
                     List<String> authorEntries = csvUtils.splitAuthors(authorsColumn);
                     for (String authorEntry : authorEntries) {
                         boolean isGoodreads = false;
-                        String namePart = authorEntry;
-                        Pattern pattern = Pattern.compile("^(.*?)\\s*\\((.*?)\\)$");
-                        Matcher matcher = pattern.matcher(authorEntry);
-                        if (matcher.find()) {
-                            namePart = matcher.group(1).trim();
-                            String contributionsStr = matcher.group(2).trim();
+
+                        Pattern parenthesisPattern = Pattern.compile("\\(([^)]+)\\)");
+                        Matcher matcher = parenthesisPattern.matcher(authorEntry);
+                        List<String> contributionsList = new ArrayList<>();
+                        while (matcher.find()) {
+                            contributionsList.add(matcher.group(1).trim());
+                        }
+                        String namePart = authorEntry.replaceAll("\\s*\\([^)]*\\)", "").trim();
+
+                        for (String contributionsStr : contributionsList) {
                             String[] contributions = contributionsStr.split(",");
                             for (String contribution : contributions) {
                                 if ("Goodreads Author".equalsIgnoreCase(contribution.trim())) {
                                     isGoodreads = true;
                                     break;
                                 }
+                            }
+                            if (isGoodreads) {
+                                break;
                             }
                         }
                         String key = namePart;
@@ -197,6 +205,7 @@ public class BookCsvService {
                         }
                     }
                 }
+
 
             }
 
