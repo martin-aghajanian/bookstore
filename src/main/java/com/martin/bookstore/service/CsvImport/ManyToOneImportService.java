@@ -38,7 +38,7 @@ public class ManyToOneImportService {
         this.csvUtils = csvUtils;
     }
 
-    public void processCsvFile(MultipartFile file) {
+    public void populateManyToOneRelations(MultipartFile file) {
 
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {

@@ -40,7 +40,7 @@ public class BookImportService {
         this.seriesRepository = seriesRepository;
     }
 
-    public void processCsv(MultipartFile file) {
+    public void populateBooksTable(MultipartFile file) {
 
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {

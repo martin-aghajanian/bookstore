@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
 import com.martin.bookstore.service.CsvImport.BookImportService;
+import com.martin.bookstore.service.CsvImport.ManyToManyImportService;
 import com.martin.bookstore.service.CsvImport.ManyToOneImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,26 +18,27 @@ public class BookCsvController {
 
     private final ManyToOneImportService manyToOneImportService;
     private final BookImportService bookImportService;
+    private final ManyToManyImportService manyToManyImportService;
 
     @Autowired
-    public BookCsvController(ManyToOneImportService manyToOneImportService, BookImportService bookImportService) {
+    public BookCsvController(ManyToOneImportService manyToOneImportService, BookImportService bookImportService, ManyToManyImportService manyToManyImportService) {
         this.manyToOneImportService = manyToOneImportService;
         this.bookImportService = bookImportService;
+        this.manyToManyImportService = manyToManyImportService;
     }
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {
 
         if (file.isEmpty()) {
-
             return ResponseEntity.badRequest().body("file is empty.");
         }
         try {
-            long start = System.currentTimeMillis();
-            manyToOneImportService.processCsvFile(file);
-            bookImportService.processCsv(file);
-            long total = System.currentTimeMillis() - start;
-            return ResponseEntity.ok("csv file processed in " + total + " ms.");
+            manyToOneImportService.populateManyToOneRelations(file);
+            bookImportService.populateBooksTable(file);
+            manyToManyImportService.populateEntityTables(file);
+            manyToManyImportService.populateJunctionTables(file);
+            return ResponseEntity.ok("csv file processed.");
 
         } catch (Exception e) {
 
