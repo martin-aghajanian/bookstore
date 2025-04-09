@@ -1,16 +1,19 @@
 package com.martin.bookstore.models.book.service;
 
-import com.martin.bookstore.models.book.persistence.repository.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.martin.bookstore.models.book.dto.BookDto;
 
-@Service
-public class BookService {
+import java.util.List;
 
-    private final BookRepository bookRepository;
+public interface BookService {
 
-    @Autowired
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
+    List<BookDto> getAllBooks();
+
+    BookDto getBookById(Long id);
+
+    BookDto createBook(BookDto bookDto);
+
+    BookDto updateBook(Long id, BookDto bookDto);
+
+    void deleteBook(Long id);
+
 }
