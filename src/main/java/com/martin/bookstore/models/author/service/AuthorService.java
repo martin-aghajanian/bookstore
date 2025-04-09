@@ -1,6 +1,7 @@
 package com.martin.bookstore.models.author.service;
 
 import com.martin.bookstore.models.author.dto.AuthorDto;
+import com.martin.bookstore.models.author.dto.AuthorMapper;
 import com.martin.bookstore.models.author.persistence.entity.Author;
 import com.martin.bookstore.models.author.persistence.repository.AuthorRepository;
 import org.springframework.stereotype.Service;
@@ -13,22 +14,24 @@ import java.util.stream.Collectors;
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
+    private final AuthorMapper authorMapper;
 
-    public AuthorService(AuthorRepository authorRepository) {
+    public AuthorService(AuthorRepository authorRepository, AuthorMapper authorMapper) {
         this.authorRepository = authorRepository;
+        this.authorMapper = authorMapper;
     }
 
     public List<AuthorDto> getAllAuthors() {
-        return authorRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+        return authorRepository.findAll().stream().map(authorMapper::toDto).collect(Collectors.toList());
     }
 
     public Optional<AuthorDto> getAuthorById(Long id) {
-        return authorRepository.findById(id).map(this::toDto);
+        return authorRepository.findById(id).map(authorMapper::toDto);
     }
 
     public AuthorDto createAuthor(AuthorDto authorDto) {
-        Author saved = authorRepository.save(toEntity(authorDto));
-        return toDto(saved);
+        Author saved = authorRepository.save(authorMapper.toEntity(authorDto));
+        return authorMapper.toDto(saved);
     }
 
     public AuthorDto updateAuthor(Long id, AuthorDto updatedAuthorDto) {
@@ -37,7 +40,7 @@ public class AuthorService {
             Author author = optionalAuthor.get();
             author.setFullName(updatedAuthorDto.getFullName());
             author.setGoodReadsAuthor(updatedAuthorDto.getGoodReadsAuthor());
-            return toDto(authorRepository.save(author));
+            return authorMapper.toDto(authorRepository.save(author));
         }
         return null;
     }
@@ -46,19 +49,5 @@ public class AuthorService {
         authorRepository.deleteById(id);
     }
 
-    private AuthorDto toDto(Author author) {
-        AuthorDto dto = new AuthorDto();
-        dto.setId(author.getId());
-        dto.setFullName(author.getFullName());
-        dto.setGoodReadsAuthor(author.getGoodReadsAuthor());
-        return dto;
-    }
 
-    private Author toEntity(AuthorDto dto) {
-        Author author = new Author();
-        author.setId(dto.getId());
-        author.setFullName(dto.getFullName());
-        author.setGoodReadsAuthor(dto.getGoodReadsAuthor());
-        return author;
-    }
 }
