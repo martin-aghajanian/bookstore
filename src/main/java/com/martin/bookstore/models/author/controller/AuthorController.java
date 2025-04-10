@@ -42,4 +42,9 @@ public class AuthorController {
         authorService.deleteAuthor(id);
     }
 
+    @GetMapping("/search")
+    public List<AuthorDto> searchAuthors(@RequestParam String name) {
+        return authorService.searchAuthorsByName(name);
+    }
+
 }
