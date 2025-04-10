@@ -17,4 +17,6 @@ public interface AuthorService {
     void deleteAuthor(Long id);
 
     List<AuthorDto> searchAuthorsByName(String name);
+
+    List<AuthorDto> filterByGoodreadsAuthor(boolean goodreads);
 }

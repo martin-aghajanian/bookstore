@@ -47,4 +47,9 @@ public class AuthorController {
         return authorService.searchAuthorsByName(name);
     }
 
+    @GetMapping("/filter")
+    public List<AuthorDto> filterByGoodreads(@RequestParam boolean goodreads) {
+        return authorService.filterByGoodreadsAuthor(goodreads);
+    }
+
 }

@@ -60,6 +60,11 @@ public class AuthorServiceImpl implements AuthorService{
                 .stream().map(authorMapper::toDto).collect(Collectors.toList());
     }
 
+    @Override
+    public List<AuthorDto> filterByGoodreadsAuthor(boolean goodreads) {
+        return authorRepository.findByGoodReadsAuthor(goodreads)
+                .stream().map(authorMapper::toDto).collect(Collectors.toList());
+    }
 
 
 }

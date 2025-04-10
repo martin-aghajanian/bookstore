@@ -9,7 +9,11 @@ import java.util.Optional;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
+
     Optional<Author> findByFullName(String authorName);
 
     List<Author> findByFullNameContainingIgnoreCase(String fullName);
+
+    List<Author> findByGoodReadsAuthor(boolean goodReadsAuthor);
+
 }
