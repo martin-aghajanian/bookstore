@@ -1,16 +1,18 @@
 package com.martin.bookstore.models.award.service;
 
-import com.martin.bookstore.models.award.persistence.repository.AwardRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.martin.bookstore.models.award.dto.AwardDto;
 
-@Service
-public class AwardService {
+import java.util.List;
 
-    private final AwardRepository awardRepository;
+public interface AwardService {
 
-    @Autowired
-    public AwardService(AwardRepository awardRepository) {
-        this.awardRepository = awardRepository;
-    }
+    List<AwardDto> getAllAwards();
+
+    AwardDto getAwardById(Long id);
+
+    AwardDto createAward(AwardDto awardDto);
+
+    AwardDto updateAward(Long id, AwardDto updatedAwardDto);
+
+    void deleteAward(Long id);
 }
