@@ -98,7 +98,7 @@ public class Book {
     private Publisher publisher;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_format_id")
+    @JoinColumn(name = "format_id")
     private Format format;
 
     // many to many

@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Table(name = "book_formats")
+@Table(name = "formats")
 @Entity
 @Getter
 @Setter
@@ -22,6 +22,6 @@ public class Format {
     @Column(name = "format", unique = true, nullable = false)
     private String format;
 
-    @OneToMany(mappedBy = "bookFormat")
+    @OneToMany(mappedBy = "format")
     private List<Book> books;
 }
