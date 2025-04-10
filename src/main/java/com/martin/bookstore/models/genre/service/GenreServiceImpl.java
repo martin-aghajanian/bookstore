@@ -17,12 +17,10 @@ public class GenreServiceImpl  implements GenreService{
 
     private final GenreRepository genreRepository;
     private final GenreMapper genreMapper;
-    private final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
 
-    public GenreServiceImpl(GenreRepository genreRepository, GenreMapper genreMapper, MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
+    public GenreServiceImpl(GenreRepository genreRepository, GenreMapper genreMapper) {
         this.genreRepository = genreRepository;
         this.genreMapper = genreMapper;
-        this.mappingJackson2HttpMessageConverter = mappingJackson2HttpMessageConverter;
     }
 
     @Override
