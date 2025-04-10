@@ -1,16 +1,19 @@
 package com.martin.bookstore.models.series.service;
 
-import com.martin.bookstore.models.series.persistence.repository.SeriesRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.martin.bookstore.models.series.dto.SeriesDto;
 
-@Service
-public class SeriesService {
+import java.util.List;
 
-    private final SeriesRepository seriesRepository;
+public interface SeriesService {
 
-    @Autowired
-    public SeriesService(SeriesRepository seriesRepository) {
-        this.seriesRepository = seriesRepository;
-    }
+    List<SeriesDto> getAllSeries();
+
+    SeriesDto getSeriesById(Long id);
+
+    SeriesDto createSeries(SeriesDto seriesDto);
+
+    SeriesDto updateSeries(Long id, SeriesDto updatedSeriesDto);
+
+    void deleteSeries(Long id);
+
 }
