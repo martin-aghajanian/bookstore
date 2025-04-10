@@ -1,16 +1,19 @@
 package com.martin.bookstore.models.character.service;
 
-import com.martin.bookstore.models.character.persistence.repository.CharacterRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.martin.bookstore.models.character.dto.CharacterDto;
 
-@Service
-public class CharacterService {
+import java.util.List;
 
-    private final CharacterRepository characterRepository;
+public interface CharacterService {
 
-    @Autowired
-    public CharacterService(CharacterRepository characterRepository) {
-        this.characterRepository = characterRepository;
-    }
+    List<CharacterDto> getAllCharacters();
+
+    CharacterDto getCharacterById(Long id);
+
+    CharacterDto createCharacter(CharacterDto characterDto);
+
+    CharacterDto updateCharacter(Long id, CharacterDto updatedCharacterDto);
+
+    void deleteCharacter(Long id);
+
 }
