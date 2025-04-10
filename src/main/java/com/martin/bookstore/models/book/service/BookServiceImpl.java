@@ -6,8 +6,8 @@ import com.martin.bookstore.models.book.persistence.entity.Book;
 import com.martin.bookstore.models.book.persistence.repository.BookRepository;
 import com.martin.bookstore.models.edition.persistence.entity.Edition;
 import com.martin.bookstore.models.edition.persistence.repository.EditionRepository;
-import com.martin.bookstore.models.format.persistence.entity.BookFormat;
-import com.martin.bookstore.models.format.persistence.repository.BookFormatRepository;
+import com.martin.bookstore.models.format.persistence.entity.Format;
+import com.martin.bookstore.models.format.persistence.repository.FormatRepository;
 import com.martin.bookstore.models.language.persistence.entity.Language;
 import com.martin.bookstore.models.language.persistence.repository.LanguageRepository;
 import com.martin.bookstore.models.publisher.persistence.entity.Publisher;
@@ -26,7 +26,7 @@ public class BookServiceImpl implements BookService{
     private final EditionRepository editionRepository;
     private final LanguageRepository languageRepository;
     private final PublisherRepository publisherRepository;
-    private final BookFormatRepository bookFormatRepository;
+    private final FormatRepository formatRepository;
     private final SeriesRepository seriesRepository;
 
     private final BookMapper bookMapper;
@@ -36,12 +36,12 @@ public class BookServiceImpl implements BookService{
 
     public BookServiceImpl(BookRepository bookRepository, EditionRepository editionRepository,
                            LanguageRepository languageRepository, PublisherRepository publisherRepository,
-                           BookFormatRepository bookFormatRepository, SeriesRepository seriesRepository, BookMapper bookMapper) {
+                           FormatRepository formatRepository, SeriesRepository seriesRepository, BookMapper bookMapper) {
         this.bookRepository = bookRepository;
         this.editionRepository = editionRepository;
         this.languageRepository = languageRepository;
         this.publisherRepository = publisherRepository;
-        this.bookFormatRepository = bookFormatRepository;
+        this.formatRepository = formatRepository;
         this.seriesRepository = seriesRepository;
         this.bookMapper = bookMapper;
     }
@@ -101,8 +101,8 @@ public class BookServiceImpl implements BookService{
         }
 
         if (bookDto.getBookFormatId() != null) {
-            BookFormat format = bookFormatRepository.findById(bookDto.getBookFormatId()).orElseThrow();
-            book.setBookFormat(format);
+            Format format = formatRepository.findById(bookDto.getBookFormatId()).orElseThrow();
+            book.setFormat(format);
         }
 
         if (bookDto.getSeriesId() != null) {

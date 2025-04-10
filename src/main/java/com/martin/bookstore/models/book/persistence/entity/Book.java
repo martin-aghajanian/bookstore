@@ -1,7 +1,7 @@
 package com.martin.bookstore.models.book.persistence.entity;
 
 import com.martin.bookstore.models.edition.persistence.entity.Edition;
-import com.martin.bookstore.models.format.persistence.entity.BookFormat;
+import com.martin.bookstore.models.format.persistence.entity.Format;
 import com.martin.bookstore.models.language.persistence.entity.Language;
 import com.martin.bookstore.models.publisher.persistence.entity.Publisher;
 import com.martin.bookstore.models.series.persistence.entity.Series;
@@ -99,7 +99,7 @@ public class Book {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_format_id")
-    private BookFormat bookFormat;
+    private Format format;
 
     // many to many
 

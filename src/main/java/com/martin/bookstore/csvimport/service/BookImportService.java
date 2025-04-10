@@ -7,8 +7,8 @@ import com.martin.bookstore.models.book.persistence.repository.*;
 import com.martin.bookstore.models.character.persistence.repository.CharacterRepository;
 import com.martin.bookstore.models.edition.persistence.entity.Edition;
 import com.martin.bookstore.models.edition.persistence.repository.EditionRepository;
-import com.martin.bookstore.models.format.persistence.entity.BookFormat;
-import com.martin.bookstore.models.format.persistence.repository.BookFormatRepository;
+import com.martin.bookstore.models.format.persistence.entity.Format;
+import com.martin.bookstore.models.format.persistence.repository.FormatRepository;
 import com.martin.bookstore.models.genre.persistence.repository.GenreRepository;
 import com.martin.bookstore.models.language.persistence.entity.Language;
 import com.martin.bookstore.models.language.persistence.repository.LanguageRepository;
@@ -39,16 +39,16 @@ public class BookImportService {
     private final CsvUtils csvUtils;
 
     private final BookRepository bookRepository;
-    private final BookFormatRepository bookFormatRepository;
+    private final FormatRepository formatRepository;
     private final EditionRepository editionRepository;
     private final LanguageRepository languageRepository;
     private final PublisherRepository publisherRepository;
     private final SeriesRepository seriesRepository;
 
-    public BookImportService(CsvUtils csvUtils, BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, BookFormatRepository bookFormatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository, AwardRepository awardRepository, BookAwardRepository bookAwardRepository) {
+    public BookImportService(CsvUtils csvUtils, BookRepository bookRepository, BookAuthorRepository bookAuthorRepository, BookCharacterRepository bookCharacterRepository, FormatRepository formatRepository, BookGenreRepository bookGenreRepository, BookSettingRepository bookSettingRepository, CharacterRepository characterRepository, EditionRepository editionRepository, GenreRepository genreRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, SettingRepository settingRepository, AuthorRepository authorRepository, AwardRepository awardRepository, BookAwardRepository bookAwardRepository) {
         this.csvUtils = csvUtils;
         this.bookRepository = bookRepository;
-        this.bookFormatRepository = bookFormatRepository;
+        this.formatRepository = formatRepository;
         this.editionRepository = editionRepository;
         this.languageRepository = languageRepository;
         this.publisherRepository = publisherRepository;
@@ -206,7 +206,7 @@ public class BookImportService {
 
                     book.setCoverImageUrl(record.get("coverImg").trim());
 
-                    // many to one relations: Edition, Language, Publisher, BookFormat
+                    // many to one relations: Edition, Language, Publisher, Format
                     String editionName = record.get("edition").trim();
                     if (!editionName.isEmpty()) {
                         Edition edition = editionRepository.findByName(editionName).orElse(null);
@@ -227,8 +227,8 @@ public class BookImportService {
 
                     String formatName = record.get("bookFormat").trim();
                     if (!formatName.isEmpty()) {
-                        BookFormat format = bookFormatRepository.findByFormat(formatName).orElse(null);
-                        book.setBookFormat(format);
+                        Format format = formatRepository.findByFormat(formatName).orElse(null);
+                        book.setFormat(format);
                     }
 
                     // Series processing

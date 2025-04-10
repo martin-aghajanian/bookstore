@@ -7,8 +7,8 @@ import com.martin.bookstore.models.award.persistence.repository.AwardRepository;
 import com.martin.bookstore.models.character.persistence.repository.CharacterRepository;
 import com.martin.bookstore.models.edition.persistence.entity.Edition;
 import com.martin.bookstore.models.edition.persistence.repository.EditionRepository;
-import com.martin.bookstore.models.format.persistence.entity.BookFormat;
-import com.martin.bookstore.models.format.persistence.repository.BookFormatRepository;
+import com.martin.bookstore.models.format.persistence.entity.Format;
+import com.martin.bookstore.models.format.persistence.repository.FormatRepository;
 import com.martin.bookstore.models.genre.persistence.entity.Genre;
 import com.martin.bookstore.models.genre.persistence.repository.GenreRepository;
 import com.martin.bookstore.models.language.persistence.entity.Language;
@@ -40,7 +40,7 @@ public class EntitiesImportService {
     private final EditionRepository editionRepository;
     private final LanguageRepository languageRepository;
     private final PublisherRepository publisherRepository;
-    private final BookFormatRepository bookFormatRepository;
+    private final FormatRepository formatRepository;
     private final SeriesRepository seriesRepository;
 
     private final AuthorRepository authorRepository;
@@ -52,11 +52,11 @@ public class EntitiesImportService {
     private final CsvUtils csvUtils;
 
 
-    public EntitiesImportService(EditionRepository editionRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, BookFormatRepository bookFormatRepository, SeriesRepository seriesRepository, AuthorRepository authorRepository, AwardRepository awardRepository, CharacterRepository characterRepository, GenreRepository genreRepository, SettingRepository settingRepository, CsvUtils csvUtils) {
+    public EntitiesImportService(EditionRepository editionRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, FormatRepository formatRepository, SeriesRepository seriesRepository, AuthorRepository authorRepository, AwardRepository awardRepository, CharacterRepository characterRepository, GenreRepository genreRepository, SettingRepository settingRepository, CsvUtils csvUtils) {
         this.editionRepository = editionRepository;
         this.languageRepository = languageRepository;
         this.publisherRepository = publisherRepository;
-        this.bookFormatRepository = bookFormatRepository;
+        this.formatRepository = formatRepository;
         this.seriesRepository = seriesRepository;
         this.authorRepository = authorRepository;
         this.awardRepository = awardRepository;
@@ -250,13 +250,13 @@ public class EntitiesImportService {
 
             // save book formats
 
-            List<BookFormat> formatsToSave = new ArrayList<>();
+            List<Format> formatsToSave = new ArrayList<>();
             for (String bookFormat : uniqueBookFormats) {
-                BookFormat format = bookFormatRepository.findByFormat(bookFormat).orElse(new BookFormat());
+                Format format = formatRepository.findByFormat(bookFormat).orElse(new Format());
                 format.setFormat(bookFormat);
                 formatsToSave.add(format);
             }
-            csvUtils.batchSave(formatsToSave, bookFormatRepository);
+            csvUtils.batchSave(formatsToSave, formatRepository);
 
             // save series
 

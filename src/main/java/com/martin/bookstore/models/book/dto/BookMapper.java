@@ -3,8 +3,8 @@ package com.martin.bookstore.models.book.dto;
 import com.martin.bookstore.models.book.persistence.entity.Book;
 import com.martin.bookstore.models.edition.persistence.entity.Edition;
 import com.martin.bookstore.models.edition.persistence.repository.EditionRepository;
-import com.martin.bookstore.models.format.persistence.entity.BookFormat;
-import com.martin.bookstore.models.format.persistence.repository.BookFormatRepository;
+import com.martin.bookstore.models.format.persistence.entity.Format;
+import com.martin.bookstore.models.format.persistence.repository.FormatRepository;
 import com.martin.bookstore.models.language.persistence.entity.Language;
 import com.martin.bookstore.models.language.persistence.repository.LanguageRepository;
 import com.martin.bookstore.models.publisher.persistence.entity.Publisher;
@@ -20,14 +20,14 @@ public class BookMapper {
     private final LanguageRepository languageRepository;
     private final PublisherRepository publisherRepository;
     private final SeriesRepository seriesRepository;
-    private final BookFormatRepository bookFormatRepository;
+    private final FormatRepository formatRepository;
 
-    public BookMapper(EditionRepository editionRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, BookFormatRepository bookFormatRepository) {
+    public BookMapper(EditionRepository editionRepository, LanguageRepository languageRepository, PublisherRepository publisherRepository, SeriesRepository seriesRepository, FormatRepository formatRepository) {
         this.editionRepository = editionRepository;
         this.languageRepository = languageRepository;
         this.publisherRepository = publisherRepository;
         this.seriesRepository = seriesRepository;
-        this.bookFormatRepository = bookFormatRepository;
+        this.formatRepository = formatRepository;
     }
 
     public BookDto toDto(Book book) {
@@ -56,7 +56,7 @@ public class BookMapper {
         dto.setSeriesId(book.getSeries() != null ? book.getSeries().getId() : null);
         dto.setLanguageId(book.getLanguage() != null ? book.getLanguage().getId() : null);
         dto.setPublisherId(book.getPublisher() != null ? book.getPublisher().getId() : null);
-        dto.setBookFormatId(book.getBookFormat() != null ? book.getBookFormat().getId() : null);
+        dto.setBookFormatId(book.getFormat() != null ? book.getFormat().getId() : null);
 
         return dto;
     }
@@ -103,8 +103,8 @@ public class BookMapper {
         }
 
         if (dto.getBookFormatId() != null) {
-            BookFormat format = bookFormatRepository.findById(dto.getBookFormatId()).orElseThrow();
-            book.setBookFormat(format);
+            Format format = formatRepository.findById(dto.getBookFormatId()).orElseThrow();
+            book.setFormat(format);
         }
 
 

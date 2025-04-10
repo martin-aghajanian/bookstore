@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class BookFormat {
+public class Format {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
