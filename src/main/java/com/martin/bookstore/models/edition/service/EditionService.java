@@ -1,16 +1,19 @@
 package com.martin.bookstore.models.edition.service;
 
-import com.martin.bookstore.models.edition.persistence.repository.EditionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.martin.bookstore.models.edition.dto.EditionDto;
 
-@Service
-public class EditionService {
+import java.util.List;
 
-    private final EditionRepository editionRepository;
+public interface EditionService {
 
-    @Autowired
-    public EditionService(EditionRepository editionRepository) {
-        this.editionRepository = editionRepository;
-    }
+    List<EditionDto> getAllEditions();
+
+    EditionDto getEditionById(Long id);
+
+    EditionDto createEdition(EditionDto editionDto);
+
+    EditionDto updateEdition(Long id, EditionDto updateEditionDto);
+
+    void deleteEdition(Long id);
+
 }
