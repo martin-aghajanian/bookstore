@@ -1,16 +1,19 @@
 package com.martin.bookstore.models.setting.service;
 
-import com.martin.bookstore.models.setting.persistence.repository.SettingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.martin.bookstore.models.setting.dto.SettingDto;
 
-@Service
-public class SettingService {
+import java.util.List;
 
-    private final SettingRepository settingRepository;
+public interface SettingService {
 
-    @Autowired
-    public SettingService(SettingRepository settingRepository) {
-        this.settingRepository = settingRepository;
-    }
+    List<SettingDto> getAllSettings();
+
+    SettingDto getSettingById(Long id);
+
+    SettingDto createSetting(SettingDto settingDto);
+
+    SettingDto updateSetting(Long id, SettingDto updatedSettingDto);
+
+    void deleteSetting(Long id);
+
 }
