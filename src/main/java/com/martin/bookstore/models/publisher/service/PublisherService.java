@@ -1,16 +1,20 @@
 package com.martin.bookstore.models.publisher.service;
 
-import com.martin.bookstore.models.publisher.persistence.repository.PublisherRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
-public class PublisherService {
+import com.martin.bookstore.models.publisher.dto.PublisherDto;
 
-    private final PublisherRepository publisherRepository;
+import java.util.List;
 
-    @Autowired
-    public PublisherService(PublisherRepository publisherRepository) {
-        this.publisherRepository = publisherRepository;
-    }
+public interface PublisherService {
+
+    List<PublisherDto> getAllPublishers();
+
+    PublisherDto getPublisherById(Long id);
+
+    PublisherDto createPublisher(PublisherDto publisherDto);
+
+    PublisherDto updatePublisher(Long id, PublisherDto updatedPublisherDto);
+
+    void deletePublisher(Long id);
+
 }
