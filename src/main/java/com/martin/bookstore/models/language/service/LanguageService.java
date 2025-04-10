@@ -1,16 +1,19 @@
 package com.martin.bookstore.models.language.service;
 
-import com.martin.bookstore.models.language.persistence.repository.LanguageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
-public class LanguageService {
+import com.martin.bookstore.models.language.dto.LanguageDto;
 
-    private final LanguageRepository languageRepository;
+import java.util.List;
 
-    @Autowired
-    public LanguageService(LanguageRepository languageRepository) {
-        this.languageRepository = languageRepository;
-    }
+public interface LanguageService {
+
+    List<LanguageDto> getAllLanguages();
+
+    LanguageDto getLanguageById(Long id);
+
+    LanguageDto createLanguage(LanguageDto languageDto);
+
+    LanguageDto updateLanguage(Long id, LanguageDto updateLanguageDto);
+
+    void deleteLanguage(Long id);
 }
