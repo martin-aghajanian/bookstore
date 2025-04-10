@@ -4,6 +4,8 @@ import com.martin.bookstore.models.author.dto.AuthorDto;
 import com.martin.bookstore.models.author.dto.AuthorMapper;
 import com.martin.bookstore.models.author.persistence.entity.Author;
 import com.martin.bookstore.models.author.persistence.repository.AuthorRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,6 +66,11 @@ public class AuthorServiceImpl implements AuthorService{
     public List<AuthorDto> filterByGoodreadsAuthor(boolean goodreads) {
         return authorRepository.findByGoodReadsAuthor(goodreads)
                 .stream().map(authorMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<AuthorDto> getAuthorsPaginated(Pageable pageable) {
+        return authorRepository.findAll(pageable).map(authorMapper::toDto);
     }
 
 

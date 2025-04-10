@@ -3,6 +3,8 @@ package com.martin.bookstore.models.author.controller;
 import com.martin.bookstore.models.author.dto.AuthorDto;
 import com.martin.bookstore.models.author.service.AuthorService;
 import com.martin.bookstore.models.author.service.AuthorServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,6 +52,14 @@ public class AuthorController {
     @GetMapping("/filter")
     public List<AuthorDto> filterByGoodreads(@RequestParam boolean goodreads) {
         return authorService.filterByGoodreadsAuthor(goodreads);
+    }
+
+    @GetMapping("/paginated")
+    public Page<AuthorDto> getAuthorsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return authorService.getAuthorsPaginated(PageRequest.of(page, size));
     }
 
 }

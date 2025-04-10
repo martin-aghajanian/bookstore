@@ -1,6 +1,8 @@
 package com.martin.bookstore.models.author.service;
 
 import com.martin.bookstore.models.author.dto.AuthorDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,4 +21,6 @@ public interface AuthorService {
     List<AuthorDto> searchAuthorsByName(String name);
 
     List<AuthorDto> filterByGoodreadsAuthor(boolean goodreads);
+
+    Page<AuthorDto> getAuthorsPaginated(Pageable pageable);
 }
