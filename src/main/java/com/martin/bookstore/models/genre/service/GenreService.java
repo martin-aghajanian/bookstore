@@ -1,16 +1,18 @@
 package com.martin.bookstore.models.genre.service;
 
-import com.martin.bookstore.models.genre.persistence.repository.GenreRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.martin.bookstore.models.genre.dto.GenreDto;
 
-@Service
-public class GenreService {
+import java.util.List;
 
-    private final GenreRepository genreRepository;
+public interface GenreService {
 
-    @Autowired
-    public GenreService(GenreRepository genreRepository) {
-        this.genreRepository = genreRepository;
-    }
+    List<GenreDto> getAllGenres();
+
+    GenreDto getGenreById(Long id);
+
+    GenreDto createGenre(GenreDto genreDto);
+
+    GenreDto updateGenre(Long id, GenreDto updatedGenreDto);
+
+    void deleteGenre(Long id);
 }
