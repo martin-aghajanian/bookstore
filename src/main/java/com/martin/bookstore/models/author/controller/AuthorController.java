@@ -1,7 +1,7 @@
 package com.martin.bookstore.models.author.controller;
 
 import com.martin.bookstore.models.author.dto.AuthorDto;
-import com.martin.bookstore.models.author.service.AuthorService;
+import com.martin.bookstore.models.author.service.AuthorServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +10,35 @@ import java.util.List;
 @RequestMapping("api/v1/authors")
 public class AuthorController {
 
-    private final AuthorService authorService;
+    private final AuthorServiceImpl authorServiceImpl;
 
-    public AuthorController(AuthorService authorService) {
-        this.authorService = authorService;
+    public AuthorController(AuthorServiceImpl authorServiceImpl) {
+        this.authorServiceImpl = authorServiceImpl;
     }
 
     @GetMapping
     public List<AuthorDto> getAllAuthors() {
-        return authorService.getAllAuthors();
+        return authorServiceImpl.getAllAuthors();
     }
 
     @GetMapping("/{id}")
     public AuthorDto getAuthorById(@PathVariable Long id) {
-        return authorService.getAuthorById(id).orElse(null);
+        return authorServiceImpl.getAuthorById(id);
     }
 
     @PostMapping
     public AuthorDto createAuthor(@RequestBody AuthorDto authorDto) {
-        return authorService.createAuthor(authorDto);
+        return authorServiceImpl.createAuthor(authorDto);
     }
 
     @PutMapping("/{id}")
     public AuthorDto updateAuthor(@PathVariable Long id, @RequestBody AuthorDto authorDto) {
-        return authorService.updateAuthor(id, authorDto);
+        return authorServiceImpl.updateAuthor(id, authorDto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteAuthor(@PathVariable Long id) {
-        authorService.deleteAuthor(id);
+        authorServiceImpl.deleteAuthor(id);
     }
 
 }

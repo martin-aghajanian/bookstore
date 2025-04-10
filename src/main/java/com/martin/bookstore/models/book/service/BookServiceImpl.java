@@ -64,7 +64,7 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public BookDto updateBook(Long id, BookDto bookDto) {
-        Book book = bookRepository.findById(id).orElseThrow();
+        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("book not found with id: " + id));
 
         book.setIsbn(bookDto.getIsbn());
         book.setTitle(bookDto.getTitle());
