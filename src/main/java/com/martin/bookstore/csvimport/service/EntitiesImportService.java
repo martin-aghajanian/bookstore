@@ -173,10 +173,12 @@ public class EntitiesImportService {
                 String awardsCol = record.get("awards").trim();
                 if (awardsCol.startsWith("[") && awardsCol.endsWith("]"))
                     awardsCol = awardsCol.substring(1, awardsCol.length() - 1);
+
                 for (String awardStr : awardsCol.split(",")) {
-                    String[] parts = awardStr.trim().split("\\(");
-                    if (parts.length > 0) {
-                        String name = parts[0].replaceAll("[\"']", "").trim();
+                    awardStr = awardStr.trim().replaceAll("[\"']", "");
+                    int lastParenIndex = awardStr.lastIndexOf(" (");
+                    if (lastParenIndex != -1) {
+                        String name = awardStr.substring(0, lastParenIndex).trim();
                         if (!name.isEmpty()) {
                             uniqueAwards.add(name);
                         }

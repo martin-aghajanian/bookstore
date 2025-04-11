@@ -36,7 +36,7 @@ public class CsvImportController {
         try {
             entitiesImportService.populateEntityTables(file);
             bookImportService.populateBooksTable(file);
-//            junctionTablesImportService.populateJunctionTables(file);
+            junctionTablesImportService.populateJunctionTables(file);
             return ResponseEntity.ok("csv file processed.");
 
         } catch (Exception e) {

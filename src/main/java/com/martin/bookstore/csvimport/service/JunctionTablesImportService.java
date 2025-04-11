@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class JunctionTablesImportService {
@@ -78,9 +79,25 @@ public class JunctionTablesImportService {
 
             for (CSVRecord record : parser) {
                 String isbnStr = record.get("isbn").trim();
+                String titleFromCsv = record.get("title").trim();
+
+                if (!isbnStr.matches("\\d{13}")) {
+                    System.out.println("Invalid ISBN format (must be 13 digits): " + isbnStr + ". Skipping record.");
+                    continue;
+                }
+
                 Long bookIsbn = Long.parseLong(isbnStr);
-                Book book = bookRepository.findByIsbn(bookIsbn).orElse(null);
-                if (book == null) {
+
+                Optional<Book> optionalBook = bookRepository.findByIsbn(bookIsbn);
+                if (optionalBook.isEmpty()) {
+                    System.out.println("No book found in DB for ISBN: " + bookIsbn);
+                    continue;
+                }
+
+                Book book = optionalBook.get();
+                if (!book.getTitle().equalsIgnoreCase(titleFromCsv)) {
+                    System.out.println("Skipping due to title mismatch for ISBN " + bookIsbn +
+                            ": CSV title = '" + titleFromCsv + "', DB title = '" + book.getTitle() + "'");
                     continue;
                 }
 
@@ -108,13 +125,16 @@ public class JunctionTablesImportService {
 
                 // awards
                 String awardsColumn = record.get("awards").trim();
-                if (awardsColumn.startsWith("[") && awardsColumn.endsWith("]"))
+                if (awardsColumn.startsWith("[") && awardsColumn.endsWith("]")) {
                     awardsColumn = awardsColumn.substring(1, awardsColumn.length() - 1);
+                }
+
                 for (String awardStr : awardsColumn.split(",")) {
-                    String[] parts = awardStr.trim().split("\\(");
-                    if (parts.length > 0) {
-                        String awardName = parts[0].replaceAll("[\"']", "").trim();
-                        String yearStr = parts[1].replace(")", "").trim();
+                    awardStr = awardStr.trim().replaceAll("[\"']", "");
+                    int lastParenIndex = awardStr.lastIndexOf(" (");
+                    if (lastParenIndex != -1) {
+                        String awardName = awardStr.substring(0, lastParenIndex).trim();
+                        String yearStr = awardStr.substring(lastParenIndex + 2).replace(")", "").trim();
 
                         try {
                             int year = Integer.parseInt(yearStr);
@@ -126,8 +146,9 @@ public class JunctionTablesImportService {
                                 ba.setYear(LocalDate.of(year, 1, 1));
                                 bookAwards.add(ba);
                             }
-                        } catch (NumberFormatException ignored) {}
-
+                        } catch (NumberFormatException e) {
+                            // skipp invalid year formats
+                        }
                     }
                 }
 
@@ -148,8 +169,9 @@ public class JunctionTablesImportService {
 
                 // characters
                 String charCol = record.get("characters").trim();
-                if (charCol.startsWith("[") && charCol.endsWith("]"))
+                if (charCol.startsWith("[") && charCol.endsWith("]")) {
                     charCol = charCol.substring(1, charCol.length() - 1);
+                }
                 for (String charStr : charCol.split(",")) {
                     charStr = charStr.replaceAll("[\"']", "").trim();
                     Character character = characterRepository.findByName(charStr).orElse(null);
@@ -178,12 +200,10 @@ public class JunctionTablesImportService {
                             bookSettings.add(bs);
                         }
                     }
-
-
                 }
             }
 
-//            csvUtils.batchSave(bookAuthors, bookAuthorRepository);
+            csvUtils.batchSave(bookAuthors, bookAuthorRepository);
             csvUtils.batchSave(bookAwards, bookAwardRepository);
             csvUtils.batchSave(bookGenres, bookGenreRepository);
             csvUtils.batchSave(bookCharacters, bookCharacterRepository);
