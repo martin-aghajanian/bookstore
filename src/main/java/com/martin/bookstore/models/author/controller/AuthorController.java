@@ -19,11 +19,6 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
-    @GetMapping
-    public List<AuthorDto> getAllAuthors() {
-        return authorService.getAllAuthors();
-    }
-
     @GetMapping("/{id}")
     public AuthorDto getAuthorById(@PathVariable Long id) {
         return authorService.getAuthorById(id);
@@ -54,12 +49,16 @@ public class AuthorController {
         return authorService.filterByGoodreadsAuthor(goodreads);
     }
 
-    @GetMapping("/paginated")
-    public Page<AuthorDto> getAuthorsPaginated(
+    @GetMapping
+    public Page<AuthorDto> filterAuthors(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean goodreads,
+            @RequestParam(required = false) String bookTitle,
+            @RequestParam(required = false) String contribution,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return authorService.getAuthorsPaginated(PageRequest.of(page, size));
+        return authorService.filterAuthors(name, goodreads, bookTitle, contribution, PageRequest.of(page, size));
     }
 
 }

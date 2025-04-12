@@ -68,9 +68,15 @@ public class AuthorServiceImpl implements AuthorService{
                 .stream().map(authorMapper::toDto).collect(Collectors.toList());
     }
 
+//    @Override
+//    public Page<AuthorDto> getAuthorsPaginated(Pageable pageable) {
+//        return authorRepository.findAll(pageable).map(authorMapper::toDto);
+//    }
+
     @Override
-    public Page<AuthorDto> getAuthorsPaginated(Pageable pageable) {
-        return authorRepository.findAll(pageable).map(authorMapper::toDto);
+    public Page<AuthorDto> filterAuthors(String name, Boolean goodreads, String bookTitle, String contribution, Pageable pageable) {
+        return authorRepository.filterAuthors(Optional.ofNullable(name).orElse(""), goodreads, bookTitle, contribution, pageable)
+                .map(authorMapper::toDto);
     }
 
 

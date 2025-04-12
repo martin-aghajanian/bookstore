@@ -22,5 +22,7 @@ public interface AuthorService {
 
     List<AuthorDto> filterByGoodreadsAuthor(boolean goodreads);
 
-    Page<AuthorDto> getAuthorsPaginated(Pageable pageable);
+//    Page<AuthorDto> getAuthorsPaginated(Pageable pageable);
+
+    Page<AuthorDto> filterAuthors(String name, Boolean goodreads, String bookTitle, String contribution, Pageable pageable);
 }
