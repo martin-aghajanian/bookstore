@@ -1,9 +1,6 @@
 package com.martin.bookstore.csvimport.controller;
 
-import com.martin.bookstore.csvimport.service.BookImportService;
-import com.martin.bookstore.csvimport.service.EntitiesImportService;
-import com.martin.bookstore.csvimport.service.JunctionTablesImportService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.martin.bookstore.csvimport.service.CsvImportService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,15 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("api/v1/csv-upload")
 public class CsvImportController {
 
-    private final EntitiesImportService entitiesImportService;
-    private final BookImportService bookImportService;
-    private final JunctionTablesImportService junctionTablesImportService;
+    private final CsvImportService csvImportService;
 
-    @Autowired
-    public CsvImportController(EntitiesImportService entitiesImportService, BookImportService bookImportService, JunctionTablesImportService junctionTablesImportService) {
-        this.entitiesImportService = entitiesImportService;
-        this.bookImportService = bookImportService;
-        this.junctionTablesImportService = junctionTablesImportService;
+    public CsvImportController(CsvImportService csvImportService) {
+        this.csvImportService = csvImportService;
     }
 
     @PostMapping(consumes = "multipart/form-data")
@@ -34,9 +26,7 @@ public class CsvImportController {
             return ResponseEntity.badRequest().body("file is empty.");
         }
         try {
-            entitiesImportService.populateEntityTables(file);
-            bookImportService.populateBooksTable(file);
-            junctionTablesImportService.populateJunctionTables(file);
+            csvImportService.importCsv(file);
             return ResponseEntity.ok("csv file processed.");
 
         } catch (Exception e) {
