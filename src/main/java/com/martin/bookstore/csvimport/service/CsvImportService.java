@@ -2,28 +2,25 @@ package com.martin.bookstore.csvimport.service;
 
 import com.martin.bookstore.csvimport.enums.CsvHeader;
 import com.martin.bookstore.csvimport.utils.CsvUtils;
-import com.martin.bookstore.models.author.persistence.entity.Author;
-import com.martin.bookstore.models.author.persistence.repository.AuthorRepository;
-import com.martin.bookstore.models.award.persistence.entity.Award;
-import com.martin.bookstore.models.award.persistence.repository.AwardRepository;
-import com.martin.bookstore.models.book.persistence.entity.*;
-import com.martin.bookstore.models.book.persistence.repository.*;
-import com.martin.bookstore.models.character.persistence.entity.Character;
-import com.martin.bookstore.models.character.persistence.repository.CharacterRepository;
-import com.martin.bookstore.models.edition.persistence.entity.Edition;
-import com.martin.bookstore.models.edition.persistence.repository.EditionRepository;
-import com.martin.bookstore.models.format.persistence.entity.Format;
-import com.martin.bookstore.models.format.persistence.repository.FormatRepository;
-import com.martin.bookstore.models.genre.persistence.entity.Genre;
-import com.martin.bookstore.models.genre.persistence.repository.GenreRepository;
-import com.martin.bookstore.models.language.persistence.entity.Language;
-import com.martin.bookstore.models.language.persistence.repository.LanguageRepository;
-import com.martin.bookstore.models.publisher.persistence.entity.Publisher;
-import com.martin.bookstore.models.publisher.persistence.repository.PublisherRepository;
-import com.martin.bookstore.models.series.persistence.entity.Series;
-import com.martin.bookstore.models.series.persistence.repository.SeriesRepository;
-import com.martin.bookstore.models.setting.persistence.entity.Setting;
-import com.martin.bookstore.models.setting.persistence.repository.SettingRepository;
+import com.martin.bookstore.entity.*;
+import com.martin.bookstore.repository.*;
+import com.martin.bookstore.entity.Character;
+import com.martin.bookstore.repository.CharacterRepository;
+import com.martin.bookstore.entity.Edition;
+import com.martin.bookstore.repository.EditionRepository;
+import com.martin.bookstore.entity.Format;
+import com.martin.bookstore.repository.FormatRepository;
+import com.martin.bookstore.entity.Genre;
+import com.martin.bookstore.repository.GenreRepository;
+import com.martin.bookstore.entity.Language;
+import com.martin.bookstore.repository.LanguageRepository;
+import com.martin.bookstore.entity.Publisher;
+import com.martin.bookstore.repository.PublisherRepository;
+import com.martin.bookstore.entity.Series;
+import com.martin.bookstore.repository.SeriesRepository;
+import com.martin.bookstore.entity.Setting;
+import com.martin.bookstore.repository.SettingRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -40,6 +37,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CsvImportService {
 
     private final CsvUtils csvUtils;
@@ -59,34 +57,6 @@ public class CsvImportService {
     private final BookGenreRepository bookGenreRepository;
     private final BookCharacterRepository bookCharacterRepository;
     private final BookSettingRepository bookSettingRepository;
-
-    public CsvImportService(CsvUtils csvUtils, BookRepository bookRepository, AuthorRepository authorRepository,
-                            AwardRepository awardRepository, CharacterRepository characterRepository,
-                            GenreRepository genreRepository, SettingRepository settingRepository,
-                            FormatRepository formatRepository, EditionRepository editionRepository,
-                            LanguageRepository languageRepository, PublisherRepository publisherRepository,
-                            SeriesRepository seriesRepository, BookAuthorRepository bookAuthorRepository,
-                            BookAwardRepository bookAwardRepository, BookGenreRepository bookGenreRepository,
-                            BookCharacterRepository bookCharacterRepository,
-                            BookSettingRepository bookSettingRepository) {
-        this.csvUtils = csvUtils;
-        this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
-        this.awardRepository = awardRepository;
-        this.characterRepository = characterRepository;
-        this.genreRepository = genreRepository;
-        this.settingRepository = settingRepository;
-        this.formatRepository = formatRepository;
-        this.editionRepository = editionRepository;
-        this.languageRepository = languageRepository;
-        this.publisherRepository = publisherRepository;
-        this.seriesRepository = seriesRepository;
-        this.bookAuthorRepository = bookAuthorRepository;
-        this.bookAwardRepository = bookAwardRepository;
-        this.bookGenreRepository = bookGenreRepository;
-        this.bookCharacterRepository = bookCharacterRepository;
-        this.bookSettingRepository = bookSettingRepository;
-    }
 
     public void importCsv(MultipartFile file) {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
@@ -124,23 +94,18 @@ public class CsvImportService {
             Map<String, Series> seriesDbMap = seriesRepository.findAll()
                     .stream().collect(Collectors.toMap(Series::getName, s -> s));
 
-
-
             Map<String, Edition> editions = new HashMap<>();
             Map<String, Language> languages = new HashMap<>();
             Map<String, Publisher> publishers = new HashMap<>();
             Map<String, Format> formats = new HashMap<>();
             Map<String, Series> seriesSet = new HashMap<>();
-
             Map<String, Award> awards = new HashMap<>();
             Map<String, Genre> genres = new HashMap<>();
             Map<String, Character> characters = new HashMap<>();
             Map<String, Setting> settings = new HashMap<>();
-
             Map<String, Author> authorsMap = new HashMap<>();
 
             List<Book> books = new ArrayList<>();
-
 
             Set<Long> existingIsbns = bookRepository.findAll()
                     .stream()
