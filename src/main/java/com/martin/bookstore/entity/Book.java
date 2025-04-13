@@ -73,6 +73,11 @@ public class Book {
     @Column(name = "cover_image_url")
     private String coverImageUrl;
 
+    // one to many
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<FileInfo> fileInfos;
+
     // many to one
 
     @ManyToOne(fetch = FetchType.LAZY)
