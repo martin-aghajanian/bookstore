@@ -17,7 +17,7 @@ public class FileInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "url")
+    @Column(name = "url", unique = true, nullable = false)
     private String url;
 
     @Column(name = "local_path")
