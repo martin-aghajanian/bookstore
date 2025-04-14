@@ -1,5 +1,8 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.enums.CoverImageFileName;
+import com.martin.bookstore.core.enums.CoverImageSize;
+import com.martin.bookstore.core.enums.FileType;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.FileInfo;
 import com.martin.bookstore.repository.BookRepository;
@@ -85,16 +88,20 @@ public class CoverImageService {
 
             if (isAccessible) {
                 Files.createDirectories(thumbDir);
-                Path fullImagePath = bookDir.resolve("full.jpg");
+                Path fullImagePath = bookDir.resolve(CoverImageFileName.FULL.getFileName());
                 downloadImage(imageUrl, fullImagePath);
 
-                createThumbnail(fullImagePath, thumbDir.resolve("small.jpg"), 100, 150);
+                createThumbnail(fullImagePath, thumbDir.resolve(
+                        CoverImageFileName.SMALL.getFileName()),
+                        CoverImageSize.SMALL.getWidth(),
+                        CoverImageSize.SMALL.getHeight()
+                );
 //                createThumbnail(fullImagePath, thumbDir.resolve("medium.jpg"), 200, 300);
 //                createThumbnail(fullImagePath, thumbDir.resolve("large.jpg"), 400, 600);
 
                 if (existing != null) {
                     existing.setIsAccessible(true);
-                    existing.setFileType("jpg");
+                    existing.setFileType(FileType.JPG.getType());
                     existing.setLocalPath(fullImagePath.toString());
                     fileInfosToSave.add(existing);
                 } else {
@@ -102,7 +109,7 @@ public class CoverImageService {
                     fileInfo.setBook(book);
                     fileInfo.setUrl(imageUrl);
                     fileInfo.setIsAccessible(true);
-                    fileInfo.setFileType("jpg");
+                    fileInfo.setFileType(FileType.JPG.getType());
                     fileInfo.setLocalPath(fullImagePath.toString());
                     fileInfosToSave.add(fileInfo);
                 }
@@ -110,7 +117,7 @@ public class CoverImageService {
             } else {
                 if (existing != null) {
                     existing.setIsAccessible(false);
-                    existing.setFileType("unknown");
+                    existing.setFileType(FileType.UNKNOWN.getType());
                     existing.setLocalPath(null);
                     fileInfosToSave.add(existing);
                 } else {
@@ -118,7 +125,7 @@ public class CoverImageService {
                     fileInfo.setBook(book);
                     fileInfo.setUrl(imageUrl);
                     fileInfo.setIsAccessible(false);
-                    fileInfo.setFileType("unknown");
+                    fileInfo.setFileType(FileType.UNKNOWN.getType());
                     fileInfo.setLocalPath(null);
                     fileInfosToSave.add(fileInfo);
                 }
@@ -128,7 +135,7 @@ public class CoverImageService {
             FileInfo fileInfo = urlToFileInfo.get(imageUrl);
             if (fileInfo != null) {
                 fileInfo.setIsAccessible(false);
-                fileInfo.setFileType("unknown");
+                fileInfo.setFileType(FileType.UNKNOWN.getType());
                 fileInfo.setLocalPath(null);
                 fileInfosToSave.add(fileInfo);
             } else {
@@ -136,7 +143,7 @@ public class CoverImageService {
                 newFileInfo.setBook(book);
                 newFileInfo.setUrl(imageUrl);
                 newFileInfo.setIsAccessible(false);
-                newFileInfo.setFileType("unknown");
+                newFileInfo.setFileType(FileType.UNKNOWN.getType());
                 newFileInfo.setLocalPath(null);
                 fileInfosToSave.add(newFileInfo);
             }
