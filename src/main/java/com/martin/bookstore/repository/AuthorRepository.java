@@ -21,18 +21,14 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
     List<Author> findByGoodReadsAuthor(boolean goodReadsAuthor);
 
     @Query("""
-    SELECT DISTINCT a FROM Author a
-    LEFT JOIN a.bookAuthor ba
-    LEFT JOIN ba.book b
-    WHERE (:name = '' OR (LOWER(a.fullName) LIKE LOWER(CONCAT('%', :name, '%'))))
-    AND (:goodreads IS NULL OR a.goodReadsAuthor = :goodreads)
-    AND (:bookTitle IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :bookTitle, '%')))
-    AND (:contribution IS NULL OR LOWER(ba.contribution) LIKE LOWER(CONCAT('%', :contribution, '%')))
+        SELECT a FROM Author a
+        JOIN a.bookAuthor ba
+        WHERE (:goodreads IS NULL OR a.goodReadsAuthor = :goodreads)
+        AND (:contribution IS NULL OR LOWER(ba.contribution) LIKE LOWER(CONCAT('%', :contribution, '%')))
     """)
-    Page<Author> filterAuthors(@Param("name") String name,
-                               @Param("goodreads") Boolean goodreads,
-                               @Param("bookTitle") String bookTitle,
+    Page<Author> filterAuthors(@Param("goodreads") Boolean goodreads,
                                @Param("contribution") String contribution,
                                Pageable pageable);
 
+    Page<Author> findByFullNameContainingIgnoreCase(String name, Pageable pageable);
 }

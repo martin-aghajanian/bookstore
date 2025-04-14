@@ -23,10 +23,6 @@ public class AuthorService {
         this.authorMapper = authorMapper;
     }
 
-    public List<AuthorResponseDto> getAllAuthors() {
-        return authorMapper.asOutput(authorRepository.findAll());
-    }
-
     public AuthorResponseDto getAuthorById(Long id) {
         return authorRepository.findById(id)
                 .map(authorMapper::asOutput)
@@ -46,25 +42,24 @@ public class AuthorService {
     }
 
     public void deleteAuthor(Long id) {
-        authorRepository.deleteById(id);
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Author not found"));
+
+        if (!author.getBookAuthor().isEmpty()) {
+            throw new IllegalStateException("Cannot delete author: they are associated with books.");
+        }
+
+        authorRepository.delete(author);
     }
 
-    public List<AuthorResponseDto> searchAuthorsByName(String name) {
-        return authorMapper.asOutput(authorRepository.findByFullNameContainingIgnoreCase(name));
+    public Page<AuthorResponseDto> filterAuthors(Boolean goodreads, String contribution, Pageable pageable) {
+        return authorRepository.filterAuthors(goodreads, contribution, pageable)
+                .map(authorMapper::asOutput);
     }
 
-    public List<AuthorResponseDto> filterByGoodreadsAuthor(boolean goodreads) {
-        return authorMapper.asOutput(authorRepository.findByGoodReadsAuthor(goodreads));
-    }
-
-    public Page<AuthorResponseDto> filterAuthors(String name, Boolean goodreads, String bookTitle, String contribution, Pageable pageable) {
-        return authorRepository.filterAuthors(
-                Optional.ofNullable(name).orElse(""),
-                goodreads,
-                bookTitle,
-                contribution,
-                pageable
-        ).map(authorMapper::asOutput);
+    public Page<AuthorResponseDto> searchAuthorsByName(String name, Pageable pageable) {
+        return authorRepository.findByFullNameContainingIgnoreCase(name, pageable)
+                .map(authorMapper::asOutput);
     }
 }
 

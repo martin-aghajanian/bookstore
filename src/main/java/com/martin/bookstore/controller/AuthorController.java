@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.AuthorRequestDto;
 import com.martin.bookstore.dto.response.AuthorResponseDto;
 import com.martin.bookstore.service.AuthorService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/authors")
+@RequiredArgsConstructor
 public class AuthorController {
 
     private final AuthorService authorService;
-
-    public AuthorController(AuthorService authorService) {
-        this.authorService = authorService;
-    }
 
     @GetMapping("/{id}")
     public AuthorResponseDto getAuthorById(@PathVariable Long id) {
@@ -39,13 +37,19 @@ public class AuthorController {
 
     @GetMapping
     public Page<AuthorResponseDto> filterAuthors(
-            @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean goodreads,
-            @RequestParam(required = false) String bookTitle,
             @RequestParam(required = false) String contribution,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return authorService.filterAuthors(name, goodreads, bookTitle, contribution, PageRequest.of(page, size));
+        return authorService.filterAuthors(goodreads, contribution, PageRequest.of(page, size));
     }
+
+    @GetMapping("/search")
+    public Page<AuthorResponseDto> searchAuthors(@RequestParam String name,
+                                                 @RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size) {
+        return authorService.searchAuthorsByName(name, PageRequest.of(page, size));
+    }
+
 }
