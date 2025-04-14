@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.LanguageDto;
-import com.martin.bookstore.core.mapper.LanguageMapper;
+import com.martin.bookstore.dto.old.LanguageDto;
+import com.martin.bookstore.core.mapper.old.LanguageMapper;
 import com.martin.bookstore.entity.Language;
 import com.martin.bookstore.repository.LanguageRepository;
 import org.springframework.stereotype.Service;

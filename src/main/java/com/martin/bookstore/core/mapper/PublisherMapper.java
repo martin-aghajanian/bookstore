@@ -1,24 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.PublisherDto;
 import com.martin.bookstore.entity.Publisher;
+import com.martin.bookstore.dto.request.PublisherRequestDto;
+import com.martin.bookstore.dto.response.PublisherResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class PublisherMapper {
+@Mapper(componentModel = "spring")
+public interface PublisherMapper {
 
-    public PublisherDto toDto(Publisher publisher) {
-        PublisherDto publisherDto = new PublisherDto();
-        publisherDto.setId(publisher.getId());
-        publisherDto.setName(publisher.getName());
-        return publisherDto;
-    }
+    Publisher asEntity(PublisherRequestDto dto);
 
-    public Publisher toEntity(PublisherDto publisherDto) {
-        Publisher publisher = new Publisher();
-        publisher.setId(publisherDto.getId());
-        publisher.setName(publisherDto.getName());
-        return publisher;
-    }
+    PublisherResponseDto asOutput(Publisher entity);
 
+    List<PublisherResponseDto> asOutput(List<Publisher> entities);
+
+    void update(@MappingTarget Publisher entity, PublisherRequestDto dto);
 }

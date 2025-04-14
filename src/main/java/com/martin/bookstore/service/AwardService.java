@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.AwardDto;
-import com.martin.bookstore.core.mapper.AwardMapper;
+import com.martin.bookstore.dto.old.AwardDto;
+import com.martin.bookstore.core.mapper.old.AwardMapper;
 import com.martin.bookstore.entity.Award;
 import com.martin.bookstore.repository.AwardRepository;
 import org.springframework.stereotype.Service;

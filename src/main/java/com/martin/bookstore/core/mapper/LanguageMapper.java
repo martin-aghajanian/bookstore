@@ -1,24 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.LanguageDto;
 import com.martin.bookstore.entity.Language;
+import com.martin.bookstore.dto.request.LanguageRequestDto;
+import com.martin.bookstore.dto.response.LanguageResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class LanguageMapper {
+@Mapper(componentModel = "spring")
+public interface LanguageMapper {
 
-    public LanguageDto toDto(Language language) {
-        LanguageDto languageDto = new LanguageDto();
-        languageDto.setId(language.getId());
-        languageDto.setName(language.getName());
-        return languageDto;
-    }
+    Language asEntity(LanguageRequestDto dto);
 
-    public Language toEntity(LanguageDto languageDto) {
-        Language language = new Language();
-        language.setId(languageDto.getId());
-        language.setName(languageDto.getName());
-        return language;
-    }
+    LanguageResponseDto asOutput(Language entity);
 
+    List<LanguageResponseDto> asOutput(List<Language> entities);
+
+    void update(@MappingTarget Language entity, LanguageRequestDto dto);
 }

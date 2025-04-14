@@ -1,22 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.AwardDto;
 import com.martin.bookstore.entity.Award;
+import com.martin.bookstore.dto.request.AwardRequestDto;
+import com.martin.bookstore.dto.response.AwardResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
-@Component
-public class AwardMapper {
-    public AwardDto toDto(Award award) {
-        AwardDto awardDto = new AwardDto();
-        awardDto.setId(award.getId());
-        awardDto.setName(award.getName());
-        return awardDto;
-    }
+import java.util.List;
 
-    public Award toEntity(AwardDto awardDto) {
-        Award award = new Award();
-        award.setId(awardDto.getId());
-        award.setName(awardDto.getName());
-        return award;
-    }
+@Component
+@Mapper(componentModel = "spring")
+public interface AwardMapper {
+
+    Award asEntity(AwardRequestDto awardRequest);
+
+    AwardResponseDto asOutput(Award award);
+
+    List<AwardResponseDto> asOutput(List<Award> awards);
+
+    void update(@MappingTarget Award entity, AwardRequestDto awardRequest);
 }

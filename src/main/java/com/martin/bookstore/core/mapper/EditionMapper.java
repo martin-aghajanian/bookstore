@@ -1,24 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.EditionDto;
 import com.martin.bookstore.entity.Edition;
+import com.martin.bookstore.dto.request.EditionRequestDto;
+import com.martin.bookstore.dto.response.EditionResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class EditionMapper {
+@Mapper(componentModel = "spring")
+public interface EditionMapper {
 
-    public EditionDto toDto(Edition edition) {
-        EditionDto editionDto = new EditionDto();
-        editionDto.setId(edition.getId());
-        editionDto.setName(edition.getName());
-        return editionDto;
-    }
+    Edition asEntity(EditionRequestDto dto);
 
-    public Edition toEntity(EditionDto editionDto) {
-        Edition edition = new Edition();
-        edition.setId(editionDto.getId());
-        edition.setName(editionDto.getName());
-        return edition;
-    }
+    EditionResponseDto asOutput(Edition entity);
 
+    List<EditionResponseDto> asOutput(List<Edition> entities);
+
+    void update(@MappingTarget Edition entity, EditionRequestDto dto);
 }

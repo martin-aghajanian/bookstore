@@ -1,23 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.GenreDto;
 import com.martin.bookstore.entity.Genre;
+import com.martin.bookstore.dto.request.GenreRequestDto;
+import com.martin.bookstore.dto.response.GenreResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class GenreMapper {
+@Mapper(componentModel = "spring")
+public interface GenreMapper {
 
-    public GenreDto toDto(Genre genre) {
-        GenreDto genreDto = new GenreDto();
-        genreDto.setId(genre.getId());
-        genreDto.setName(genre.getName());
-        return genreDto;
-    }
+    Genre asEntity(GenreRequestDto dto);
 
-    public Genre toEntity(GenreDto genreDto) {
-        Genre genre = new Genre();
-        genre.setId(genreDto.getId());
-        genre.setName(genreDto.getName());
-        return genre;
-    }
+    GenreResponseDto asOutput(Genre entity);
+
+    List<GenreResponseDto> asOutput(List<Genre> entities);
+
+    void update(@MappingTarget Genre entity, GenreRequestDto dto);
 }

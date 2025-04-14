@@ -1,6 +1,6 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.FormatDto;
+import com.martin.bookstore.dto.old.FormatDto;
 import com.martin.bookstore.service.FormatService;
 import org.springframework.web.bind.annotation.*;
 

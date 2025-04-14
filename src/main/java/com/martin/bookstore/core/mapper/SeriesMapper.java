@@ -1,23 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.SeriesDto;
 import com.martin.bookstore.entity.Series;
+import com.martin.bookstore.dto.request.SeriesRequestDto;
+import com.martin.bookstore.dto.response.SeriesResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class SeriesMapper {
+@Mapper(componentModel = "spring")
+public interface SeriesMapper {
 
-    public SeriesDto toDto(Series series) {
-        SeriesDto seriesDto = new SeriesDto();
-        seriesDto.setId(series.getId());
-        seriesDto.setName(series.getName());
-        return seriesDto;
-    }
+    Series asEntity(SeriesRequestDto dto);
 
-    public Series toEntity(SeriesDto seriesDto) {
-        Series series = new Series();
-        series.setId(seriesDto.getId());
-        series.setName(seriesDto.getName());
-        return series;
-    }
+    SeriesResponseDto asOutput(Series entity);
+
+    List<SeriesResponseDto> asOutput(List<Series> entities);
+
+    void update(@MappingTarget Series entity, SeriesRequestDto dto);
 }

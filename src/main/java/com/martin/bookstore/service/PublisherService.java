@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.PublisherDto;
-import com.martin.bookstore.core.mapper.PublisherMapper;
+import com.martin.bookstore.dto.old.PublisherDto;
+import com.martin.bookstore.core.mapper.old.PublisherMapper;
 import com.martin.bookstore.entity.Publisher;
 import com.martin.bookstore.repository.PublisherRepository;
 import org.springframework.stereotype.Service;

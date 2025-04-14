@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.SettingDto;
-import com.martin.bookstore.core.mapper.SettingMapper;
+import com.martin.bookstore.dto.old.SettingDto;
+import com.martin.bookstore.core.mapper.old.SettingMapper;
 import com.martin.bookstore.entity.Setting;
 import com.martin.bookstore.repository.SettingRepository;
 import org.springframework.stereotype.Component;

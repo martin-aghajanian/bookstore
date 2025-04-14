@@ -1,23 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.SettingDto;
 import com.martin.bookstore.entity.Setting;
+import com.martin.bookstore.dto.request.SettingRequestDto;
+import com.martin.bookstore.dto.response.SettingResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class SettingMapper {
+@Mapper(componentModel = "spring")
+public interface SettingMapper {
 
-    public SettingDto toDto(Setting setting) {
-        SettingDto settingDto = new SettingDto();
-        settingDto.setId(setting.getId());
-        settingDto.setName(setting.getName());
-        return settingDto;
-    }
+    Setting asEntity(SettingRequestDto dto);
 
-    public Setting toEntity(SettingDto settingDto) {
-        Setting setting = new Setting();
-        setting.setId(settingDto.getId());
-        setting.setName(settingDto.getName());
-        return setting;
-    }
+    SettingResponseDto asOutput(Setting entity);
+
+    List<SettingResponseDto> asOutput(List<Setting> entities);
+
+    void update(@MappingTarget Setting entity, SettingRequestDto dto);
 }

@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.AuthorDto;
-import com.martin.bookstore.core.mapper.AuthorMapper;
+import com.martin.bookstore.dto.old.AuthorDto;
+import com.martin.bookstore.core.mapper.old.AuthorMapper;
 import com.martin.bookstore.entity.Author;
 import com.martin.bookstore.repository.AuthorRepository;
 import org.springframework.data.domain.Page;

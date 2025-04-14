@@ -1,6 +1,6 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.AuthorDto;
+import com.martin.bookstore.dto.old.AuthorDto;
 import com.martin.bookstore.service.AuthorService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

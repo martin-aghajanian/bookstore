@@ -1,6 +1,6 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.AwardDto;
+import com.martin.bookstore.dto.old.AwardDto;
 import com.martin.bookstore.service.AwardService;
 import org.springframework.web.bind.annotation.*;
 

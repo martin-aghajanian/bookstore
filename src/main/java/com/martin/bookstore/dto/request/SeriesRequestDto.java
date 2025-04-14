@@ -1,4 +1,4 @@
-package com.martin.bookstore.dto;
+package com.martin.bookstore.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class CharacterDto {
-    private Long id;
+@NoArgsConstructor
+public class SeriesRequestDto {
     private String name;
 }

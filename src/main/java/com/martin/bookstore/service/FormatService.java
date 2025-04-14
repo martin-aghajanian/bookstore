@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.FormatDto;
-import com.martin.bookstore.core.mapper.FormatMapper;
+import com.martin.bookstore.dto.old.FormatDto;
+import com.martin.bookstore.core.mapper.old.FormatMapper;
 import com.martin.bookstore.entity.Format;
 import com.martin.bookstore.repository.FormatRepository;
 import org.springframework.stereotype.Service;

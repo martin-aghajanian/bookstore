@@ -1,4 +1,4 @@
-package com.martin.bookstore.dto;
+package com.martin.bookstore.dto.old;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LanguageDto {
+public class GenreDto {
     private Long id;
     private String name;
 }

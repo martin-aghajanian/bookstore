@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.GenreDto;
-import com.martin.bookstore.core.mapper.GenreMapper;
+import com.martin.bookstore.dto.old.GenreDto;
+import com.martin.bookstore.core.mapper.old.GenreMapper;
 import com.martin.bookstore.entity.Genre;
 import com.martin.bookstore.repository.GenreRepository;
 import org.springframework.stereotype.Service;

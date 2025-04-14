@@ -1,4 +1,4 @@
-package com.martin.bookstore.dto;
+package com.martin.bookstore.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class AwardDto {
+@NoArgsConstructor
+public class FormatResponseDto {
     private Long id;
-    private String name;
+    private String format;
 }

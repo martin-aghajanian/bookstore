@@ -1,24 +1,23 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.FormatDto;
 import com.martin.bookstore.entity.Format;
+import com.martin.bookstore.dto.request.FormatRequestDto;
+import com.martin.bookstore.dto.response.FormatResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 
 @Component
-public class FormatMapper {
+@Mapper(componentModel = "spring")
+public interface FormatMapper {
 
-    public FormatDto toDto(Format format) {
-        FormatDto formatDto = new FormatDto();
-        formatDto.setId(format.getId());
-        formatDto.setFormat(format.getFormat());
-        return formatDto;
-    }
+    Format asEntity(FormatRequestDto dto);
 
-    public Format toEntity(FormatDto formatDto) {
-        Format format = new Format();
-        format.setId(formatDto.getId());
-        format.setFormat(formatDto.getFormat());
-        return format;
-    }
+    FormatResponseDto asOutput(Format entity);
+
+    List<FormatResponseDto> asOutput(List<Format> entities);
+
+    void update(@MappingTarget Format entity, FormatRequestDto dto);
 }

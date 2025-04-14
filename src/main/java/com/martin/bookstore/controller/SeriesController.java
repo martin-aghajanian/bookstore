@@ -1,6 +1,6 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.SeriesDto;
+import com.martin.bookstore.dto.old.SeriesDto;
 import com.martin.bookstore.service.SeriesService;
 import org.springframework.web.bind.annotation.*;
 

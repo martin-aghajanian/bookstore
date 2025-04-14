@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.CharacterDto;
-import com.martin.bookstore.core.mapper.CharacterMapper;
+import com.martin.bookstore.dto.old.CharacterDto;
+import com.martin.bookstore.core.mapper.old.CharacterMapper;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.repository.CharacterRepository;
 import org.springframework.stereotype.Service;

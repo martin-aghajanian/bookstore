@@ -1,23 +1,24 @@
 package com.martin.bookstore.core.mapper;
 
-import com.martin.bookstore.dto.CharacterDto;
 import com.martin.bookstore.entity.Character;
+import com.martin.bookstore.dto.request.CharacterRequestDto;
+import com.martin.bookstore.dto.response.CharacterResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-public class CharacterMapper {
+@Mapper(componentModel = "spring")
+public interface CharacterMapper {
 
-    public CharacterDto toDto(Character character) {
-        CharacterDto characterDto = new CharacterDto();
-        characterDto.setId(character.getId());
-        characterDto.setName(character.getName());
-        return characterDto;
-    }
+    Character asEntity(CharacterRequestDto dto);
 
-    public Character toEntity(CharacterDto characterDto) {
-        Character character = new Character();
-        character.setId(characterDto.getId());
-        character.setName(characterDto.getName());
-        return character;
-    }
+    CharacterResponseDto asOutput(Character entity);
+
+    List<CharacterResponseDto> asOutput(List<Character> entities);
+
+    void update(@MappingTarget Character entity, CharacterRequestDto dto);
 }
+

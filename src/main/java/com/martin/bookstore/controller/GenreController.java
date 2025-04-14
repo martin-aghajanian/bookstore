@@ -1,6 +1,6 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.GenreDto;
+import com.martin.bookstore.dto.old.GenreDto;
 import com.martin.bookstore.service.GenreService;
 import com.martin.bookstore.repository.GenreRepository;
 import org.springframework.util.PathMatcher;

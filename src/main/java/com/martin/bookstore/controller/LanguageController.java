@@ -1,6 +1,6 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.LanguageDto;
+import com.martin.bookstore.dto.old.LanguageDto;
 import com.martin.bookstore.service.LanguageService;
 import org.springframework.web.bind.annotation.*;
 

@@ -2,8 +2,8 @@ package com.martin.bookstore.service;
 
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.repository.*;
-import com.martin.bookstore.dto.BookDto;
-import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.old.BookDto;
+import com.martin.bookstore.core.mapper.old.BookMapper;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.repository.CharacterRepository;
 import com.martin.bookstore.entity.Edition;
