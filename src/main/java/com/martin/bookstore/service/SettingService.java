@@ -1,14 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.old.SettingDto;
-import com.martin.bookstore.core.mapper.old.SettingMapper;
+import com.martin.bookstore.dto.request.SettingRequestDto;
+import com.martin.bookstore.dto.response.SettingResponseDto;
 import com.martin.bookstore.entity.Setting;
+import com.martin.bookstore.core.mapper.SettingMapper;
 import com.martin.bookstore.repository.SettingRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class SettingService {
@@ -21,27 +20,26 @@ public class SettingService {
         this.settingMapper = settingMapper;
     }
 
-    public List<SettingDto> getAllSettings() {
-        return settingRepository.findAll().stream().map(settingMapper::toDto).collect(Collectors.toList());
+    public List<SettingResponseDto> getAllSettings() {
+        return settingMapper.asOutput(settingRepository.findAll());
     }
 
-    public SettingDto getSettingById(Long id) {
-        return settingRepository.findById(id).map(settingMapper::toDto).orElseThrow(() -> new RuntimeException("setting not found"));
+    public SettingResponseDto getSettingById(Long id) {
+        return settingRepository.findById(id)
+                .map(settingMapper::asOutput)
+                .orElseThrow(() -> new RuntimeException("setting not found"));
     }
 
-    public SettingDto createSetting(SettingDto settingDto) {
-        Setting saved = settingRepository.save(settingMapper.toEntity(settingDto));
-        return settingMapper.toDto(saved);
+    public SettingResponseDto createSetting(SettingRequestDto dto) {
+        Setting saved = settingRepository.save(settingMapper.asEntity(dto));
+        return settingMapper.asOutput(saved);
     }
 
-    public SettingDto updateSetting(Long id, SettingDto updatedSettingDto) {
-        Optional<Setting> optionalSetting = settingRepository.findById(id);
-        if (optionalSetting.isPresent()) {
-            Setting setting = optionalSetting.get();
-            setting.setName(updatedSettingDto.getName());
-            return settingMapper.toDto(settingRepository.save(setting));
-        }
-        return null;
+    public SettingResponseDto updateSetting(Long id, SettingRequestDto dto) {
+        Setting setting = settingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("setting not found"));
+        settingMapper.update(setting, dto);
+        return settingMapper.asOutput(settingRepository.save(setting));
     }
 
     public void deleteSetting(Long id) {

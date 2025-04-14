@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -39,8 +40,10 @@ public class BookRequestDto {
     private Long formatId;
 
     private List<Long> authorIds;
+    private Map<Long, String> authorContributions;
     private List<Long> genreIds;
     private List<Long> characterIds;
     private List<Long> settingIds;
     private List<Long> awardIds;
+    private Map<Long, String> awardYears;
 }

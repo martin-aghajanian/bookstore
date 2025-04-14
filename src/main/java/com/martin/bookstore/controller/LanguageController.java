@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.LanguageDto;
+import com.martin.bookstore.dto.request.LanguageRequestDto;
+import com.martin.bookstore.dto.response.LanguageResponseDto;
 import com.martin.bookstore.service.LanguageService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,23 +18,23 @@ public class LanguageController {
     }
 
     @GetMapping
-    public List<LanguageDto> getAllLanguages() {
+    public List<LanguageResponseDto> getAllLanguages() {
         return languageService.getAllLanguages();
     }
 
     @GetMapping("/{id}")
-    public LanguageDto getLanguageById(@PathVariable Long id) {
+    public LanguageResponseDto getLanguageById(@PathVariable Long id) {
         return languageService.getLanguageById(id);
     }
 
     @PostMapping
-    public LanguageDto createLanguage(@RequestBody LanguageDto languageDto) {
-        return languageService.createLanguage(languageDto);
+    public LanguageResponseDto createLanguage(@RequestBody LanguageRequestDto dto) {
+        return languageService.createLanguage(dto);
     }
 
     @PutMapping("/{id}")
-    public LanguageDto updateLanguage(@PathVariable Long id, @RequestBody LanguageDto languageDto) {
-        return languageService.updateLanguage(id, languageDto);
+    public LanguageResponseDto updateLanguage(@PathVariable Long id, @RequestBody LanguageRequestDto dto) {
+        return languageService.updateLanguage(id, dto);
     }
 
     @DeleteMapping("/{id}")

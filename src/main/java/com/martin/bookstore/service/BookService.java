@@ -1,9 +1,10 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.request.BookRequestDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.repository.*;
-import com.martin.bookstore.dto.old.BookDto;
-import com.martin.bookstore.core.mapper.old.BookMapper;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.repository.CharacterRepository;
 import com.martin.bookstore.entity.Edition;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -77,136 +77,107 @@ public class BookService {
         this.bookMapper = bookMapper;
     }
 
-    public List<BookDto> getAllBooks() {
-        return bookRepository.findAll().stream().map(bookMapper::toDto).collect(Collectors.toList());
+    public List<BookResponseDto> getAllBooks() {
+        return bookMapper.asOutput(bookRepository.findAll());
     }
 
-    public BookDto getBookById(Long id) {
-        return bookRepository.findById(id).map(bookMapper::toDto).orElseThrow(() -> new RuntimeException("book not found"));
+    public BookResponseDto getBookById(Long id) {
+        return bookRepository.findById(id)
+                .map(bookMapper::asOutput)
+                .orElseThrow(() -> new RuntimeException("book not found"));
     }
 
     @Transactional
-    public BookDto createBook(BookDto bookDto) {
-        Book book = bookMapper.toEntity(bookDto);
+    public BookResponseDto createBook(BookRequestDto dto) {
+        Book book = bookMapper.asEntity(dto);
         Book savedBook = bookRepository.save(book);
 
-        if (bookDto.getAuthorIds() != null) {
-            for (Long authorId : bookDto.getAuthorIds()) {
+        if (dto.getAuthorIds() != null) {
+            dto.getAuthorIds().forEach(authorId -> {
                 Author author = authorRepository.findById(authorId).orElseThrow();
                 BookAuthor bookAuthor = new BookAuthor();
                 bookAuthor.setBook(savedBook);
                 bookAuthor.setAuthor(author);
 
-                String contribution = bookDto.getAuthorContributions() != null
-                        ? bookDto.getAuthorContributions().get(authorId)
+                String contribution = dto.getAuthorContributions() != null
+                        ? dto.getAuthorContributions().get(authorId)
                         : "Author";
-                bookAuthor.setContribution(contribution);
 
+                bookAuthor.setContribution(contribution);
                 bookAuthorRepository.save(bookAuthor);
-            }
+            });
         }
 
-        if (bookDto.getGenreIds() != null) {
-            for (Long genreId : bookDto.getGenreIds()) {
+        if (dto.getGenreIds() != null) {
+            dto.getGenreIds().forEach(genreId -> {
                 Genre genre = genreRepository.findById(genreId).orElseThrow();
                 BookGenre bookGenre = new BookGenre();
                 bookGenre.setBook(savedBook);
                 bookGenre.setGenre(genre);
                 bookGenreRepository.save(bookGenre);
-            }
+            });
         }
 
-        if (bookDto.getCharacterIds() != null) {
-            for (Long characterId : bookDto.getCharacterIds()) {
+        if (dto.getCharacterIds() != null) {
+            dto.getCharacterIds().forEach(characterId -> {
                 Character character = characterRepository.findById(characterId).orElseThrow();
-                BookCharacter bookCharacter = new BookCharacter();
-                bookCharacter.setBook(savedBook);
-                bookCharacter.setCharacter(character);
-                bookCharacterRepository.save(bookCharacter);
-            }
+                BookCharacter bc = new BookCharacter();
+                bc.setBook(savedBook);
+                bc.setCharacter(character);
+                bookCharacterRepository.save(bc);
+            });
         }
 
-        if (bookDto.getSettingIds() != null) {
-            for (Long settingId : bookDto.getSettingIds()) {
+        if (dto.getSettingIds() != null) {
+            dto.getSettingIds().forEach(settingId -> {
                 Setting setting = settingRepository.findById(settingId).orElseThrow();
-                BookSetting bookSetting = new BookSetting();
-                bookSetting.setBook(savedBook);
-                bookSetting.setSetting(setting);
-                bookSettingRepository.save(bookSetting);
-            }
+                BookSetting bs = new BookSetting();
+                bs.setBook(savedBook);
+                bs.setSetting(setting);
+                bookSettingRepository.save(bs);
+            });
         }
 
-        if (bookDto.getAwardIds() != null) {
-            for (Long awardId : bookDto.getAwardIds()) {
+        if (dto.getAwardIds() != null) {
+            dto.getAwardIds().forEach(awardId -> {
                 Award award = awardRepository.findById(awardId).orElseThrow();
-                BookAward bookAward = new BookAward();
-                bookAward.setBook(savedBook);
-                bookAward.setAward(award);
-
+                BookAward ba = new BookAward();
+                ba.setBook(savedBook);
+                ba.setAward(award);
                 LocalDate year = LocalDate.now();
-                if (bookDto.getAwardYears() != null && bookDto.getAwardYears().containsKey(awardId)) {
-                    year = LocalDate.parse(bookDto.getAwardYears().get(awardId));
+                if (dto.getAwardYears() != null && dto.getAwardYears().containsKey(awardId)) {
+                    year = LocalDate.parse(dto.getAwardYears().get(awardId));
                 }
-                bookAward.setYear(year);
-
-                bookAwardRepository.save(bookAward);
-            }
+                ba.setYear(year);
+                bookAwardRepository.save(ba);
+            });
         }
 
-        return bookMapper.toDto(savedBook);
+        return bookMapper.asOutput(savedBook);
     }
 
 
-    public BookDto updateBook(Long id, BookDto bookDto) {
-        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("book not found with id: " + id));
+    public BookResponseDto updateBook(Long id, BookRequestDto dto) {
+        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("book not found"));
+        bookMapper.update(book, dto);
 
-        book.setIsbn(bookDto.getIsbn());
-        book.setTitle(bookDto.getTitle());
-        book.setDescription(bookDto.getDescription());
-        book.setPages(bookDto.getPages());
-        book.setPublishDate(bookDto.getPublishDate());
-        book.setFirstPublishDate(bookDto.getFirstPublishDate());
-        book.setRating(bookDto.getRating());
-        book.setLikedPercentage(bookDto.getLikedPercentage());
-        book.setPrice(bookDto.getPrice());
-        book.setNumRatings(bookDto.getNumRatings());
-        book.setFiveStarRatings(bookDto.getFiveStarRatings());
-        book.setFourStarRatings(bookDto.getFourStarRatings());
-        book.setThreeStarRatings(bookDto.getThreeStarRatings());
-        book.setTwoStarRatings(bookDto.getTwoStarRatings());
-        book.setOneStarRatings(bookDto.getOneStarRatings());
-        book.setBbeVotes(bookDto.getBbeVotes());
-        book.setBbeScore(bookDto.getBbeScore());
-        book.setCoverImageUrl(bookDto.getCoverImageUrl());
-
-        if (bookDto.getEditionId() != null) {
-            Edition edition = editionRepository.findById(bookDto.getEditionId()).orElseThrow();
-            book.setEdition(edition);
+        if (dto.getEditionId() != null) {
+            book.setEdition(editionRepository.findById(dto.getEditionId()).orElseThrow());
+        }
+        if (dto.getLanguageId() != null) {
+            book.setLanguage(languageRepository.findById(dto.getLanguageId()).orElseThrow());
+        }
+        if (dto.getPublisherId() != null) {
+            book.setPublisher(publisherRepository.findById(dto.getPublisherId()).orElseThrow());
+        }
+        if (dto.getFormatId() != null) {
+            book.setFormat(formatRepository.findById(dto.getFormatId()).orElseThrow());
+        }
+        if (dto.getSeriesId() != null) {
+            book.setSeries(seriesRepository.findById(dto.getSeriesId()).orElseThrow());
         }
 
-        if (bookDto.getLanguageId() != null) {
-            Language language = languageRepository.findById(bookDto.getLanguageId()).orElseThrow();
-            book.setLanguage(language);
-        }
-
-        if (bookDto.getPublisherId() != null) {
-            Publisher publisher = publisherRepository.findById(bookDto.getPublisherId()).orElseThrow();
-            book.setPublisher(publisher);
-        }
-
-        if (bookDto.getBookFormatId() != null) {
-            Format format = formatRepository.findById(bookDto.getBookFormatId()).orElseThrow();
-            book.setFormat(format);
-        }
-
-        if (bookDto.getSeriesId() != null) {
-            Series series = seriesRepository.findById(bookDto.getSeriesId()).orElseThrow();
-            book.setSeries(series);
-        }
-
-        // many to many
-
-        return bookMapper.toDto(bookRepository.save(book));
+        return bookMapper.asOutput(bookRepository.save(book));
     }
 
     public void deleteBook(Long id) {

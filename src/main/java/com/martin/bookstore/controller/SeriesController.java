@@ -1,13 +1,14 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.SeriesDto;
+import com.martin.bookstore.dto.request.SeriesRequestDto;
+import com.martin.bookstore.dto.response.SeriesResponseDto;
 import com.martin.bookstore.service.SeriesService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("api/v1/series")
 public class SeriesController {
 
     private final SeriesService seriesService;
@@ -17,23 +18,23 @@ public class SeriesController {
     }
 
     @GetMapping
-    public List<SeriesDto> getAllSeries() {
+    public List<SeriesResponseDto> getAllSeries() {
         return seriesService.getAllSeries();
     }
 
     @GetMapping("/{id}")
-    public SeriesDto getSeriesById(@PathVariable Long id) {
+    public SeriesResponseDto getSeriesById(@PathVariable Long id) {
         return seriesService.getSeriesById(id);
     }
 
     @PostMapping
-    public SeriesDto createSeries(@RequestBody SeriesDto seriesDto) {
-        return seriesService.createSeries(seriesDto);
+    public SeriesResponseDto createSeries(@RequestBody SeriesRequestDto dto) {
+        return seriesService.createSeries(dto);
     }
 
     @PutMapping("/{id}")
-    public SeriesDto updateSeries(@PathVariable Long id, @RequestBody SeriesDto seriesDto) {
-        return seriesService.updateSeries(id, seriesDto);
+    public SeriesResponseDto updateSeries(@PathVariable Long id, @RequestBody SeriesRequestDto dto) {
+        return seriesService.updateSeries(id, dto);
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.BookDto;
+import com.martin.bookstore.dto.request.BookRequestDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.service.BookService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,28 +18,27 @@ public class BookController {
     }
 
     @GetMapping
-    public List<BookDto> getAllBooks() {
+    public List<BookResponseDto> getAllBooks() {
         return bookService.getAllBooks();
     }
 
     @GetMapping("/{id}")
-    public BookDto getBookById(@PathVariable Long id) {
+    public BookResponseDto getBookById(@PathVariable Long id) {
         return bookService.getBookById(id);
     }
 
     @PostMapping
-    public BookDto createBook(@RequestBody BookDto bookDto) {
-        return bookService.createBook(bookDto);
+    public BookResponseDto createBook(@RequestBody BookRequestDto dto) {
+        return bookService.createBook(dto);
     }
 
     @PutMapping("/{id}")
-    public BookDto updateBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
-        return bookService.updateBook(id, bookDto);
+    public BookResponseDto updateBook(@PathVariable Long id, @RequestBody BookRequestDto dto) {
+        return bookService.updateBook(id, dto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
     }
-
 }

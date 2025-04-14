@@ -1,13 +1,14 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.EditionDto;
+import com.martin.bookstore.dto.request.EditionRequestDto;
+import com.martin.bookstore.dto.response.EditionResponseDto;
 import com.martin.bookstore.service.EditionService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/Editions")
+@RequestMapping("api/v1/editions")
 public class EditionController {
 
     private final EditionService editionService;
@@ -17,23 +18,23 @@ public class EditionController {
     }
 
     @GetMapping
-    public List<EditionDto> getAllEditions() {
+    public List<EditionResponseDto> getAllEditions() {
         return editionService.getAllEditions();
     }
 
     @GetMapping("/{id}")
-    public EditionDto getEditionById(@PathVariable Long id) {
+    public EditionResponseDto getEditionById(@PathVariable Long id) {
         return editionService.getEditionById(id);
     }
 
     @PostMapping
-    public EditionDto createEdition(@RequestBody EditionDto editionDto) {
-        return editionService.createEdition(editionDto);
+    public EditionResponseDto createEdition(@RequestBody EditionRequestDto dto) {
+        return editionService.createEdition(dto);
     }
 
     @PutMapping("/{id}")
-    public EditionDto updateEdition(@PathVariable Long id, @RequestBody EditionDto editionDto) {
-        return editionService.updateEdition(id, editionDto);
+    public EditionResponseDto updateEdition(@PathVariable Long id, @RequestBody EditionRequestDto dto) {
+        return editionService.updateEdition(id, dto);
     }
 
     @DeleteMapping("/{id}")

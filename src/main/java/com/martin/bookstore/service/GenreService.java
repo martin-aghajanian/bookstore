@@ -1,14 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.old.GenreDto;
-import com.martin.bookstore.core.mapper.old.GenreMapper;
+import com.martin.bookstore.dto.request.GenreRequestDto;
+import com.martin.bookstore.dto.response.GenreResponseDto;
 import com.martin.bookstore.entity.Genre;
+import com.martin.bookstore.core.mapper.GenreMapper;
 import com.martin.bookstore.repository.GenreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class GenreService {
@@ -21,27 +20,26 @@ public class GenreService {
         this.genreMapper = genreMapper;
     }
 
-    public List<GenreDto> getAllGenres() {
-        return genreRepository.findAll().stream().map(genreMapper::toDto).collect(Collectors.toList());
+    public List<GenreResponseDto> getAllGenres() {
+        return genreMapper.asOutput(genreRepository.findAll());
     }
 
-    public GenreDto getGenreById(Long id) {
-        return genreRepository.findById(id).map(genreMapper::toDto).orElseThrow(() -> new RuntimeException("genre not found"));
+    public GenreResponseDto getGenreById(Long id) {
+        return genreRepository.findById(id)
+                .map(genreMapper::asOutput)
+                .orElseThrow(() -> new RuntimeException("genre not found"));
     }
 
-    public GenreDto createGenre(GenreDto genreDto) {
-        Genre saved = genreRepository.save(genreMapper.toEntity(genreDto));
-        return genreMapper.toDto(saved);
+    public GenreResponseDto createGenre(GenreRequestDto dto) {
+        Genre saved = genreRepository.save(genreMapper.asEntity(dto));
+        return genreMapper.asOutput(saved);
     }
 
-    public GenreDto updateGenre(Long id, GenreDto updatedGenreDto) {
-        Optional<Genre> optionalGenre = genreRepository.findById(id);
-        if (optionalGenre.isPresent()) {
-            Genre genre = optionalGenre.get();
-            genre.setName(updatedGenreDto.getName());
-            return genreMapper.toDto(genreRepository.save(genre));
-        }
-        return null;
+    public GenreResponseDto updateGenre(Long id, GenreRequestDto dto) {
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("genre not found"));
+        genreMapper.update(genre, dto);
+        return genreMapper.asOutput(genreRepository.save(genre));
     }
 
     public void deleteGenre(Long id) {

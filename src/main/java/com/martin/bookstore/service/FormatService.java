@@ -1,14 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.old.FormatDto;
-import com.martin.bookstore.core.mapper.old.FormatMapper;
+import com.martin.bookstore.dto.request.FormatRequestDto;
+import com.martin.bookstore.dto.response.FormatResponseDto;
 import com.martin.bookstore.entity.Format;
+import com.martin.bookstore.core.mapper.FormatMapper;
 import com.martin.bookstore.repository.FormatRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FormatService {
@@ -21,28 +20,26 @@ public class FormatService {
         this.formatMapper = formatMapper;
     }
 
-    public List<FormatDto> getAllFormats() {
-        return formatRepository.findAll().stream().map(formatMapper::toDto).collect(Collectors.toList());
+    public List<FormatResponseDto> getAllFormats() {
+        return formatMapper.asOutput(formatRepository.findAll());
     }
 
-    public FormatDto getFormatById(Long id) {
-        return formatRepository.findById(id).map(formatMapper::toDto)
+    public FormatResponseDto getFormatById(Long id) {
+        return formatRepository.findById(id)
+                .map(formatMapper::asOutput)
                 .orElseThrow(() -> new RuntimeException("format not found"));
     }
 
-    public FormatDto createFormat(FormatDto formatDto) {
-        Format saved = formatRepository.save(formatMapper.toEntity(formatDto));
-        return formatMapper.toDto(saved);
+    public FormatResponseDto createFormat(FormatRequestDto dto) {
+        Format saved = formatRepository.save(formatMapper.asEntity(dto));
+        return formatMapper.asOutput(saved);
     }
 
-    public FormatDto updateFormat(Long id, FormatDto updatedFormatdto) {
-        Optional<Format> optionalFormat = formatRepository.findById(id);
-        if (optionalFormat.isPresent()) {
-            Format format = optionalFormat.get();
-            format.setFormat(updatedFormatdto.getFormat());
-            return formatMapper.toDto(formatRepository.save(format));
-        }
-        return null;
+    public FormatResponseDto updateFormat(Long id, FormatRequestDto dto) {
+        Format format = formatRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("format not found"));
+        formatMapper.update(format, dto);
+        return formatMapper.asOutput(formatRepository.save(format));
     }
 
     public void deleteFormat(Long id) {

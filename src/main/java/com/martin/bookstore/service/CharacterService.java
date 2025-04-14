@@ -1,14 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.old.CharacterDto;
-import com.martin.bookstore.core.mapper.old.CharacterMapper;
+import com.martin.bookstore.dto.request.CharacterRequestDto;
+import com.martin.bookstore.dto.response.CharacterResponseDto;
 import com.martin.bookstore.entity.Character;
+import com.martin.bookstore.core.mapper.CharacterMapper;
 import com.martin.bookstore.repository.CharacterRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CharacterService {
@@ -21,27 +20,26 @@ public class CharacterService {
         this.characterMapper = characterMapper;
     }
 
-    public List<CharacterDto> getAllCharacters() {
-        return characterRepository.findAll().stream().map(characterMapper::toDto).collect(Collectors.toList());
+    public List<CharacterResponseDto> getAllCharacters() {
+        return characterMapper.asOutput(characterRepository.findAll());
     }
 
-    public CharacterDto getCharacterById(Long id) {
-        return characterRepository.findById(id).map(characterMapper::toDto).orElseThrow(() -> new RuntimeException("character not found"));
+    public CharacterResponseDto getCharacterById(Long id) {
+        return characterRepository.findById(id)
+                .map(characterMapper::asOutput)
+                .orElseThrow(() -> new RuntimeException("character not found"));
     }
 
-    public CharacterDto createCharacter(CharacterDto characterDto) {
-        Character saved = characterRepository.save(characterMapper.toEntity(characterDto));
-        return characterMapper.toDto(saved);
+    public CharacterResponseDto createCharacter(CharacterRequestDto dto) {
+        Character saved = characterRepository.save(characterMapper.asEntity(dto));
+        return characterMapper.asOutput(saved);
     }
 
-    public CharacterDto updateCharacter(Long id, CharacterDto updatedCharacterDto) {
-        Optional<Character> optionalCharacter = characterRepository.findById(id);
-        if (optionalCharacter.isPresent()) {
-            Character character = optionalCharacter.get();
-            character.setName(updatedCharacterDto.getName());
-            return characterMapper.toDto(characterRepository.save(character));
-        }
-        return null;
+    public CharacterResponseDto updateCharacter(Long id, CharacterRequestDto dto) {
+        Character character = characterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("character not found"));
+        characterMapper.update(character, dto);
+        return characterMapper.asOutput(characterRepository.save(character));
     }
 
     public void deleteCharacter(Long id) {

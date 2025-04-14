@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.CharacterDto;
+import com.martin.bookstore.dto.request.CharacterRequestDto;
+import com.martin.bookstore.dto.response.CharacterResponseDto;
 import com.martin.bookstore.service.CharacterService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,23 +18,23 @@ public class CharacterController {
     }
 
     @GetMapping
-    public List<CharacterDto> getAllCharacters() {
+    public List<CharacterResponseDto> getAllCharacters() {
         return characterService.getAllCharacters();
     }
 
     @GetMapping("/{id}")
-    public CharacterDto getCharacterById(@PathVariable Long id) {
+    public CharacterResponseDto getCharacterById(@PathVariable Long id) {
         return characterService.getCharacterById(id);
     }
 
     @PostMapping
-    public CharacterDto createCharacter(@RequestBody CharacterDto characterDto) {
-        return characterService.createCharacter(characterDto);
+    public CharacterResponseDto createCharacter(@RequestBody CharacterRequestDto dto) {
+        return characterService.createCharacter(dto);
     }
 
     @PutMapping("/{id}")
-    public CharacterDto updateCharacter(@PathVariable Long id, @RequestBody CharacterDto characterDto) {
-        return characterService.updateCharacter(id, characterDto);
+    public CharacterResponseDto updateCharacter(@PathVariable Long id, @RequestBody CharacterRequestDto dto) {
+        return characterService.updateCharacter(id, dto);
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.SettingDto;
+import com.martin.bookstore.dto.request.SettingRequestDto;
+import com.martin.bookstore.dto.response.SettingResponseDto;
 import com.martin.bookstore.service.SettingService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,28 +18,27 @@ public class SettingController {
     }
 
     @GetMapping
-    public List<SettingDto> getAllSettings() {
+    public List<SettingResponseDto> getAllSettings() {
         return settingService.getAllSettings();
     }
 
     @GetMapping("/{id}")
-    public SettingDto getSettingById(@PathVariable Long id) {
+    public SettingResponseDto getSettingById(@PathVariable Long id) {
         return settingService.getSettingById(id);
     }
 
     @PostMapping
-    public SettingDto createSetting(@RequestBody SettingDto settingDto) {
-        return settingService.createSetting(settingDto);
+    public SettingResponseDto createSetting(@RequestBody SettingRequestDto dto) {
+        return settingService.createSetting(dto);
     }
 
     @PutMapping("/{id}")
-    public SettingDto updateSetting(@PathVariable Long id, @RequestBody SettingDto settingDto) {
-        return settingService.updateSetting(id, settingDto);
+    public SettingResponseDto updateSetting(@PathVariable Long id, @RequestBody SettingRequestDto dto) {
+        return settingService.updateSetting(id, dto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteSetting(@PathVariable Long id) {
         settingService.deleteSetting(id);
     }
-
 }

@@ -1,14 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.old.PublisherDto;
-import com.martin.bookstore.core.mapper.old.PublisherMapper;
+import com.martin.bookstore.dto.request.PublisherRequestDto;
+import com.martin.bookstore.dto.response.PublisherResponseDto;
 import com.martin.bookstore.entity.Publisher;
+import com.martin.bookstore.core.mapper.PublisherMapper;
 import com.martin.bookstore.repository.PublisherRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class PublisherService {
@@ -21,27 +20,26 @@ public class PublisherService {
         this.publisherMapper = publisherMapper;
     }
 
-    public List<PublisherDto> getAllPublishers() {
-        return publisherRepository.findAll().stream().map(publisherMapper::toDto).collect(Collectors.toList());
+    public List<PublisherResponseDto> getAllPublishers() {
+        return publisherMapper.asOutput(publisherRepository.findAll());
     }
 
-    public PublisherDto getPublisherById(Long id) {
-        return publisherRepository.findById(id).map(publisherMapper::toDto).orElseThrow(() -> new RuntimeException("publisher not found"));
+    public PublisherResponseDto getPublisherById(Long id) {
+        return publisherRepository.findById(id)
+                .map(publisherMapper::asOutput)
+                .orElseThrow(() -> new RuntimeException("publisher not found"));
     }
 
-    public PublisherDto createPublisher(PublisherDto publisherDto) {
-        Publisher saved = publisherRepository.save(publisherMapper.toEntity(publisherDto));
-        return publisherMapper.toDto(saved);
+    public PublisherResponseDto createPublisher(PublisherRequestDto dto) {
+        Publisher saved = publisherRepository.save(publisherMapper.asEntity(dto));
+        return publisherMapper.asOutput(saved);
     }
 
-    public PublisherDto updatePublisher(Long id, PublisherDto updatedPublisherDto) {
-        Optional<Publisher> optionalPublisher = publisherRepository.findById(id);
-        if (optionalPublisher.isPresent()) {
-            Publisher publisher = optionalPublisher.get();
-            publisher.setName(updatedPublisherDto.getName());
-            return publisherMapper.toDto(publisherRepository.save(publisher));
-        }
-        return null;
+    public PublisherResponseDto updatePublisher(Long id, PublisherRequestDto dto) {
+        Publisher publisher = publisherRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("publisher not found"));
+        publisherMapper.update(publisher, dto);
+        return publisherMapper.asOutput(publisherRepository.save(publisher));
     }
 
     public void deletePublisher(Long id) {

@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.PublisherDto;
+import com.martin.bookstore.dto.request.PublisherRequestDto;
+import com.martin.bookstore.dto.response.PublisherResponseDto;
 import com.martin.bookstore.service.PublisherService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,23 +18,23 @@ public class PublisherController {
     }
 
     @GetMapping
-    public List<PublisherDto> getAllPublisherB() {
+    public List<PublisherResponseDto> getAllPublisherB() {
         return publisherService.getAllPublishers();
     }
 
     @GetMapping("/{id}")
-    public PublisherDto getPublisherById(@PathVariable Long id) {
+    public PublisherResponseDto getPublisherById(@PathVariable Long id) {
         return publisherService.getPublisherById(id);
     }
 
     @PostMapping
-    public PublisherDto createPublisher(@RequestBody PublisherDto publisherDto) {
-        return publisherService.createPublisher(publisherDto);
+    public PublisherResponseDto createPublisher(@RequestBody PublisherRequestDto dto) {
+        return publisherService.createPublisher(dto);
     }
 
     @PutMapping("/{id}")
-    public PublisherDto updatePublisher(@PathVariable Long id, @RequestBody PublisherDto publisherDto) {
-        return publisherService.updatePublisher(id, publisherDto);
+    public PublisherResponseDto updatePublisher(@PathVariable Long id, @RequestBody PublisherRequestDto dto) {
+        return publisherService.updatePublisher(id, dto);
     }
 
     @DeleteMapping("/{id}")

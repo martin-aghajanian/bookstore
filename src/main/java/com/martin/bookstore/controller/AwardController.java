@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.AwardDto;
+import com.martin.bookstore.dto.request.AwardRequestDto;
+import com.martin.bookstore.dto.response.AwardResponseDto;
 import com.martin.bookstore.service.AwardService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,28 +18,27 @@ public class AwardController {
     }
 
     @GetMapping
-    public List<AwardDto> getAllAwards() {
+    public List<AwardResponseDto> getAllAwards() {
         return awardService.getAllAwards();
     }
 
     @GetMapping("/{id}")
-    public AwardDto getAwardById(@PathVariable Long id) {
+    public AwardResponseDto getAwardById(@PathVariable Long id) {
         return awardService.getAwardById(id);
     }
 
     @PostMapping
-    public AwardDto createAward(@RequestBody AwardDto awardDto) {
-        return awardService.createAward(awardDto);
+    public AwardResponseDto createAward(@RequestBody AwardRequestDto dto) {
+        return awardService.createAward(dto);
     }
 
     @PutMapping("/{id}")
-    public AwardDto updateAward(@PathVariable Long id, @RequestBody AwardDto awardDto) {
-        return awardService.updateAward(id, awardDto);
+    public AwardResponseDto updateAward(@PathVariable Long id, @RequestBody AwardRequestDto dto) {
+        return awardService.updateAward(id, dto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteAward(@PathVariable Long id) {
         awardService.deleteAward(id);
     }
-
 }

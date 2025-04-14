@@ -1,14 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.old.AwardDto;
-import com.martin.bookstore.core.mapper.old.AwardMapper;
+import com.martin.bookstore.dto.request.AwardRequestDto;
+import com.martin.bookstore.dto.response.AwardResponseDto;
 import com.martin.bookstore.entity.Award;
+import com.martin.bookstore.core.mapper.AwardMapper;
 import com.martin.bookstore.repository.AwardRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AwardService {
@@ -21,27 +20,26 @@ public class AwardService {
         this.awardMapper = awardMapper;
     }
 
-    public List<AwardDto> getAllAwards() {
-        return awardRepository.findAll().stream().map(awardMapper::toDto).collect(Collectors.toList());
+    public List<AwardResponseDto> getAllAwards() {
+        return awardMapper.asOutput(awardRepository.findAll());
     }
 
-    public AwardDto getAwardById(Long id) {
-        return awardRepository.findById(id).map(awardMapper::toDto).orElseThrow(() -> new RuntimeException("award not found"));
+    public AwardResponseDto getAwardById(Long id) {
+        return awardRepository.findById(id)
+                .map(awardMapper::asOutput)
+                .orElseThrow(() -> new RuntimeException("Award not found"));
     }
 
-    public AwardDto createAward(AwardDto awardDto) {
-        Award saved = awardRepository.save(awardMapper.toEntity(awardDto));
-        return awardMapper.toDto(saved);
+    public AwardResponseDto createAward(AwardRequestDto dto) {
+        Award saved = awardRepository.save(awardMapper.asEntity(dto));
+        return awardMapper.asOutput(saved);
     }
 
-    public AwardDto updateAward(Long id, AwardDto updatedAwardDto) {
-        Optional<Award> optionalAward = awardRepository.findById(id);
-        if (optionalAward.isPresent()) {
-            Award award = optionalAward.get();
-            award.setName(updatedAwardDto.getName());
-            return awardMapper.toDto(awardRepository.save(award));
-        }
-        return null;
+    public AwardResponseDto updateAward(Long id, AwardRequestDto dto) {
+        Award award = awardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Award not found"));
+        awardMapper.update(award, dto);
+        return awardMapper.asOutput(awardRepository.save(award));
     }
 
     public void deleteAward(Long id) {

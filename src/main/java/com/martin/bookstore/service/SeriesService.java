@@ -1,14 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.dto.old.SeriesDto;
-import com.martin.bookstore.core.mapper.old.SeriesMapper;
+import com.martin.bookstore.dto.request.SeriesRequestDto;
+import com.martin.bookstore.dto.response.SeriesResponseDto;
 import com.martin.bookstore.entity.Series;
+import com.martin.bookstore.core.mapper.SeriesMapper;
 import com.martin.bookstore.repository.SeriesRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SeriesService {
@@ -21,27 +20,26 @@ public class SeriesService {
         this.seriesMapper = seriesMapper;
     }
 
-    public List<SeriesDto> getAllSeries() {
-        return seriesRepository.findAll().stream().map(seriesMapper::toDto).collect(Collectors.toList());
+    public List<SeriesResponseDto> getAllSeries() {
+        return seriesMapper.asOutput(seriesRepository.findAll());
     }
 
-    public SeriesDto getSeriesById(Long id) {
-        return seriesRepository.findById(id).map(seriesMapper::toDto).orElseThrow(() -> new RuntimeException("series not found"));
+    public SeriesResponseDto getSeriesById(Long id) {
+        return seriesRepository.findById(id)
+                .map(seriesMapper::asOutput)
+                .orElseThrow(() -> new RuntimeException("series not found"));
     }
 
-    public SeriesDto createSeries(SeriesDto seriesDto) {
-        Series saved = seriesRepository.save(seriesMapper.toEntity(seriesDto));
-        return seriesMapper.toDto(saved);
+    public SeriesResponseDto createSeries(SeriesRequestDto dto) {
+        Series saved = seriesRepository.save(seriesMapper.asEntity(dto));
+        return seriesMapper.asOutput(saved);
     }
 
-    public SeriesDto updateSeries(Long id, SeriesDto updatedSeriesDto) {
-        Optional<Series> optionalSeries = seriesRepository.findById(id);
-        if (optionalSeries.isPresent()) {
-            Series series = optionalSeries.get();
-            series.setName(updatedSeriesDto.getName());
-            return seriesMapper.toDto(seriesRepository.save(series));
-        }
-        return null;
+    public SeriesResponseDto updateSeries(Long id, SeriesRequestDto dto) {
+        Series series = seriesRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("series not found"));
+        seriesMapper.update(series, dto);
+        return seriesMapper.asOutput(seriesRepository.save(series));
     }
 
     public void deleteSeries(Long id) {

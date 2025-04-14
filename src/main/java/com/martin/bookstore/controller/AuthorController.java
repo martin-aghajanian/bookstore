@@ -1,6 +1,7 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.dto.old.AuthorDto;
+import com.martin.bookstore.dto.request.AuthorRequestDto;
+import com.martin.bookstore.dto.response.AuthorResponseDto;
 import com.martin.bookstore.service.AuthorService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,18 +18,18 @@ public class AuthorController {
     }
 
     @GetMapping("/{id}")
-    public AuthorDto getAuthorById(@PathVariable Long id) {
+    public AuthorResponseDto getAuthorById(@PathVariable Long id) {
         return authorService.getAuthorById(id);
     }
 
     @PostMapping
-    public AuthorDto createAuthor(@RequestBody AuthorDto authorDto) {
-        return authorService.createAuthor(authorDto);
+    public AuthorResponseDto createAuthor(@RequestBody AuthorRequestDto dto) {
+        return authorService.createAuthor(dto);
     }
 
     @PutMapping("/{id}")
-    public AuthorDto updateAuthor(@PathVariable Long id, @RequestBody AuthorDto authorDto) {
-        return authorService.updateAuthor(id, authorDto);
+    public AuthorResponseDto updateAuthor(@PathVariable Long id, @RequestBody AuthorRequestDto dto) {
+        return authorService.updateAuthor(id, dto);
     }
 
     @DeleteMapping("/{id}")
@@ -37,7 +38,7 @@ public class AuthorController {
     }
 
     @GetMapping
-    public Page<AuthorDto> filterAuthors(
+    public Page<AuthorResponseDto> filterAuthors(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean goodreads,
             @RequestParam(required = false) String bookTitle,
@@ -47,5 +48,4 @@ public class AuthorController {
     ) {
         return authorService.filterAuthors(name, goodreads, bookTitle, contribution, PageRequest.of(page, size));
     }
-
 }
