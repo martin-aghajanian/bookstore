@@ -16,7 +16,8 @@ import java.util.List;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books_id_seq")
+    @SequenceGenerator(name = "books_id_seq", sequenceName = "books_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "isbn", unique = true, nullable = false)

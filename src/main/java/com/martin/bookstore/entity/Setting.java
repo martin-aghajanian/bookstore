@@ -15,7 +15,8 @@ import java.util.List;
 public class Setting {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "settings_id_seq")
+    @SequenceGenerator(name = "settings_id_seq", sequenceName = "settings_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "name", nullable = false)

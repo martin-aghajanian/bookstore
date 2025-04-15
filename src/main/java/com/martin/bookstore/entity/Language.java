@@ -15,7 +15,8 @@ import java.util.List;
 public class Language {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "languages_id_seq")
+    @SequenceGenerator(name = "languages_id_seq", sequenceName = "languages_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "name", unique = true, nullable = false)

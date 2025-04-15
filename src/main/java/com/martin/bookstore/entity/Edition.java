@@ -15,7 +15,8 @@ import java.util.List;
 public class Edition {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editions_id_seq")
+    @SequenceGenerator(name = "editions_id_seq", sequenceName = "editions_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "name")

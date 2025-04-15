@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
 public class FileInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_info_id_seq")
+    @SequenceGenerator(name = "file_info_id_seq", sequenceName = "file_info_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "url", unique = true, nullable = false)

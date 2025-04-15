@@ -13,7 +13,8 @@ import lombok.Setter;
 public class BookAuthor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books_authors_id_seq")
+    @SequenceGenerator(name = "books_authors_id_seq", sequenceName = "books_authors_id_seq", allocationSize = 50)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -15,7 +15,8 @@ import java.util.List;
 public class Format {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "formats_id_seq")
+    @SequenceGenerator(name = "formats_id_seq", sequenceName = "formats_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "format", unique = true, nullable = false)

@@ -13,7 +13,8 @@ import lombok.Setter;
 public class BookSetting {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books_settings_id_seq")
+    @SequenceGenerator(name = "books_settings_id_seq", sequenceName = "books_settings_id_seq", allocationSize = 50)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
