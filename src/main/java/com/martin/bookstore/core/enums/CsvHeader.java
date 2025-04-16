@@ -1,4 +1,4 @@
-package com.martin.bookstore.csvimport.enums;
+package com.martin.bookstore.core.enums;
 
 public enum CsvHeader {
     TITLE("title"),

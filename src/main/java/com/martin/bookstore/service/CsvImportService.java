@@ -1,7 +1,7 @@
-package com.martin.bookstore.csvimport.service;
+package com.martin.bookstore.service;
 
-import com.martin.bookstore.csvimport.enums.CsvHeader;
-import com.martin.bookstore.csvimport.utils.CsvUtils;
+import com.martin.bookstore.core.enums.CsvHeader;
+import com.martin.bookstore.core.utils.CsvUtils;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.repository.*;
 import com.martin.bookstore.entity.Character;

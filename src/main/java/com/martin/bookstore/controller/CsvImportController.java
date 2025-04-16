@@ -1,6 +1,6 @@
-package com.martin.bookstore.csvimport.controller;
+package com.martin.bookstore.controller;
 
-import com.martin.bookstore.csvimport.service.CsvImportService;
+import com.martin.bookstore.service.CsvImportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

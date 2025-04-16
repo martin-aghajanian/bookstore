@@ -1,6 +1,6 @@
-package com.martin.bookstore.csvimport.utils;
+package com.martin.bookstore.core.utils;
 
-import com.martin.bookstore.csvimport.enums.CsvHeader;
+import com.martin.bookstore.core.enums.CsvHeader;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.entity.Character;
 import org.apache.commons.csv.CSVParser;
