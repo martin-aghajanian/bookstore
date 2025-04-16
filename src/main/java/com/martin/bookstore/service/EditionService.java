@@ -5,20 +5,17 @@ import com.martin.bookstore.dto.response.EditionResponseDto;
 import com.martin.bookstore.entity.Edition;
 import com.martin.bookstore.core.mapper.EditionMapper;
 import com.martin.bookstore.repository.EditionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EditionService {
 
     private final EditionRepository editionRepository;
     private final EditionMapper editionMapper;
-
-    public EditionService(EditionRepository editionRepository, EditionMapper editionMapper) {
-        this.editionRepository = editionRepository;
-        this.editionMapper = editionMapper;
-    }
 
     public List<EditionResponseDto> getAllEditions() {
         return editionMapper.asOutput(editionRepository.findAll());

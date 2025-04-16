@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.FormatRequestDto;
 import com.martin.bookstore.dto.response.FormatResponseDto;
 import com.martin.bookstore.service.FormatService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/formats")
+@RequiredArgsConstructor
 public class FormatController {
 
     private final FormatService formatService;
-
-    public FormatController(FormatService formatService) {
-        this.formatService = formatService;
-    }
 
     @GetMapping
     public List<FormatResponseDto> getAllFormats() {

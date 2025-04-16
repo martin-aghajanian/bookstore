@@ -5,20 +5,17 @@ import com.martin.bookstore.dto.response.SettingResponseDto;
 import com.martin.bookstore.entity.Setting;
 import com.martin.bookstore.core.mapper.SettingMapper;
 import com.martin.bookstore.repository.SettingRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class SettingService {
 
     private final SettingRepository settingRepository;
     private final SettingMapper settingMapper;
-
-    public SettingService(SettingRepository settingRepository, SettingMapper settingMapper) {
-        this.settingRepository = settingRepository;
-        this.settingMapper = settingMapper;
-    }
 
     public List<SettingResponseDto> getAllSettings() {
         return settingMapper.asOutput(settingRepository.findAll());

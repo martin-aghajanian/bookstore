@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.CharacterRequestDto;
 import com.martin.bookstore.dto.response.CharacterResponseDto;
 import com.martin.bookstore.service.CharacterService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/characters")
+@RequiredArgsConstructor
 public class CharacterController {
 
     private final CharacterService characterService;
-
-    public CharacterController(CharacterService characterService) {
-        this.characterService = characterService;
-    }
 
     @GetMapping
     public List<CharacterResponseDto> getAllCharacters() {

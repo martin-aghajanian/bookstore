@@ -5,20 +5,17 @@ import com.martin.bookstore.dto.response.SeriesResponseDto;
 import com.martin.bookstore.entity.Series;
 import com.martin.bookstore.core.mapper.SeriesMapper;
 import com.martin.bookstore.repository.SeriesRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SeriesService {
 
     private final SeriesRepository seriesRepository;
     private final SeriesMapper seriesMapper;
-
-    public SeriesService(SeriesRepository seriesRepository, SeriesMapper seriesMapper) {
-        this.seriesRepository = seriesRepository;
-        this.seriesMapper = seriesMapper;
-    }
 
     public List<SeriesResponseDto> getAllSeries() {
         return seriesMapper.asOutput(seriesRepository.findAll());

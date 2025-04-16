@@ -5,20 +5,17 @@ import com.martin.bookstore.dto.response.GenreResponseDto;
 import com.martin.bookstore.entity.Genre;
 import com.martin.bookstore.core.mapper.GenreMapper;
 import com.martin.bookstore.repository.GenreRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GenreService {
 
     private final GenreRepository genreRepository;
     private final GenreMapper genreMapper;
-
-    public GenreService(GenreRepository genreRepository, GenreMapper genreMapper) {
-        this.genreRepository = genreRepository;
-        this.genreMapper = genreMapper;
-    }
 
     public List<GenreResponseDto> getAllGenres() {
         return genreMapper.asOutput(genreRepository.findAll());

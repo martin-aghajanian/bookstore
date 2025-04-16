@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.EditionRequestDto;
 import com.martin.bookstore.dto.response.EditionResponseDto;
 import com.martin.bookstore.service.EditionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/editions")
+@RequiredArgsConstructor
 public class EditionController {
 
     private final EditionService editionService;
-
-    public EditionController(EditionService editionService) {
-        this.editionService = editionService;
-    }
 
     @GetMapping
     public List<EditionResponseDto> getAllEditions() {

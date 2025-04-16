@@ -1,6 +1,7 @@
 package com.martin.bookstore.csvimport.controller;
 
 import com.martin.bookstore.csvimport.service.CsvImportService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,13 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/csv-upload")
+@RequiredArgsConstructor
 public class CsvImportController {
 
     private final CsvImportService csvImportService;
-
-    public CsvImportController(CsvImportService csvImportService) {
-        this.csvImportService = csvImportService;
-    }
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {

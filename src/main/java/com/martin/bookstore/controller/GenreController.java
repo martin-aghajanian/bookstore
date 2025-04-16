@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.GenreRequestDto;
 import com.martin.bookstore.dto.response.GenreResponseDto;
 import com.martin.bookstore.service.GenreService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/genres")
+@RequiredArgsConstructor
 public class GenreController {
 
     private final GenreService genreService;
-
-    public GenreController(GenreService genreService) {
-        this.genreService = genreService;
-    }
 
     @GetMapping
     public List<GenreResponseDto> getAllGenres() {

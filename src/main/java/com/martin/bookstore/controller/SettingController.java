@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.SettingRequestDto;
 import com.martin.bookstore.dto.response.SettingResponseDto;
 import com.martin.bookstore.service.SettingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/settings")
+@RequiredArgsConstructor
 public class SettingController {
 
     private final SettingService settingService;
-
-    public SettingController(SettingService settingService) {
-        this.settingService = settingService;
-    }
 
     @GetMapping
     public List<SettingResponseDto> getAllSettings() {

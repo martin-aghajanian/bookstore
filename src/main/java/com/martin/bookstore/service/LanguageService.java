@@ -5,20 +5,17 @@ import com.martin.bookstore.dto.response.LanguageResponseDto;
 import com.martin.bookstore.entity.Language;
 import com.martin.bookstore.core.mapper.LanguageMapper;
 import com.martin.bookstore.repository.LanguageRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LanguageService {
 
     private final LanguageRepository languageRepository;
     private final LanguageMapper languageMapper;
-
-    public LanguageService(LanguageRepository languageRepository, LanguageMapper languageMapper) {
-        this.languageRepository = languageRepository;
-        this.languageMapper = languageMapper;
-    }
 
     public List<LanguageResponseDto> getAllLanguages() {
         return languageMapper.asOutput(languageRepository.findAll());

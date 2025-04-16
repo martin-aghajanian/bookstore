@@ -5,6 +5,7 @@ import com.martin.bookstore.dto.response.AwardResponseDto;
 import com.martin.bookstore.entity.Award;
 import com.martin.bookstore.core.mapper.AwardMapper;
 import com.martin.bookstore.repository.AwardRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,15 +13,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AwardService {
 
     private final AwardRepository awardRepository;
     private final AwardMapper awardMapper;
-
-    public AwardService(AwardRepository awardRepository, AwardMapper awardMapper) {
-        this.awardRepository = awardRepository;
-        this.awardMapper = awardMapper;
-    }
 
     public List<AwardResponseDto> getAllAwards() {
         return awardMapper.asOutput(awardRepository.findAll());

@@ -5,20 +5,17 @@ import com.martin.bookstore.dto.response.FormatResponseDto;
 import com.martin.bookstore.entity.Format;
 import com.martin.bookstore.core.mapper.FormatMapper;
 import com.martin.bookstore.repository.FormatRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FormatService {
 
     private final FormatRepository formatRepository;
     private final FormatMapper formatMapper;
-
-    public FormatService(FormatRepository formatRepository, FormatMapper formatMapper) {
-        this.formatRepository = formatRepository;
-        this.formatMapper = formatMapper;
-    }
 
     public List<FormatResponseDto> getAllFormats() {
         return formatMapper.asOutput(formatRepository.findAll());

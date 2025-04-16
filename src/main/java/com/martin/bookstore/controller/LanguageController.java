@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.LanguageRequestDto;
 import com.martin.bookstore.dto.response.LanguageResponseDto;
 import com.martin.bookstore.service.LanguageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/languages")
+@RequiredArgsConstructor
 public class LanguageController {
 
     private final LanguageService languageService;
-
-    public LanguageController(LanguageService languageService) {
-        this.languageService = languageService;
-    }
 
     @GetMapping
     public List<LanguageResponseDto> getAllLanguages() {

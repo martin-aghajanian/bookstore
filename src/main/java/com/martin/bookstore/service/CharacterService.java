@@ -5,20 +5,17 @@ import com.martin.bookstore.dto.response.CharacterResponseDto;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.core.mapper.CharacterMapper;
 import com.martin.bookstore.repository.CharacterRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final CharacterMapper characterMapper;
-
-    public CharacterService(CharacterRepository characterRepository, CharacterMapper characterMapper) {
-        this.characterRepository = characterRepository;
-        this.characterMapper = characterMapper;
-    }
 
     public List<CharacterResponseDto> getAllCharacters() {
         return characterMapper.asOutput(characterRepository.findAll());

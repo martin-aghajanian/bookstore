@@ -21,6 +21,7 @@ import com.martin.bookstore.entity.Series;
 import com.martin.bookstore.repository.SeriesRepository;
 import com.martin.bookstore.entity.Setting;
 import com.martin.bookstore.repository.SettingRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BookService {
 
     private final BookRepository bookRepository;
@@ -49,33 +51,8 @@ public class BookService {
     private final BookSettingRepository bookSettingRepository;
     private final BookAwardRepository bookAwardRepository;
 
-
     private final BookMapper bookMapper;
 
-
-
-
-    public BookService(BookRepository bookRepository, EditionRepository editionRepository,
-                       LanguageRepository languageRepository, PublisherRepository publisherRepository,
-                       FormatRepository formatRepository, SeriesRepository seriesRepository, AuthorRepository authorRepository, GenreRepository genreRepository, CharacterRepository characterRepository, SettingRepository settingRepository, AwardRepository awardRepository, BookAuthorRepository bookAuthorRepository, BookGenreRepository bookGenreRepository, BookCharacterRepository bookCharacterRepository, BookSettingRepository bookSettingRepository, BookAwardRepository bookAwardRepository, BookMapper bookMapper) {
-        this.bookRepository = bookRepository;
-        this.editionRepository = editionRepository;
-        this.languageRepository = languageRepository;
-        this.publisherRepository = publisherRepository;
-        this.formatRepository = formatRepository;
-        this.seriesRepository = seriesRepository;
-        this.authorRepository = authorRepository;
-        this.genreRepository = genreRepository;
-        this.characterRepository = characterRepository;
-        this.settingRepository = settingRepository;
-        this.awardRepository = awardRepository;
-        this.bookAuthorRepository = bookAuthorRepository;
-        this.bookGenreRepository = bookGenreRepository;
-        this.bookCharacterRepository = bookCharacterRepository;
-        this.bookSettingRepository = bookSettingRepository;
-        this.bookAwardRepository = bookAwardRepository;
-        this.bookMapper = bookMapper;
-    }
 
     public List<BookResponseDto> getAllBooks() {
         return bookMapper.asOutput(bookRepository.findAll());

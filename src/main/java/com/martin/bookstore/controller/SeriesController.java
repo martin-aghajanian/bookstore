@@ -3,19 +3,17 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.SeriesRequestDto;
 import com.martin.bookstore.dto.response.SeriesResponseDto;
 import com.martin.bookstore.service.SeriesService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/series")
+@RequiredArgsConstructor
 public class SeriesController {
 
     private final SeriesService seriesService;
-
-    public SeriesController(SeriesService seriesService) {
-        this.seriesService = seriesService;
-    }
 
     @GetMapping
     public List<SeriesResponseDto> getAllSeries() {
