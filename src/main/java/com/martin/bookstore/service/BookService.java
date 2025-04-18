@@ -22,6 +22,8 @@ import com.martin.bookstore.repository.SeriesRepository;
 import com.martin.bookstore.entity.Setting;
 import com.martin.bookstore.repository.SettingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -159,5 +161,10 @@ public class BookService {
 
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
+    }
+
+    public Page<BookResponseDto> searchBooksByTitleOrDescription(String query, Pageable pageable) {
+        Page<Book> result = bookRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, pageable);
+        return result.map(bookMapper::asOutput);
     }
 }

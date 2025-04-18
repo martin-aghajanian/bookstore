@@ -4,6 +4,8 @@ import com.martin.bookstore.dto.request.BookRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,11 +16,6 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-
-    @GetMapping
-    public List<BookResponseDto> getAllBooks() {
-        return bookService.getAllBooks();
-    }
 
     @GetMapping("/{id}")
     public BookResponseDto getBookById(@PathVariable Long id) {
@@ -39,4 +36,15 @@ public class BookController {
     public void deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
     }
+
+    @GetMapping("/search")
+    public Page<BookResponseDto> searchBooks(
+            @RequestParam("title") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return bookService.searchBooksByTitleOrDescription(query, PageRequest.of(page, size));
+    }
+
+
 }
