@@ -1,5 +1,6 @@
 package com.martin.bookstore.entity;
 
+import com.martin.bookstore.core.enums.FileType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

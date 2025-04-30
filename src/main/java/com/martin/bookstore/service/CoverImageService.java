@@ -10,6 +10,7 @@ import com.martin.bookstore.repository.FileInfoRepository;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class CoverImageService {
     private String rootDir;
 
     public void processBookCovers() {
-        List<Book> books = bookRepository.findAll();
+        List<Book> books = bookRepository.findAll(Pageable.ofSize(10)).getContent();
         Map<String, FileInfo> urlToFileInfo = new HashMap<>();
         for (FileInfo fi : fileInfoRepository.findAll()) {
             urlToFileInfo.put(fi.getUrl(), fi);
@@ -75,15 +76,14 @@ public class CoverImageService {
 
     private void processSingleBook(Book book, Map<String, FileInfo> urlToFileInfo, Queue<FileInfo> fileInfosToSave) {
         String imageUrl = book.getCoverImageUrl();
-        Long isbn = book.getIsbn();
-        if (imageUrl == null || imageUrl.isBlank() || isbn == null) return;
+        Long id = book.getId();
 
         FileInfo existing = urlToFileInfo.get(imageUrl);
         if (existing != null && Boolean.TRUE.equals(existing.getIsAccessible())) return;
 
         try {
             boolean isAccessible = isImageUrlValid(imageUrl);
-            Path bookDir = Paths.get(rootDir, String.valueOf(isbn));
+            Path bookDir = Paths.get(rootDir, String.valueOf(id));
             Path thumbDir = bookDir.resolve("thumbnails");
 
             if (isAccessible) {
@@ -149,7 +149,7 @@ public class CoverImageService {
             }
         }
 
-        System.out.printf("Finished book ID %d - ISBN %d%n", book.getId(), isbn);
+        System.out.println("book ID "+id+" image processed");
     }
 
     private boolean isImageUrlValid(String urlStr) {

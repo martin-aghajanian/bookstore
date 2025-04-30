@@ -1,6 +1,7 @@
 package com.martin.bookstore.service;
 
 import com.martin.bookstore.core.enums.CsvHeader;
+import com.martin.bookstore.core.exception.CsvProcessingException;
 import com.martin.bookstore.core.utils.CsvUtils;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.repository.*;
@@ -118,6 +119,8 @@ public class CsvImportService {
             Queue<BookCharacter> bookCharacters = new ConcurrentLinkedQueue<>();
             Queue<BookSetting> bookSettings = new ConcurrentLinkedQueue<>();
 
+            ConcurrentLinkedQueue<String> failedRecords = new ConcurrentLinkedQueue<>();
+
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
             List<CSVRecord> records = csvParser.getRecords();
@@ -138,7 +141,7 @@ public class CsvImportService {
                                 books, bookAuthors, bookAwards, bookGenres, bookCharacters, bookSettings
                         );
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        failedRecords.add("Record #" + recordNumber + ": " + record.toString());
                     } finally {
                         latch.countDown();
                     }
@@ -149,29 +152,32 @@ public class CsvImportService {
             latch.await();
             executor.shutdown();
 
-            csvUtils.safeSaveAll(new ArrayList<>(editions.values()), editionRepository, "editions");
-            csvUtils.safeSaveAll(new ArrayList<>(languages.values()), languageRepository, "languages");
-            csvUtils.safeSaveAll(new ArrayList<>(publishers.values()), publisherRepository, "publishers");
-            csvUtils.safeSaveAll(new ArrayList<>(formats.values()), formatRepository, "formats");
-            csvUtils.safeSaveAll(new ArrayList<>(seriesSet.values()), seriesRepository, "series");
-            csvUtils.safeSaveAll(new ArrayList<>(authorsMap.values()), authorRepository, "authors");
-            csvUtils.safeSaveAll(new ArrayList<>(awards.values()), awardRepository, "awards");
-            csvUtils.safeSaveAll(new ArrayList<>(genres.values()), genreRepository, "genres");
-            csvUtils.safeSaveAll(new ArrayList<>(characters.values()), characterRepository, "characters");
-            csvUtils.safeSaveAll(new ArrayList<>(settings.values()), settingRepository, "settings");
+            editionRepository.saveAll(new ArrayList<>(editions.values()));
+            languageRepository.saveAll(new ArrayList<>(languages.values()));
+            publisherRepository.saveAll(new ArrayList<>(publishers.values()));
+            formatRepository.saveAll(new ArrayList<>(formats.values()));
+            seriesRepository.saveAll(new ArrayList<>(seriesSet.values()));
+            authorRepository.saveAll(new ArrayList<>(authorsMap.values()));
+            awardRepository.saveAll(new ArrayList<>(awards.values()));
+            genreRepository.saveAll(new ArrayList<>(genres.values()));
+            characterRepository.saveAll(new ArrayList<>(characters.values()));
+            settingRepository.saveAll(new ArrayList<>(settings.values()));
 
-            csvUtils.safeSaveAll(new ArrayList<>(books), bookRepository, "books");
+            bookRepository.saveAll(new ArrayList<>(books));
 
-            csvUtils.safeSaveAll(new ArrayList<>(bookAuthors), bookAuthorRepository, "bookAuthors");
-            csvUtils.safeSaveAll(new ArrayList<>(bookAwards), bookAwardRepository, "bookAwards");
-            csvUtils.safeSaveAll(new ArrayList<>(bookGenres), bookGenreRepository, "bookGenres");
-            csvUtils.safeSaveAll(new ArrayList<>(bookCharacters), bookCharacterRepository, "bookCharacters");
-            csvUtils.safeSaveAll(new ArrayList<>(bookSettings), bookSettingRepository, "bookSettings");
+            bookAuthorRepository.saveAll(new ArrayList<>(bookAuthors));
+            bookAwardRepository.saveAll(new ArrayList<>(bookAwards));
+            bookGenreRepository.saveAll(new ArrayList<>(bookGenres));
+            bookCharacterRepository.saveAll(new ArrayList<>(bookCharacters));
+            bookSettingRepository.saveAll(new ArrayList<>(bookSettings));
 
+            if (!failedRecords.isEmpty()) {
+                System.out.println("Total failed records: " + failedRecords.size());
+                // add to a .txt
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("error processing CSV file", e);
+            throw new CsvProcessingException("error processing CSV file", e);
         }
     }
 
@@ -223,14 +229,19 @@ public class CsvImportService {
             String bbeScoreStr = record.get(CsvHeader.BBE_SCORE.value());
             String bbeVotesStr = record.get(CsvHeader.BBE_VOTES.value());
 
-            if (title.isEmpty() || !isbnStr.matches("\\d{13}") || publishDateStr.isEmpty()) {
-                System.out.println("skipping invalid record #" + recordCount);
-                return;
+            csvUtils.validateRequiredFields(recordCount, title, isbnStr, publishDateStr);
+
+            Long isbn;
+            try {
+                isbn = Long.parseLong(isbnStr);
+            } catch (NumberFormatException e) {
+                throw new CsvProcessingException("Record #" + recordCount + " has invalid ISBN format: " + isbnStr, e);
             }
 
-            Long isbn = Long.parseLong(isbnStr);
             synchronized (processedIsbns) {
-                if (processedIsbns.contains(isbn)) return;
+                if (processedIsbns.contains(isbn)) {
+                    throw new CsvProcessingException("Record #" + recordCount + " has duplicate ISBN: " + isbn);
+                }
                 processedIsbns.add(isbn);
             }
 
@@ -241,27 +252,29 @@ public class CsvImportService {
             book.setCoverImageUrl(coverImageStr);
 
             LocalDate parsedDate = csvUtils.parseDate(publishDateStr);
-            if (parsedDate == null) return;
+            if (parsedDate == null) {
+                throw new CsvProcessingException("Record #" + recordCount + " has unparseable publish date: " + publishDateStr);
+            }
             book.setPublishDate(parsedDate);
 
             LocalDate firstDate = csvUtils.parseDate(firstPublishDateStr);
             book.setFirstPublishDate(firstDate);
 
-            csvUtils.tryParseInt(pagesStr, book::setPages);
-            csvUtils.tryParseDouble(ratingStr, book::setRating);
-            csvUtils.tryParseDouble(likedPercentStr, book::setLikedPercentage);
-            csvUtils.tryParseDouble(priceStr, book::setPrice);
-            csvUtils.tryParseLong(numRatingsStr, book::setNumRatings);
-            csvUtils.tryParseLong(bbeScoreStr, book::setBbeScore);
-            csvUtils.tryParseLong(bbeVotesStr, book::setBbeVotes);
+            csvUtils.tryParseInt(pagesStr, book::setPages, recordCount, CsvHeader.PAGES.value());
+            csvUtils.tryParseDouble(ratingStr, book::setRating, recordCount, CsvHeader.RATING.value());
+            csvUtils.tryParseDouble(likedPercentStr, book::setLikedPercentage, recordCount, CsvHeader.LIKED_PERCENT.value());
+            csvUtils.tryParseDouble(priceStr, book::setPrice, recordCount, CsvHeader.PRICE.value());
+            csvUtils.tryParseLong(numRatingsStr, book::setNumRatings, recordCount, CsvHeader.NUM_RATINGS.value());
+            csvUtils.tryParseLong(bbeScoreStr, book::setBbeScore, recordCount, CsvHeader.BBE_SCORE.value());
+            csvUtils.tryParseLong(bbeVotesStr, book::setBbeVotes, recordCount, CsvHeader.BBE_VOTES.value());
 
             String[] ratings = starRatings.split(",");
             if (ratings.length == 5) {
-                csvUtils.tryParseLong(ratings[0], book::setFiveStarRatings);
-                csvUtils.tryParseLong(ratings[1], book::setFourStarRatings);
-                csvUtils.tryParseLong(ratings[2], book::setThreeStarRatings);
-                csvUtils.tryParseLong(ratings[3], book::setTwoStarRatings);
-                csvUtils.tryParseLong(ratings[4], book::setOneStarRatings);
+                csvUtils.tryParseLong(ratings[0], book::setFiveStarRatings, recordCount, CsvHeader.RATINGS_BY_STARS.value() + " (5-star)");
+                csvUtils.tryParseLong(ratings[1], book::setFourStarRatings, recordCount, CsvHeader.RATINGS_BY_STARS.value() + " (4-star)");
+                csvUtils.tryParseLong(ratings[2], book::setThreeStarRatings, recordCount, CsvHeader.RATINGS_BY_STARS.value() + " (3-star)");
+                csvUtils.tryParseLong(ratings[3], book::setTwoStarRatings, recordCount, CsvHeader.RATINGS_BY_STARS.value() + " (2-star)");
+                csvUtils.tryParseLong(ratings[4], book::setOneStarRatings, recordCount, CsvHeader.RATINGS_BY_STARS.value() + " (1-star)");
             }
 
             csvUtils.resolveEdition(book, record.get(CsvHeader.EDITION.value()).trim(), editionDbMap, editions);
@@ -278,7 +291,7 @@ public class CsvImportService {
             books.add(book);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new CsvProcessingException("failed to process record #" + recordCount, e);
         }
     }
 }

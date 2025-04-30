@@ -1,11 +1,18 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.exception.DeleteNotAllowedException;
+import com.martin.bookstore.core.exception.NotFoundException;
+import com.martin.bookstore.core.mapper.BookMapper;
 import com.martin.bookstore.dto.request.EditionRequestDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.EditionResponseDto;
 import com.martin.bookstore.entity.Edition;
 import com.martin.bookstore.core.mapper.EditionMapper;
+import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.EditionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +23,8 @@ public class EditionService {
 
     private final EditionRepository editionRepository;
     private final EditionMapper editionMapper;
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
 
     public List<EditionResponseDto> getAllEditions() {
         return editionMapper.asOutput(editionRepository.findAll());
@@ -24,7 +33,7 @@ public class EditionService {
     public EditionResponseDto getEditionById(Long id) {
         return editionRepository.findById(id)
                 .map(editionMapper::asOutput)
-                .orElseThrow(() -> new RuntimeException("edition not found"));
+                .orElseThrow(() -> new NotFoundException("edition with id " + id + " not found"));
     }
 
     public EditionResponseDto createEdition(EditionRequestDto dto) {
@@ -34,12 +43,27 @@ public class EditionService {
 
     public EditionResponseDto updateEdition(Long id, EditionRequestDto dto) {
         Edition edition = editionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("edition not found"));
+                .orElseThrow(() -> new NotFoundException("edition with id " + id + " not found"));
         editionMapper.update(edition, dto);
         return editionMapper.asOutput(editionRepository.save(edition));
     }
 
     public void deleteEdition(Long id) {
-        editionRepository.deleteById(id);
+        Edition edition = editionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("edition with id " + id + " not found"));
+
+        if (edition.getBooks() != null && !edition.getBooks().isEmpty()) {
+            throw new DeleteNotAllowedException("Cannot delete edition associated with books");
+        }
+
+        editionRepository.delete(edition);
+    }
+
+    public Page<BookResponseDto> getBooksByEdition(Long editionId, Pageable pageable) {
+        editionRepository.findById(editionId)
+                .orElseThrow(() -> new NotFoundException("edition with id " + editionId + " not found"));
+
+        return bookRepository.findByEditionId(editionId, pageable)
+                .map(bookMapper::asOutput);
     }
 }

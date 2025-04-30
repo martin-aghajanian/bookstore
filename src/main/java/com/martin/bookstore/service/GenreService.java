@@ -1,11 +1,18 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.exception.DeleteNotAllowedException;
+import com.martin.bookstore.core.exception.NotFoundException;
+import com.martin.bookstore.core.mapper.BookMapper;
 import com.martin.bookstore.dto.request.GenreRequestDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.GenreResponseDto;
 import com.martin.bookstore.entity.Genre;
 import com.martin.bookstore.core.mapper.GenreMapper;
+import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.GenreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +23,8 @@ public class GenreService {
 
     private final GenreRepository genreRepository;
     private final GenreMapper genreMapper;
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
 
     public List<GenreResponseDto> getAllGenres() {
         return genreMapper.asOutput(genreRepository.findAll());
@@ -24,7 +33,7 @@ public class GenreService {
     public GenreResponseDto getGenreById(Long id) {
         return genreRepository.findById(id)
                 .map(genreMapper::asOutput)
-                .orElseThrow(() -> new RuntimeException("genre not found"));
+                .orElseThrow(() -> new NotFoundException("genre with id " + id + " not found"));
     }
 
     public GenreResponseDto createGenre(GenreRequestDto dto) {
@@ -34,12 +43,27 @@ public class GenreService {
 
     public GenreResponseDto updateGenre(Long id, GenreRequestDto dto) {
         Genre genre = genreRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("genre not found"));
+                .orElseThrow(() -> new NotFoundException("genre with id " + id + " not found"));
         genreMapper.update(genre, dto);
         return genreMapper.asOutput(genreRepository.save(genre));
     }
 
     public void deleteGenre(Long id) {
-        genreRepository.deleteById(id);
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("genre with id " + id + " not found"));
+
+        if (genre.getBookGenres() != null && !genre.getBookGenres().isEmpty()) {
+            throw new DeleteNotAllowedException("Cannot delete genre associated with books");
+        }
+
+        genreRepository.delete(genre);
+    }
+
+    public Page<BookResponseDto> getBooksByGenre(Long genreId, Pageable pageable) {
+        genreRepository.findById(genreId)
+                .orElseThrow(() -> new NotFoundException("genre with id " + genreId + " not found"));
+
+        return bookRepository.findByGenreId(genreId, pageable)
+                .map(bookMapper::asOutput);
     }
 }

@@ -1,34 +1,32 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.filters.BookFilterRequestDto;
 import com.martin.bookstore.dto.request.BookRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.repository.*;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.repository.CharacterRepository;
-import com.martin.bookstore.entity.Edition;
 import com.martin.bookstore.repository.EditionRepository;
-import com.martin.bookstore.entity.Format;
 import com.martin.bookstore.repository.FormatRepository;
 import com.martin.bookstore.entity.Genre;
 import com.martin.bookstore.repository.GenreRepository;
-import com.martin.bookstore.entity.Language;
 import com.martin.bookstore.repository.LanguageRepository;
-import com.martin.bookstore.entity.Publisher;
 import com.martin.bookstore.repository.PublisherRepository;
-import com.martin.bookstore.entity.Series;
 import com.martin.bookstore.repository.SeriesRepository;
 import com.martin.bookstore.entity.Setting;
 import com.martin.bookstore.repository.SettingRepository;
+import com.martin.bookstore.repository.specification.BookSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -55,15 +53,10 @@ public class BookService {
 
     private final BookMapper bookMapper;
 
-
-    public List<BookResponseDto> getAllBooks() {
-        return bookMapper.asOutput(bookRepository.findAll());
-    }
-
     public BookResponseDto getBookById(Long id) {
         return bookRepository.findById(id)
                 .map(bookMapper::asOutput)
-                .orElseThrow(() -> new RuntimeException("book not found"));
+                .orElseThrow(() -> new NotFoundException("book with id " + id + " not found"));
     }
 
     @Transactional
@@ -73,7 +66,7 @@ public class BookService {
 
         if (dto.getAuthorIds() != null) {
             dto.getAuthorIds().forEach(authorId -> {
-                Author author = authorRepository.findById(authorId).orElseThrow();
+                Author author = authorRepository.findById(authorId).orElseThrow(() -> new NotFoundException("Author with id " + authorId + " not found"));
                 BookAuthor bookAuthor = new BookAuthor();
                 bookAuthor.setBook(savedBook);
                 bookAuthor.setAuthor(author);
@@ -89,7 +82,8 @@ public class BookService {
 
         if (dto.getGenreIds() != null) {
             dto.getGenreIds().forEach(genreId -> {
-                Genre genre = genreRepository.findById(genreId).orElseThrow();
+                Genre genre = genreRepository.findById(genreId)
+                        .orElseThrow(() -> new NotFoundException("Genre with id " + genreId + " not found"));
                 BookGenre bookGenre = new BookGenre();
                 bookGenre.setBook(savedBook);
                 bookGenre.setGenre(genre);
@@ -99,7 +93,8 @@ public class BookService {
 
         if (dto.getCharacterIds() != null) {
             dto.getCharacterIds().forEach(characterId -> {
-                Character character = characterRepository.findById(characterId).orElseThrow();
+                Character character = characterRepository.findById(characterId)
+                        .orElseThrow(() -> new NotFoundException("Character with id " + characterId + " not found"));
                 BookCharacter bc = new BookCharacter();
                 bc.setBook(savedBook);
                 bc.setCharacter(character);
@@ -109,7 +104,8 @@ public class BookService {
 
         if (dto.getSettingIds() != null) {
             dto.getSettingIds().forEach(settingId -> {
-                Setting setting = settingRepository.findById(settingId).orElseThrow();
+                Setting setting = settingRepository.findById(settingId)
+                        .orElseThrow(() -> new NotFoundException("Setting with id " + settingId + " not found"));
                 BookSetting bs = new BookSetting();
                 bs.setBook(savedBook);
                 bs.setSetting(setting);
@@ -119,7 +115,8 @@ public class BookService {
 
         if (dto.getAwardIds() != null) {
             dto.getAwardIds().forEach(awardId -> {
-                Award award = awardRepository.findById(awardId).orElseThrow();
+                Award award = awardRepository.findById(awardId)
+                        .orElseThrow(() -> new NotFoundException("Award with id " + awardId + " not found"));
                 BookAward ba = new BookAward();
                 ba.setBook(savedBook);
                 ba.setAward(award);
@@ -137,34 +134,65 @@ public class BookService {
 
 
     public BookResponseDto updateBook(Long id, BookRequestDto dto) {
-        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("book not found"));
+        Book book = bookRepository.findById(id).orElseThrow(() -> new NotFoundException("book with id " + id + " not found"));
         bookMapper.update(book, dto);
 
         if (dto.getEditionId() != null) {
-            book.setEdition(editionRepository.findById(dto.getEditionId()).orElseThrow());
+            book.setEdition(editionRepository.findById(dto.getEditionId())
+                    .orElseThrow(() -> new NotFoundException("Edition with id " + dto.getEditionId() + " not found")));
         }
         if (dto.getLanguageId() != null) {
-            book.setLanguage(languageRepository.findById(dto.getLanguageId()).orElseThrow());
+            book.setLanguage(languageRepository.findById(dto.getLanguageId())
+                    .orElseThrow(() -> new NotFoundException("language with id " + dto.getLanguageId() + " not found")));
         }
         if (dto.getPublisherId() != null) {
-            book.setPublisher(publisherRepository.findById(dto.getPublisherId()).orElseThrow());
+            book.setPublisher(publisherRepository.findById(dto.getPublisherId())
+                    .orElseThrow(() -> new NotFoundException("Publisher with id " + dto.getPublisherId() + " not found")));
         }
         if (dto.getFormatId() != null) {
-            book.setFormat(formatRepository.findById(dto.getFormatId()).orElseThrow());
+            book.setFormat(formatRepository.findById(dto.getFormatId())
+                    .orElseThrow(() -> new NotFoundException("Format with id " + dto.getFormatId() + " not found")));
         }
         if (dto.getSeriesId() != null) {
-            book.setSeries(seriesRepository.findById(dto.getSeriesId()).orElseThrow());
+            book.setSeries(seriesRepository.findById(dto.getSeriesId())
+                    .orElseThrow(() -> new NotFoundException("Series with id " + dto.getSeriesId() + " not found")));
         }
 
         return bookMapper.asOutput(bookRepository.save(book));
     }
 
     public void deleteBook(Long id) {
-        bookRepository.deleteById(id);
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Book with id " + id + " not found"));
+
+        bookAuthorRepository.deleteAllByBook(book);
+        bookAwardRepository.deleteAllByBook(book);
+        bookCharacterRepository.deleteAllByBook(book);
+        bookSettingRepository.deleteAllByBook(book);
+        bookGenreRepository.deleteAllByBook(book);
+
+        bookRepository.delete(book);
     }
 
     public Page<BookResponseDto> searchBooksByTitleOrDescription(String query, Pageable pageable) {
         Page<Book> result = bookRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, pageable);
         return result.map(bookMapper::asOutput);
     }
+
+    public Page<BookResponseDto> filterBooks(BookFilterRequestDto filter, Pageable pageable) {
+        Specification<Book> spec = BookSpecification.filter(
+                filter.getGenreId(),
+                filter.getLanguageId(),
+                filter.getFormatId(),
+                filter.getMinPages(),
+                filter.getMaxPages(),
+                filter.getMinPrice(),
+                filter.getMaxPrice(),
+                filter.getMinDate(),
+                filter.getMaxDate()
+        );
+
+        return bookRepository.findAll(spec, pageable).map(bookMapper::asOutput);
+    }
+
 }

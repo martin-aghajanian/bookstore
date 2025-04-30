@@ -1,11 +1,17 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.exception.DeleteNotAllowedException;
+import com.martin.bookstore.core.exception.NotFoundException;
+import com.martin.bookstore.core.mapper.BookMapper;
 import com.martin.bookstore.dto.request.CharacterRequestDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.CharacterResponseDto;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.core.mapper.CharacterMapper;
 import com.martin.bookstore.repository.CharacterRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,15 +22,12 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final CharacterMapper characterMapper;
-
-    public List<CharacterResponseDto> getAllCharacters() {
-        return characterMapper.asOutput(characterRepository.findAll());
-    }
+    private final BookMapper bookMapper;
 
     public CharacterResponseDto getCharacterById(Long id) {
         return characterRepository.findById(id)
                 .map(characterMapper::asOutput)
-                .orElseThrow(() -> new RuntimeException("character not found"));
+                .orElseThrow(() -> new NotFoundException("character with id " + id + " not found"));
     }
 
     public CharacterResponseDto createCharacter(CharacterRequestDto dto) {
@@ -34,12 +37,27 @@ public class CharacterService {
 
     public CharacterResponseDto updateCharacter(Long id, CharacterRequestDto dto) {
         Character character = characterRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("character not found"));
+                .orElseThrow(() -> new NotFoundException("character with id " + id + " not found"));
         characterMapper.update(character, dto);
         return characterMapper.asOutput(characterRepository.save(character));
     }
 
     public void deleteCharacter(Long id) {
-        characterRepository.deleteById(id);
+        Character character = characterRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("character with id " + id + " not found"));
+
+        if (character.getBookCharacters() != null && !character.getBookCharacters().isEmpty()) {
+            throw new DeleteNotAllowedException("cannot delete character associated with books");
+        }
+
+        characterRepository.delete(character);
+    }
+
+    public Page<BookResponseDto> getBooksByCharacter(Long characterId, Pageable pageable) {
+        characterRepository.findById(characterId)
+                .orElseThrow(() -> new NotFoundException("character with id " + characterId + " not found"));
+
+        return characterRepository.findBooksByCharacterId(characterId, pageable)
+                .map(bookMapper::asOutput);
     }
 }

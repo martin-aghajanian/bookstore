@@ -1,6 +1,7 @@
 package com.martin.bookstore.core.utils;
 
 import com.martin.bookstore.core.enums.CsvHeader;
+import com.martin.bookstore.core.exception.CsvProcessingException;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.entity.Character;
 import org.apache.commons.csv.CSVParser;
@@ -81,8 +82,14 @@ public class CsvUtils {
 
         for (String header : requiredHeaders) {
             if (!parser.getHeaderMap().containsKey(header)) {
-                throw new RuntimeException("csv file is missing required header: " + header);
+                throw new CsvProcessingException("csv file is missing required header: " + header);
             }
+        }
+    }
+
+    public void validateRequiredFields(int recordCount, String title, String isbnStr, String publishDateStr) {
+        if (title.isEmpty() || !isbnStr.matches("\\d{13}") || publishDateStr.isEmpty()) {
+            throw new CsvProcessingException("Record #" + recordCount + " is missing required fields or has invalid ISBN");
         }
     }
 
@@ -119,32 +126,36 @@ public class CsvUtils {
         return null;
     }
 
-    public void tryParseInt(String value, IntConsumer setter) {
+    public void tryParseInt(String value, IntConsumer setter, int recordCount, String fieldName) {
         try {
             if (value != null && !value.trim().isEmpty()) {
                 setter.accept(Integer.parseInt(value.trim()));
             }
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException e) {
+            throw new CsvProcessingException("Record #" + recordCount + ": invalid integer value for field '" + fieldName + "': " + value, e);
         }
     }
 
-    public void tryParseLong(String value, LongConsumer setter) {
+    public void tryParseLong(String value, LongConsumer setter, int recordCount, String fieldName) {
         try {
             if (value != null && !value.trim().isEmpty()) {
                 setter.accept(Long.parseLong(value.trim()));
             }
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException e) {
+            throw new CsvProcessingException("Record #" + recordCount + ": invalid long value for field '" + fieldName + "': " + value, e);
         }
     }
 
-    public void tryParseDouble(String value, DoubleConsumer setter) {
+    public void tryParseDouble(String value, DoubleConsumer setter, int recordCount, String fieldName) {
         try {
             if (value != null && !value.trim().isEmpty()) {
                 setter.accept(Double.parseDouble(value.trim()));
             }
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException e) {
+            throw new CsvProcessingException("Record #" + recordCount + ": invalid double value for field '" + fieldName + "': " + value, e);
         }
     }
+
 
 
     public void resolveEdition(Book book, String editionName,

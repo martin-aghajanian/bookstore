@@ -1,5 +1,7 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.exception.DeleteNotAllowedException;
+import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
 import com.martin.bookstore.dto.request.AuthorRequestDto;
 import com.martin.bookstore.dto.response.AuthorResponseDto;
@@ -16,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class AuthorService {
     public AuthorResponseDto getAuthorById(Long id) {
         return authorRepository.findById(id)
                 .map(authorMapper::asOutput)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
     }
 
     public AuthorResponseDto createAuthor(AuthorRequestDto dto) {
@@ -39,17 +40,17 @@ public class AuthorService {
 
     public AuthorResponseDto updateAuthor(Long id, AuthorRequestDto dto) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
         authorMapper.update(author, dto);
         return authorMapper.asOutput(authorRepository.save(author));
     }
 
     public void deleteAuthor(Long id) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
 
         if (!author.getBookAuthor().isEmpty()) {
-            throw new IllegalStateException("Cannot delete author: they are associated with books.");
+            throw new DeleteNotAllowedException("Cannot delete author: they are associated with books.");
         }
 
         authorRepository.delete(author);
@@ -67,7 +68,7 @@ public class AuthorService {
 
     public Page<BookResponseDto> getBooksByAuthorId(Long authorId, Pageable pageable) {
         Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException("Author with id " + authorId + " not found"));
 
         List<Book> books = author.getBookAuthor().stream()
                 .map(BookAuthor::getBook)

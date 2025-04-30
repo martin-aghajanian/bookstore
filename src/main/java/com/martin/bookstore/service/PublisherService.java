@@ -1,5 +1,7 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.exception.DeleteNotAllowedException;
+import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
 import com.martin.bookstore.dto.request.PublisherRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
@@ -31,7 +33,7 @@ public class PublisherService {
     public PublisherResponseDto getPublisherById(Long id) {
         return publisherRepository.findById(id)
                 .map(publisherMapper::asOutput)
-                .orElseThrow(() -> new RuntimeException("publisher not found"));
+                .orElseThrow(() -> new NotFoundException("publisher with id " + id + " not found"));
     }
 
     public PublisherResponseDto createPublisher(PublisherRequestDto dto) {
@@ -41,17 +43,17 @@ public class PublisherService {
 
     public PublisherResponseDto updatePublisher(Long id, PublisherRequestDto dto) {
         Publisher publisher = publisherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("publisher not found"));
+                .orElseThrow(() -> new NotFoundException("publisher with id " + id + " not found"));
         publisherMapper.update(publisher, dto);
         return publisherMapper.asOutput(publisherRepository.save(publisher));
     }
 
     public void deletePublisher(Long id) {
         Publisher publisher = publisherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Publisher not found"));
+                .orElseThrow(() -> new NotFoundException("Publisher with id " + id + " not found"));
 
         if (!publisher.getBooks().isEmpty()) {
-            throw new IllegalStateException("Cannot delete publisher: it is associated with books.");
+            throw new DeleteNotAllowedException("Cannot delete publisher: it is associated with books.");
         }
 
         publisherRepository.delete(publisher);
@@ -64,7 +66,7 @@ public class PublisherService {
 
     public Page<BookResponseDto> getBooksByPublisherId(Long publisherId, Pageable pageable) {
         Publisher publisher = publisherRepository.findById(publisherId)
-                .orElseThrow(() -> new RuntimeException("Publisher not found"));
+                .orElseThrow(() -> new NotFoundException("Publisher with id " + publisherId + " not found"));
 
         List<Book> books = publisher.getBooks();
 

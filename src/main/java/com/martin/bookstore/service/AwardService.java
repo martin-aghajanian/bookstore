@@ -1,5 +1,7 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.core.exception.DeleteNotAllowedException;
+import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.dto.request.AwardRequestDto;
 import com.martin.bookstore.dto.response.AwardResponseDto;
 import com.martin.bookstore.entity.Award;
@@ -19,14 +21,10 @@ public class AwardService {
     private final AwardRepository awardRepository;
     private final AwardMapper awardMapper;
 
-    public List<AwardResponseDto> getAllAwards() {
-        return awardMapper.asOutput(awardRepository.findAll());
-    }
-
     public AwardResponseDto getAwardById(Long id) {
         return awardRepository.findById(id)
                 .map(awardMapper::asOutput)
-                .orElseThrow(() -> new RuntimeException("Award not found"));
+                .orElseThrow(() -> new NotFoundException("Award with id " + id + " not found"));
     }
 
     public AwardResponseDto createAward(AwardRequestDto dto) {
@@ -36,17 +34,17 @@ public class AwardService {
 
     public AwardResponseDto updateAward(Long id, AwardRequestDto dto) {
         Award award = awardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Award not found"));
+                .orElseThrow(() -> new NotFoundException("Award with id " + id + " not found"));
         awardMapper.update(award, dto);
         return awardMapper.asOutput(awardRepository.save(award));
     }
 
     public void deleteAward(Long id) {
         Award award = awardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Award not found"));
+                .orElseThrow(() -> new NotFoundException("Award with id " + id + " not found"));
 
         if (!award.getBookAwards().isEmpty()) {
-            throw new IllegalStateException("Cannot delete award: it is associated with books.");
+            throw new DeleteNotAllowedException("Cannot delete award: it is associated with books.");
         }
 
         awardRepository.delete(award);

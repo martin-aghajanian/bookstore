@@ -1,9 +1,14 @@
 package com.martin.bookstore.controller;
 
 import com.martin.bookstore.dto.request.CharacterRequestDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.CharacterResponseDto;
 import com.martin.bookstore.service.CharacterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,28 +20,38 @@ public class CharacterController {
 
     private final CharacterService characterService;
 
-    @GetMapping
-    public List<CharacterResponseDto> getAllCharacters() {
-        return characterService.getAllCharacters();
-    }
-
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public CharacterResponseDto getCharacterById(@PathVariable Long id) {
         return characterService.getCharacterById(id);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public CharacterResponseDto createCharacter(@RequestBody CharacterRequestDto dto) {
         return characterService.createCharacter(dto);
     }
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public CharacterResponseDto updateCharacter(@PathVariable Long id, @RequestBody CharacterRequestDto dto) {
         return characterService.updateCharacter(id, dto);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCharacter(@PathVariable Long id) {
         characterService.deleteCharacter(id);
+    }
+
+    @GetMapping("/{id}/books")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<BookResponseDto> getBooksByCharacter(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return characterService.getBooksByCharacter(id, pageable);
     }
 }
