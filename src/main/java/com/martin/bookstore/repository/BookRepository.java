@@ -1,7 +1,5 @@
 package com.martin.bookstore.repository;
 
-import com.martin.bookstore.dto.BookDto;
-import com.martin.bookstore.dto.BookProjection;
 import com.martin.bookstore.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,15 +39,4 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     """)
     Page<Book> findBySettingId(@Param("settingId") Long settingId, Pageable pageable);
 
-    @Query("""
-        select
-        b.id as id,
-        b.title as name,
-        a.fullName as authorName
-        from Book b
-        inner join b.bookAuthor ba
-        inner join ba.author a
-        where b.title = :name
-""")
-    BookProjection findBookByName(String name);
 }
