@@ -1,16 +1,13 @@
 package com.martin.bookstore;
 
-import com.martin.bookstore.security.auth.AuthenticationService;
-import com.martin.bookstore.security.auth.RegisterRequest;
-import org.springframework.boot.CommandLineRunner;
+import com.martin.bookstore.security.properties.PasswordValidationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-import static com.martin.bookstore.security.user.Role.ADMIN;
-import static com.martin.bookstore.security.user.Role.MANAGER;
 
 @SpringBootApplication
+@EnableConfigurationProperties(PasswordValidationProperties.class)
 public class BookstoreApplication {
 
     public static void main(String[] args) {

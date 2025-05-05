@@ -1,6 +1,7 @@
 package com.martin.bookstore.security.auth;
 
 import com.martin.bookstore.security.user.Role;
+import com.martin.bookstore.security.validation.StrongPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -29,7 +30,7 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Password cannot be blank")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @StrongPassword
     private String password;
 
     private Role role;
