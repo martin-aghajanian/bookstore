@@ -1,11 +1,10 @@
-package com.martin.bookstore.security.auth;
+package com.martin.bookstore.security.dto;
 
 import com.martin.bookstore.security.user.Role;
 import com.martin.bookstore.security.validation.PasswordMatches;
 import com.martin.bookstore.security.validation.StrongPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.auth;
+package com.martin.bookstore.security.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

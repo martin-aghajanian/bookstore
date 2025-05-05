@@ -1,6 +1,6 @@
 package com.martin.bookstore.security.validation;
 
-import com.martin.bookstore.security.auth.RegisterRequest;
+import com.martin.bookstore.security.dto.RegisterRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

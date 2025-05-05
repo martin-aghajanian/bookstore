@@ -1,13 +1,15 @@
 package com.martin.bookstore.security.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.martin.bookstore.security.dto.AuthenticationRequest;
+import com.martin.bookstore.security.dto.AuthenticationResponse;
+import com.martin.bookstore.security.dto.RegisterRequest;
 import com.martin.bookstore.security.config.JwtService;
 import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
 import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
 import com.martin.bookstore.security.token.Token;
 import com.martin.bookstore.security.token.TokenRepository;
 import com.martin.bookstore.security.token.TokenType;
-import com.martin.bookstore.security.user.Role;
 import com.martin.bookstore.security.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,11 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import com.martin.bookstore.security.user.User;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
