@@ -1,11 +1,15 @@
 package com.martin.bookstore.entity;
 
+import com.martin.bookstore.core.enums.FileDownloadStatus;
 import com.martin.bookstore.core.enums.FileType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "file_info")
@@ -19,19 +23,25 @@ public class FileInfo {
     @SequenceGenerator(name = "file_info_id_seq", sequenceName = "file_info_id_seq", allocationSize = 50)
     private Long id;
 
-    @Column(name = "url", unique = true, nullable = false)
-    private String url;
+    @Column(name = "file_url", unique = true, nullable = false)
+    private String fileUrl;
 
-    @Column(name = "local_path")
-    private String localPath;
+    @Column(name = "file_path")
+    private String filePath;
 
-    @Column(name = "is_accessible")
-    private Boolean isAccessible;
+    @Column(name = "file_name")
+    private String fileName;
 
-    @Column(name = "file_type")
-    private String fileType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private FileDownloadStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    private Book book;
+    @Column(name = "file_format")
+    private String fileFormat;
+
+    @Column(name = "error_message")
+    private String errorMessage;
+
+    @OneToMany(mappedBy = "fileInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookFileInfo> bookFileInfos = new ArrayList<>();
 }

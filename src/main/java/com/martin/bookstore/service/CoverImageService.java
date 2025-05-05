@@ -2,8 +2,10 @@ package com.martin.bookstore.service;
 
 import com.martin.bookstore.core.enums.CoverImageFileName;
 import com.martin.bookstore.core.enums.CoverImageSize;
+import com.martin.bookstore.core.enums.FileDownloadStatus;
 import com.martin.bookstore.core.enums.FileType;
 import com.martin.bookstore.entity.Book;
+import com.martin.bookstore.entity.BookFileInfo;
 import com.martin.bookstore.entity.FileInfo;
 import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.FileInfoRepository;
@@ -38,23 +40,22 @@ public class CoverImageService {
 
     public void processBookCovers() {
         List<Book> books = bookRepository.findAll(Pageable.ofSize(10)).getContent();
-        Map<String, FileInfo> urlToFileInfo = new HashMap<>();
+        Map<String, FileInfo> existingByUrl = new HashMap<>();
         for (FileInfo fi : fileInfoRepository.findAll()) {
-            urlToFileInfo.put(fi.getUrl(), fi);
+            if (fi.getFileUrl() != null) {
+                existingByUrl.put(fi.getFileUrl() + "|" + fi.getFileName(), fi);
+            }
         }
 
-
-        Queue<FileInfo> fileInfosToSave = new ConcurrentLinkedQueue<>();
-        int total = books.size();
-        ExecutorService executor = Executors.newFixedThreadPool(8);
-        CountDownLatch latch = new CountDownLatch(total);
+        Queue<FileInfo> toSave = new ConcurrentLinkedQueue<>();
+        ExecutorService exec = Executors.newFixedThreadPool(8);
+        CountDownLatch latch = new CountDownLatch(books.size());
 
         for (Book book : books) {
-            executor.submit(() -> {
+            exec.submit(() -> {
                 try {
-                    processSingleBook(book, urlToFileInfo, fileInfosToSave);
-                } catch (Exception e) {
-                    System.err.println("error processing book ID " + book.getId() + ": " + e.getMessage());
+                    processSingleBook(book, existingByUrl, toSave);
+                } catch (Exception ignored) {
                 } finally {
                     latch.countDown();
                 }
@@ -66,90 +67,78 @@ public class CoverImageService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        exec.shutdown();
 
-        executor.shutdown();
-
-        if (!fileInfosToSave.isEmpty()) {
-            fileInfoRepository.saveAll(fileInfosToSave);
+        if (!toSave.isEmpty()) {
+            fileInfoRepository.saveAll(toSave);
         }
     }
 
-    private void processSingleBook(Book book, Map<String, FileInfo> urlToFileInfo, Queue<FileInfo> fileInfosToSave) {
-        String imageUrl = book.getCoverImageUrl();
-        Long id = book.getId();
-
-        FileInfo existing = urlToFileInfo.get(imageUrl);
-        if (existing != null && Boolean.TRUE.equals(existing.getIsAccessible())) return;
+    private void processSingleBook(Book book,
+                                   Map<String, FileInfo> existingByUrl,
+                                   Queue<FileInfo> toSave) {
+        String url = book.getCoverImageUrl();
+        boolean accessible = isImageUrlValid(url);
+        Path baseDir = Paths.get(rootDir, String.valueOf(book.getId()));
+        Path thumbDir = baseDir.resolve("thumbnails");
 
         try {
-            boolean isAccessible = isImageUrlValid(imageUrl);
-            Path bookDir = Paths.get(rootDir, String.valueOf(id));
-            Path thumbDir = bookDir.resolve("thumbnails");
-
-            if (isAccessible) {
+            if (accessible) {
                 Files.createDirectories(thumbDir);
-                Path fullImagePath = bookDir.resolve(CoverImageFileName.FULL.getFileName());
-                downloadImage(imageUrl, fullImagePath);
-
-                createThumbnail(fullImagePath, thumbDir.resolve(
-                        CoverImageFileName.SMALL.getFileName()),
-                        CoverImageSize.SMALL.getWidth(),
-                        CoverImageSize.SMALL.getHeight()
-                );
-//                createThumbnail(fullImagePath, thumbDir.resolve("medium.jpg"), 200, 300);
-//                createThumbnail(fullImagePath, thumbDir.resolve("large.jpg"), 400, 600);
-
-                if (existing != null) {
-                    existing.setIsAccessible(true);
-                    existing.setFileType(FileType.JPG.getType());
-                    existing.setLocalPath(fullImagePath.toString());
-                    fileInfosToSave.add(existing);
-                } else {
-                    FileInfo fileInfo = new FileInfo();
-                    fileInfo.setBook(book);
-                    fileInfo.setUrl(imageUrl);
-                    fileInfo.setIsAccessible(true);
-                    fileInfo.setFileType(FileType.JPG.getType());
-                    fileInfo.setLocalPath(fullImagePath.toString());
-                    fileInfosToSave.add(fileInfo);
+                Path fullPath = baseDir.resolve(CoverImageFileName.FULL.getFileName());
+                downloadImage(url, fullPath);
+                for (CoverImageFileName v : Arrays.asList(
+                        CoverImageFileName.SMALL,
+                        CoverImageFileName.MEDIUM,
+                        CoverImageFileName.LARGE)) {
+                    Path thumbPath = thumbDir.resolve(v.getFileName());
+                    CoverImageSize sz = CoverImageSize.valueOf(v.name());
+                    Thumbnails.of(fullPath.toFile())
+                            .size(sz.getWidth(), sz.getHeight())
+                            .toFile(thumbPath.toFile());
                 }
+                for (CoverImageFileName v : CoverImageFileName.values()) {
+                    boolean isFull = v == CoverImageFileName.FULL;
+                    String fn = v.getFileName();
+                    String fu = isFull ? url : null;
+                    Path fp = isFull ? baseDir.resolve(fn) : thumbDir.resolve(fn);
+                    FileInfo fi = existingByUrl.getOrDefault(url + "|" + fn, new FileInfo());
+                    fi.setFileUrl(fu);
+                    fi.setFileName(fn);
+                    fi.setFilePath(fp.toString());
+                    fi.setFileFormat(FileType.JPG.getType());
+                    fi.setStatus(FileDownloadStatus.COMPLETED);
+                    fi.setErrorMessage(null);
 
+                    BookFileInfo bf = new BookFileInfo();
+                    bf.setBook(book);
+                    bf.setFileInfo(fi);
+                    fi.getBookFileInfos().add(bf);
+
+                    toSave.add(fi);
+                }
             } else {
-                if (existing != null) {
-                    existing.setIsAccessible(false);
-                    existing.setFileType(FileType.UNKNOWN.getType());
-                    existing.setLocalPath(null);
-                    fileInfosToSave.add(existing);
-                } else {
-                    FileInfo fileInfo = new FileInfo();
-                    fileInfo.setBook(book);
-                    fileInfo.setUrl(imageUrl);
-                    fileInfo.setIsAccessible(false);
-                    fileInfo.setFileType(FileType.UNKNOWN.getType());
-                    fileInfo.setLocalPath(null);
-                    fileInfosToSave.add(fileInfo);
+                for (CoverImageFileName v : CoverImageFileName.values()) {
+                    boolean isFull = v == CoverImageFileName.FULL;
+                    FileInfo fi = new FileInfo();
+                    fi.setFileUrl(isFull ? url : null);
+                    fi.setFileName(v.getFileName());
+                    fi.setFilePath(null);
+                    fi.setFileFormat(FileType.UNKNOWN.getType());
+                    fi.setStatus(FileDownloadStatus.FAILED);
+                    fi.setErrorMessage("URL not accessible");
+
+                    BookFileInfo bf = new BookFileInfo();
+                    bf.setBook(book);
+                    bf.setFileInfo(fi);
+                    fi.getBookFileInfos().add(bf);
+
+                    toSave.add(fi);
                 }
             }
-
         } catch (Exception e) {
-            FileInfo fileInfo = urlToFileInfo.get(imageUrl);
-            if (fileInfo != null) {
-                fileInfo.setIsAccessible(false);
-                fileInfo.setFileType(FileType.UNKNOWN.getType());
-                fileInfo.setLocalPath(null);
-                fileInfosToSave.add(fileInfo);
-            } else {
-                FileInfo newFileInfo = new FileInfo();
-                newFileInfo.setBook(book);
-                newFileInfo.setUrl(imageUrl);
-                newFileInfo.setIsAccessible(false);
-                newFileInfo.setFileType(FileType.UNKNOWN.getType());
-                newFileInfo.setLocalPath(null);
-                fileInfosToSave.add(newFileInfo);
-            }
+            // handle exceptions if needed
         }
-
-        System.out.println("book ID "+id+" image processed");
     }
 
     private boolean isImageUrlValid(String urlStr) {
@@ -166,9 +155,5 @@ public class CoverImageService {
         try (InputStream inputStream = new URL(urlStr).openStream()) {
             Files.copy(inputStream, outputPath, StandardCopyOption.REPLACE_EXISTING);
         }
-    }
-
-    private void createThumbnail(Path sourcePath, Path outputPath, int width, int height) throws IOException {
-        Thumbnails.of(sourcePath.toFile()).size(width, height).toFile(outputPath.toFile());
     }
 }
