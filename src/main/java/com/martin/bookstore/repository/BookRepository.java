@@ -4,6 +4,7 @@ import com.martin.bookstore.criteria.BookSearchCriteria;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.entity.Book;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -82,4 +83,6 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
           and b.price <= coalesce(:#{#criteria.maxPrice}, b.price)
     """)
     Page<BookResponseDto> findAll(BookSearchCriteria criteria, Pageable pageable);
+
+    Page<Book> findByPublisherId(Long publisherId, PageRequest pageRequest);
 }

@@ -3,16 +3,19 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.PublisherRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.PublisherResponseDto;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.Publisher;
 import com.martin.bookstore.core.mapper.PublisherMapper;
+import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.PublisherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ import java.util.List;
 public class PublisherService {
 
     private final PublisherRepository publisherRepository;
+    private final BookRepository bookRepository;
     private final PublisherMapper publisherMapper;
     private final BookMapper bookMapper;
 
@@ -64,20 +68,15 @@ public class PublisherService {
                 .map(publisherMapper::asOutput);
     }
 
-    public Page<BookResponseDto> getBooksByPublisherId(Long publisherId, Pageable pageable) {
-        Publisher publisher = publisherRepository.findById(publisherId)
-                .orElseThrow(() -> new NotFoundException("Publisher with id " + publisherId + " not found"));
+    public PageResponseDto<BookResponseDto> getBooksByPublisherId(Long publisherId, int page, int size) {
+        publisherRepository.findById(publisherId)
+                .orElseThrow(() -> new NotFoundException("publisher with id " + publisherId + " not found"));
 
-        List<Book> books = publisher.getBooks();
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Book> bookPage = bookRepository.findByPublisherId(publisherId, pageRequest);
+        Page<BookResponseDto> dtoPage = bookPage.map(bookMapper::asOutput);
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), books.size());
-
-        List<BookResponseDto> content = books.subList(start, end).stream()
-                .map(bookMapper::asOutput)
-                .toList();
-
-        return new PageImpl<>(content, pageable, books.size());
+        return PageResponseDto.from(dtoPage);
     }
 
 }

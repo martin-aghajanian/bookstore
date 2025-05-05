@@ -1,5 +1,6 @@
 package com.martin.bookstore.controller;
 
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.PublisherRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.PublisherResponseDto;
@@ -18,6 +19,13 @@ import java.util.List;
 public class PublisherController {
 
     private final PublisherService publisherService;
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<PublisherResponseDto> getAllPublishers(@RequestParam(defaultValue = "0") int page,
+                                                       @RequestParam(defaultValue = "10") int size) {
+        return publisherService.getAllPublishers(PageRequest.of(page, size));
+    }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -53,16 +61,12 @@ public class PublisherController {
 
     @GetMapping("/{id}/books")
     @ResponseStatus(HttpStatus.OK)
-    public Page<BookResponseDto> getBooksByPublisher(@PathVariable Long id,
-                                                     @RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "10") int size) {
-        return publisherService.getBooksByPublisherId(id, PageRequest.of(page, size));
+    public PageResponseDto<BookResponseDto> getBooksByPublisher(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return publisherService.getBooksByPublisherId(id, page, size);
     }
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Page<PublisherResponseDto> getAllPublishers(@RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "10") int size) {
-        return publisherService.getAllPublishers(PageRequest.of(page, size));
-    }
 }
