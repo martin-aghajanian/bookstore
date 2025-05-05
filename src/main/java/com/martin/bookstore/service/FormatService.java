@@ -3,15 +3,18 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.FormatRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.FormatResponseDto;
+import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.Format;
 import com.martin.bookstore.core.mapper.FormatMapper;
 import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.FormatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -59,11 +62,14 @@ public class FormatService {
         formatRepository.delete(format);
     }
 
-    public Page<BookResponseDto> getBooksByFormat(Long formatId, Pageable pageable) {
+    public PageResponseDto<BookResponseDto> getBooksByFormat(Long formatId, int page, int size) {
         formatRepository.findById(formatId)
                 .orElseThrow(() -> new NotFoundException("format with id " + formatId + " not found"));
 
-        return bookRepository.findByFormatId(formatId, pageable)
-                .map(bookMapper::asOutput);
+        var pageRequest = PageRequest.of(page, size);
+        Page<Book> bookPage = bookRepository.findByFormatId(formatId, pageRequest);
+        Page<BookResponseDto> dtoPage = bookPage.map(bookMapper::asOutput);
+
+        return PageResponseDto.from(dtoPage);
     }
 }
