@@ -3,6 +3,7 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.service.CoverImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,6 +16,7 @@ public class CoverImageController {
 
     private final CoverImageService coverImageService;
 
+    @PreAuthorize("hasAuthority('data:import')")
     @PostMapping("/download")
     @ResponseStatus(HttpStatus.OK)
     public String downloadCovers() {

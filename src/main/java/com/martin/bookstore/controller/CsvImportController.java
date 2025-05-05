@@ -4,6 +4,7 @@ import com.martin.bookstore.service.CsvImportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,7 @@ public class CsvImportController {
 
     private final CsvImportService csvImportService;
 
+    @PreAuthorize("hasAuthority('data:import')")
     @PostMapping(consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {
