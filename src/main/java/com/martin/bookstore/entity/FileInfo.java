@@ -4,18 +4,25 @@ import com.martin.bookstore.core.enums.FileDownloadStatus;
 import com.martin.bookstore.core.enums.FileType;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "file_info")
+@Table(
+        name = "file_info",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_file_url_file_name",
+                        columnNames = { "file_url", "file_name" }
+                )
+        }
+)
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class FileInfo {
 
     @Id
@@ -23,7 +30,7 @@ public class FileInfo {
     @SequenceGenerator(name = "file_info_id_seq", sequenceName = "file_info_id_seq", allocationSize = 50)
     private Long id;
 
-    @Column(name = "file_url", unique = true, nullable = false)
+    @Column(name = "file_url", nullable = false)
     private String fileUrl;
 
     @Column(name = "file_path")
@@ -43,5 +50,5 @@ public class FileInfo {
     private String errorMessage;
 
     @OneToMany(mappedBy = "fileInfo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookFileInfo> bookFileInfos;
+    private List<BookFileInfo> bookFileInfos = new ArrayList<>();
 }

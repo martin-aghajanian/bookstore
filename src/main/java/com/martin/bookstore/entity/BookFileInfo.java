@@ -2,14 +2,14 @@ package com.martin.bookstore.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "books_file_info")
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class BookFileInfo {
 
     @Id

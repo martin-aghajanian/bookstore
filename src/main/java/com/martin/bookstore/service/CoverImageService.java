@@ -1,3 +1,4 @@
+// File: com/martin/bookstore/service/CoverImageService.java
 package com.martin.bookstore.service;
 
 import com.martin.bookstore.core.enums.CoverImageFileName;
@@ -14,18 +15,15 @@ import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,122 +36,105 @@ public class CoverImageService {
     @Value("${bookstore.image.cover.root.dir}")
     private String rootDir;
 
+    @Transactional
     public void processBookCovers() {
         List<Book> books = bookRepository.findAll(Pageable.ofSize(10)).getContent();
-        Map<String, FileInfo> existingByUrl = new HashMap<>();
-        for (FileInfo fi : fileInfoRepository.findAll()) {
-            if (fi.getFileUrl() != null) {
-                existingByUrl.put(fi.getFileUrl() + "|" + fi.getFileName(), fi);
-            }
-        }
-
-        Queue<FileInfo> toSave = new ConcurrentLinkedQueue<>();
         ExecutorService exec = Executors.newFixedThreadPool(8);
-        CountDownLatch latch = new CountDownLatch(books.size());
-
-        for (Book book : books) {
-            exec.submit(() -> {
-                try {
-                    processSingleBook(book, existingByUrl, toSave);
-                } catch (Exception ignored) {
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
 
         try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        exec.shutdown();
-
-        if (!toSave.isEmpty()) {
-            fileInfoRepository.saveAll(toSave);
-        }
-    }
-
-    private void processSingleBook(Book book,
-                                   Map<String, FileInfo> existingByUrl,
-                                   Queue<FileInfo> toSave) {
-        String url = book.getCoverImageUrl();
-        boolean accessible = isImageUrlValid(url);
-        Path baseDir = Paths.get(rootDir, String.valueOf(book.getId()));
-        Path thumbDir = baseDir.resolve("thumbnails");
-
-        try {
-            if (accessible) {
-                Files.createDirectories(thumbDir);
-                Path fullPath = baseDir.resolve(CoverImageFileName.FULL.getFileName());
-                downloadImage(url, fullPath);
-                for (CoverImageFileName v : Arrays.asList(
-                        CoverImageFileName.SMALL,
-                        CoverImageFileName.MEDIUM,
-                        CoverImageFileName.LARGE)) {
-                    Path thumbPath = thumbDir.resolve(v.getFileName());
-                    CoverImageSize sz = CoverImageSize.valueOf(v.name());
-                    Thumbnails.of(fullPath.toFile())
-                            .size(sz.getWidth(), sz.getHeight())
-                            .toFile(thumbPath.toFile());
-                }
-                for (CoverImageFileName v : CoverImageFileName.values()) {
-                    boolean isFull = v == CoverImageFileName.FULL;
-                    String fn = v.getFileName();
-                    String fu = isFull ? url : null;
-                    Path fp = isFull ? baseDir.resolve(fn) : thumbDir.resolve(fn);
-                    FileInfo fi = existingByUrl.getOrDefault(url + "|" + fn, new FileInfo());
-                    fi.setFileUrl(fu);
-                    fi.setFileName(fn);
-                    fi.setFilePath(fp.toString());
-                    fi.setFileFormat(FileType.JPG.getType());
-                    fi.setStatus(FileDownloadStatus.COMPLETED);
-                    fi.setErrorMessage(null);
-
-                    BookFileInfo bf = new BookFileInfo();
-                    bf.setBook(book);
-                    bf.setFileInfo(fi);
-                    fi.getBookFileInfos().add(bf);
-
-                    toSave.add(fi);
-                }
-            } else {
-                for (CoverImageFileName v : CoverImageFileName.values()) {
-                    boolean isFull = v == CoverImageFileName.FULL;
-                    FileInfo fi = new FileInfo();
-                    fi.setFileUrl(isFull ? url : null);
-                    fi.setFileName(v.getFileName());
-                    fi.setFilePath(null);
-                    fi.setFileFormat(FileType.UNKNOWN.getType());
-                    fi.setStatus(FileDownloadStatus.FAILED);
-                    fi.setErrorMessage("URL not accessible");
-
-                    BookFileInfo bf = new BookFileInfo();
-                    bf.setBook(book);
-                    bf.setFileInfo(fi);
-                    fi.getBookFileInfos().add(bf);
-
-                    toSave.add(fi);
-                }
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            for (Book book : books) {
+                futures.add(CompletableFuture.runAsync(() -> processSingleBook(book), exec));
             }
-        } catch (Exception e) {
-            // handle exceptions if needed
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        } finally {
+            exec.shutdown();
         }
     }
 
-    private boolean isImageUrlValid(String urlStr) {
+    private void processSingleBook(Book book) {
+        String url = book.getCoverImageUrl();
+        Path baseDir = Paths.get(rootDir, book.getId().toString());
+        Map<CoverImageFileName, FileInfo> fiMap = new EnumMap<>(CoverImageFileName.class);
+
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(urlStr).openConnection();
-            connection.setRequestMethod("HEAD");
-            return connection.getResponseCode() == 200;
-        } catch (Exception e) {
-            return false;
+            Files.createDirectories(baseDir);
+
+            for (CoverImageFileName sizeKey : List.of(
+                    CoverImageFileName.FULL,
+                    CoverImageFileName.MEDIUM,
+                    CoverImageFileName.SMALL
+            )) {
+                FileInfo fi = fileInfoRepository
+                        .findByBookAndFileName(book, sizeKey.getFileName())
+                        .orElseGet(FileInfo::new);
+
+                List<BookFileInfo> bfList = Optional.ofNullable(fi.getBookFileInfos())
+                        .orElse(new ArrayList<>());
+
+                boolean alreadyLinked = bfList.stream()
+                        .anyMatch(bf -> bf.getBook().getId().equals(book.getId()));
+                if (!alreadyLinked) {
+                    BookFileInfo bf = new BookFileInfo();
+                    bf.setBook(book);
+                    bf.setFileInfo(fi);
+                    bfList.add(bf);
+                }
+                fi.setBookFileInfos(bfList);
+
+                fi.setFileUrl(url);
+                fi.setFileName(sizeKey.getFileName());
+                fi.setFileFormat(FileType.UNKNOWN.getType());
+                fi.setStatus(FileDownloadStatus.valueOf(FileDownloadStatus.PENDING.name()));
+
+                fileInfoRepository.save(fi);
+                fiMap.put(sizeKey, fi);
+            }
+
+            FileInfo fullFi = fiMap.get(CoverImageFileName.FULL);
+            fullFi.setStatus(FileDownloadStatus.valueOf(FileDownloadStatus.DOWNLOADING.name()));
+            fileInfoRepository.save(fullFi);
+
+            Path fullPath = baseDir.resolve(CoverImageFileName.FULL.getFileName());
+            downloadImage(url, fullPath);
+
+            fullFi.setFilePath(fullPath.toString());
+            fullFi.setFileFormat(FileType.JPG.getType());
+            fullFi.setStatus(FileDownloadStatus.valueOf(FileDownloadStatus.COMPLETED.name()));
+            fileInfoRepository.save(fullFi);
+
+            for (CoverImageFileName sizeKey : List.of(
+                    CoverImageFileName.MEDIUM,
+                    CoverImageFileName.SMALL
+            )) {
+                FileInfo thumbFi = fiMap.get(sizeKey);
+                thumbFi.setStatus(FileDownloadStatus.valueOf(FileDownloadStatus.DOWNLOADING.name()));
+                fileInfoRepository.save(thumbFi);
+
+                Path thumbPath = baseDir.resolve(sizeKey.getFileName());
+                var sz = CoverImageSize.valueOf(sizeKey.name());
+                Thumbnails.of(fullPath.toFile())
+                        .size(sz.getWidth(), sz.getHeight())
+                        .toFile(thumbPath.toFile());
+
+                thumbFi.setFilePath(thumbPath.toString());
+                thumbFi.setFileFormat(FileType.JPG.getType());
+                thumbFi.setStatus(FileDownloadStatus.valueOf(FileDownloadStatus.COMPLETED.name()));
+                fileInfoRepository.save(thumbFi);
+            }
+
+        } catch (IOException e) {
+            fiMap.values().forEach(fi -> {
+                fi.setStatus(FileDownloadStatus.valueOf(FileDownloadStatus.FAILED.name()));
+                fi.setErrorMessage(e.getMessage());
+                fileInfoRepository.save(fi);
+            });
         }
     }
 
     private void downloadImage(String urlStr, Path outputPath) throws IOException {
-        try (InputStream inputStream = new URL(urlStr).openStream()) {
-            Files.copy(inputStream, outputPath, StandardCopyOption.REPLACE_EXISTING);
+        try (InputStream in = new URL(urlStr).openStream()) {
+            Files.copy(in, outputPath, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

@@ -16,7 +16,7 @@ public class CoverImageController {
 
     private final CoverImageService coverImageService;
 
-    @PreAuthorize("hasAuthority('data:import')")
+//    @PreAuthorize("hasAuthority('data:import')")
     @PostMapping("/download")
     @ResponseStatus(HttpStatus.OK)
     public String downloadCovers() {
