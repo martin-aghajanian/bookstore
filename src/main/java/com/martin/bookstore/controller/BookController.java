@@ -2,15 +2,10 @@ package com.martin.bookstore.controller;
 
 import com.martin.bookstore.criteria.BookSearchCriteria;
 import com.martin.bookstore.dto.PageResponseDto;
-import com.martin.bookstore.dto.filters.BookFilterRequestDto;
 import com.martin.bookstore.dto.request.BookRequestDto;
-import com.martin.bookstore.dto.response.BookResponseDto;
+import com.martin.bookstore.dto.response.*;
 import com.martin.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +46,36 @@ public class BookController {
     @ResponseStatus(HttpStatus.OK)
     public PageResponseDto<BookResponseDto> getAll(BookSearchCriteria criteria) {
         return bookService.getAll(criteria);
+    }
+
+    @GetMapping("/{id}/genres")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GenreResponseDto> getGenresByBook(@PathVariable Long id) {
+        return bookService.getGenresByBookId(id);
+    }
+
+    @GetMapping("/{id}/authors")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AuthorResponseDto> getAuthorsByBook(@PathVariable Long id) {
+        return bookService.getAuthorsByBookId(id);
+    }
+
+    @GetMapping("/{id}/settings")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SettingResponseDto> getSettingsByBook(@PathVariable Long id) {
+        return bookService.getSettingsByBookId(id);
+    }
+
+    @GetMapping("/{id}/awards")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AwardResponseDto> getAwardsByBook(@PathVariable Long id) {
+        return bookService.getAwardsByBookId(id);
+    }
+
+    @GetMapping("/{id}/characters")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CharacterResponseDto> getCharactersByBook(@PathVariable Long id) {
+        return bookService.getCharactersByBookId(id);
     }
 
 

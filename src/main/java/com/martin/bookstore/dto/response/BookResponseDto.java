@@ -61,7 +61,6 @@ public class BookResponseDto {
             Long oneStarRatings,
             Long bbeVotes,
             Long bbeScore,
-            String coverImageUrl,
             EditionResponseDto edition,
             SeriesResponseDto series,
             LanguageResponseDto language,
@@ -86,7 +85,6 @@ public class BookResponseDto {
         this.oneStarRatings    = oneStarRatings;
         this.bbeVotes          = bbeVotes;
         this.bbeScore          = bbeScore;
-        this.coverImageUrl     = coverImageUrl;
         this.edition           = edition;
         this.series            = series;
         this.language          = language;

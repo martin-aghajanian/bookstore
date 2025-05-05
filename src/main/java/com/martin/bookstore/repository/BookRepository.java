@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     Page<Book> findByEditionId(Long editionId, Pageable pageable);
@@ -55,7 +53,6 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
             b.oneStarRatings,
             b.bbeVotes,
             b.bbeScore,
-            b.coverImageUrl,
             new com.martin.bookstore.dto.response.EditionResponseDto(e.id, e.name),
             new com.martin.bookstore.dto.response.SeriesResponseDto(s.id, s.name),
             new com.martin.bookstore.dto.response.LanguageResponseDto(l.id, l.name),

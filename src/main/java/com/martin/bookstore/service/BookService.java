@@ -1,11 +1,11 @@
 package com.martin.bookstore.service;
 
 import com.martin.bookstore.core.exception.NotFoundException;
-import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.core.mapper.*;
 import com.martin.bookstore.criteria.BookSearchCriteria;
 import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.BookRequestDto;
-import com.martin.bookstore.dto.response.BookResponseDto;
+import com.martin.bookstore.dto.response.*;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.repository.*;
 import com.martin.bookstore.entity.Character;
@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,11 @@ public class BookService {
     private final BookAwardRepository bookAwardRepository;
 
     private final BookMapper bookMapper;
+    private final GenreMapper genreMapper;
+    private final AuthorMapper authorMapper;
+    private final SettingMapper settingMapper;
+    private final AwardMapper awardMapper;
+    private final CharacterMapper characterMapper;
 
     public BookResponseDto getBookById(Long id) {
         return bookRepository.findById(id)
@@ -179,6 +186,51 @@ public class BookService {
                 criteria.buildPageRequest()
         );
         return PageResponseDto.from(page);
+    }
+
+    public List<GenreResponseDto> getGenresByBookId(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + bookId));
+        return book.getBookGenres().stream()
+                .map(BookGenre::getGenre)
+                .map(genreMapper::asOutput)
+                .collect(Collectors.toList());
+    }
+
+    public List<AuthorResponseDto> getAuthorsByBookId(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + bookId));
+        return book.getBookAuthor().stream()
+                .map(BookAuthor::getAuthor)
+                .map(authorMapper::asOutput)
+                .collect(Collectors.toList());
+    }
+
+    public List<SettingResponseDto> getSettingsByBookId(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + bookId));
+        return book.getBookSetting().stream()
+                .map(BookSetting::getSetting)
+                .map(settingMapper::asOutput)
+                .collect(Collectors.toList());
+    }
+
+    public List<AwardResponseDto> getAwardsByBookId(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + bookId));
+        return book.getBookAwards().stream()
+                .map(BookAward::getAward)
+                .map(awardMapper::asOutput)
+                .collect(Collectors.toList());
+    }
+
+    public List<CharacterResponseDto> getCharactersByBookId(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + bookId));
+        return book.getBookCharacters().stream()
+                .map(BookCharacter::getCharacter)
+                .map(characterMapper::asOutput)
+                .collect(Collectors.toList());
     }
 
 }
