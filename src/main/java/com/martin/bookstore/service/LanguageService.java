@@ -3,6 +3,7 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.LanguageRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.LanguageResponseDto;
@@ -13,6 +14,7 @@ import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.LanguageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -60,11 +62,14 @@ public class LanguageService {
         languageRepository.delete(language);
     }
 
-    public Page<BookResponseDto> getBooksByLanguage(Long languageId, Pageable pageable) {
+    public PageResponseDto<BookResponseDto> getBooksByLanguage(Long languageId, int page, int size) {
         languageRepository.findById(languageId)
                 .orElseThrow(() -> new NotFoundException("language with id " + languageId + " not found"));
 
-        return bookRepository.findByLanguageId(languageId, pageable)
-                .map(bookMapper::asOutput);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Book> bookPage = bookRepository.findByLanguageId(languageId, pageRequest);
+        Page<BookResponseDto> dtoPage = bookPage.map(bookMapper::asOutput);
+
+        return PageResponseDto.from(dtoPage);
     }
 }
