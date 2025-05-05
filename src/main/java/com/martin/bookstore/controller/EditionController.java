@@ -1,5 +1,6 @@
 package com.martin.bookstore.controller;
 
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.EditionRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.EditionResponseDto;
@@ -52,12 +53,11 @@ public class EditionController {
 
     @GetMapping("/{id}/books")
     @ResponseStatus(HttpStatus.OK)
-    public Page<BookResponseDto> getBooksByEdition(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    public PageResponseDto<BookResponseDto> getBooksByEdition(
+            @PathVariable("id") Long id,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return editionService.getBooksByEdition(id, pageable);
+        return editionService.getBooksByEdition(id, page, size);
     }
 }

@@ -3,6 +3,7 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.EditionRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.EditionResponseDto;
@@ -12,6 +13,7 @@ import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.EditionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -59,11 +61,15 @@ public class EditionService {
         editionRepository.delete(edition);
     }
 
-    public Page<BookResponseDto> getBooksByEdition(Long editionId, Pageable pageable) {
+    public PageResponseDto<BookResponseDto> getBooksByEdition(Long editionId, int page, int size) {
         editionRepository.findById(editionId)
                 .orElseThrow(() -> new NotFoundException("edition with id " + editionId + " not found"));
 
-        return bookRepository.findByEditionId(editionId, pageable)
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<BookResponseDto> dtoPage = bookRepository
+                .findByEditionId(editionId, pageRequest)
                 .map(bookMapper::asOutput);
+
+        return PageResponseDto.from(dtoPage);
     }
 }
