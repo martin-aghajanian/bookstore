@@ -17,11 +17,11 @@ public class BookFileInfo {
     @SequenceGenerator(name = "books_file_info_id_seq", sequenceName = "books_file_info_id_seq", allocationSize = 50)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "file_info_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "file_info_id", nullable = false)
     private FileInfo fileInfo;
 }

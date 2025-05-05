@@ -74,11 +74,6 @@ public class Book {
     @Column(name = "cover_image_url")
     private String coverImageUrl;
 
-    // one to many
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    private List<FileInfo> fileInfos;
-
     // many to one
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -104,19 +99,22 @@ public class Book {
 
     // many to many
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookAuthor> bookAuthor;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookGenre> bookGenres;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookCharacter> bookCharacters;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookSetting> bookSetting;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookAward> bookAwards;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookFileInfo> bookFileInfos;
 
 }

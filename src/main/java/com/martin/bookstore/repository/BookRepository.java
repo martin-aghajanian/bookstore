@@ -1,5 +1,7 @@
 package com.martin.bookstore.repository;
 
+import com.martin.bookstore.criteria.BookSearchCriteria;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,12 +15,6 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
-    Optional<Book> findByIsbn(Long isbn);
-
-    Optional<Book> findByTitle(String title);
-
-    Page<Book> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title, String description, Pageable pageable);
-
     Page<Book> findByEditionId(Long editionId, Pageable pageable);
 
     Page<Book> findByFormatId(Long formatId, Pageable pageable);
@@ -39,4 +35,54 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     """)
     Page<Book> findBySettingId(@Param("settingId") Long settingId, Pageable pageable);
 
+    @Query("""
+        select new com.martin.bookstore.dto.response.BookResponseDto(
+            b.id,
+            b.isbn,
+            b.title,
+            b.description,
+            b.pages,
+            b.publishDate,
+            b.firstPublishDate,
+            b.rating,
+            b.likedPercentage,
+            b.price,
+            b.numRatings,
+            b.fiveStarRatings,
+            b.fourStarRatings,
+            b.threeStarRatings,
+            b.twoStarRatings,
+            b.oneStarRatings,
+            b.bbeVotes,
+            b.bbeScore,
+            b.coverImageUrl,
+            new com.martin.bookstore.dto.response.EditionResponseDto(e.id, e.name),
+            new com.martin.bookstore.dto.response.SeriesResponseDto(s.id, s.name),
+            new com.martin.bookstore.dto.response.LanguageResponseDto(l.id, l.name),
+            new com.martin.bookstore.dto.response.PublisherResponseDto(p.id, p.name),
+            new com.martin.bookstore.dto.response.FormatResponseDto(f.id, f.format)
+        )
+        from Book b
+        left join b.edition e
+        left join b.series s
+        left join b.language l
+        left join b.publisher p
+        left join b.format f
+        where (:#{#criteria.query} is null
+               or lower(b.title) like concat('%', lower(:#{#criteria.query}), '%')
+               or lower(b.description) like concat('%', lower(:#{#criteria.query}), '%'))
+          and (:#{#criteria.genreId} is null or exists (
+                   select 1 from BookGenre bg where bg.book = b and bg.genre.id = :#{#criteria.genreId}
+               ))
+          and (:#{#criteria.authorId}    is null or exists (
+                   select 1 from BookAuthor ba where ba.book = b and ba.author.id = :#{#criteria.authorId}
+               ))
+          and b.publishDate >= coalesce(:#{#criteria.minDate}, b.publishDate)
+          and b.publishDate <= coalesce(:#{#criteria.maxDate}, b.publishDate)
+          and b.pages >= coalesce(:#{#criteria.minPages}, b.pages)
+          and b.pages <= coalesce(:#{#criteria.maxPages}, b.pages)
+          and b.price >= coalesce(:#{#criteria.minPrice}, b.price)
+          and b.price <= coalesce(:#{#criteria.maxPrice}, b.price)
+    """)
+    Page<BookResponseDto> findAll(BookSearchCriteria criteria, Pageable pageable);
 }

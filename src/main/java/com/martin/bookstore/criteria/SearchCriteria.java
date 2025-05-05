@@ -12,6 +12,8 @@ public class SearchCriteria {
 
     private int page;
     private int size;
+    private String sortBy = "id";
+    private String direction = "ASC";
 
     public PageRequest buildPageRequest() {
         int pageNumber = Math.max(page, 0);

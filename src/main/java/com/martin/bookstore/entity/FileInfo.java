@@ -43,5 +43,5 @@ public class FileInfo {
     private String errorMessage;
 
     @OneToMany(mappedBy = "fileInfo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookFileInfo> bookFileInfos = new ArrayList<>();
+    private List<BookFileInfo> bookFileInfos;
 }

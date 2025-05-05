@@ -2,6 +2,8 @@ package com.martin.bookstore.service;
 
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.criteria.BookSearchCriteria;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.filters.BookFilterRequestDto;
 import com.martin.bookstore.dto.request.BookRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
@@ -175,25 +177,12 @@ public class BookService {
         bookRepository.delete(book);
     }
 
-    public Page<BookResponseDto> searchBooksByTitleOrDescription(String query, Pageable pageable) {
-        Page<Book> result = bookRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, pageable);
-        return result.map(bookMapper::asOutput);
-    }
-
-    public Page<BookResponseDto> filterBooks(BookFilterRequestDto filter, Pageable pageable) {
-        Specification<Book> spec = BookSpecification.filter(
-                filter.getGenreId(),
-                filter.getLanguageId(),
-                filter.getFormatId(),
-                filter.getMinPages(),
-                filter.getMaxPages(),
-                filter.getMinPrice(),
-                filter.getMaxPrice(),
-                filter.getMinDate(),
-                filter.getMaxDate()
+    public PageResponseDto<BookResponseDto> getAll(BookSearchCriteria criteria) {
+        Page page = bookRepository.findAll(
+                criteria,
+                criteria.buildPageRequest()
         );
-
-        return bookRepository.findAll(spec, pageable).map(bookMapper::asOutput);
+        return PageResponseDto.from(page);
     }
 
 }

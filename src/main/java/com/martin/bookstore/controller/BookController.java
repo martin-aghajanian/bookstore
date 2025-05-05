@@ -1,5 +1,7 @@
 package com.martin.bookstore.controller;
 
+import com.martin.bookstore.criteria.BookSearchCriteria;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.filters.BookFilterRequestDto;
 import com.martin.bookstore.dto.request.BookRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
@@ -45,26 +47,10 @@ public class BookController {
         bookService.deleteBook(id);
     }
 
-    @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<BookResponseDto> searchBooks(
-            @RequestParam("title") String query,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return bookService.searchBooksByTitleOrDescription(query, PageRequest.of(page, size));
-    }
-
-
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<BookResponseDto> getBooks(
-            BookFilterRequestDto filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(filter.getDirection()), filter.getSortBy()));
-        return bookService.filterBooks(filter, pageable);
+    public PageResponseDto<BookResponseDto> getAll(BookSearchCriteria criteria) {
+        return bookService.getAll(criteria);
     }
 
 
