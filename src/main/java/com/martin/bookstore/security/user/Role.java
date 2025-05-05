@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,27 +14,46 @@ import static com.martin.bookstore.security.user.Permission.*;
 
 @RequiredArgsConstructor
 public enum Role {
-    USER(Collections.emptySet()),
+    USER(
+            EnumSet.noneOf(Permission.class)
+    ),
+
     ADMIN(
-            Set.of(
-                    ADMIN_READ,
-                    ADMIN_UPDATE,
-                    ADMIN_DELETE,
-                    ADMIN_CREATE,
+            EnumSet.allOf(Permission.class)
+    ),
+
+    MANAGER(
+            EnumSet.of(
                     MANAGER_READ,
                     MANAGER_UPDATE,
                     MANAGER_DELETE,
                     MANAGER_CREATE
             )
     ),
-    MANAGER(
-            Set.of(
-                    MANAGER_READ,
-                    MANAGER_UPDATE,
-                    MANAGER_DELETE,
-                    MANAGER_CREATE
+
+    CONTENT_EDITOR(
+            EnumSet.of(
+                    CONTENT_READ,
+                    CONTENT_CREATE,
+                    CONTENT_UPDATE,
+                    CONTENT_DELETE
             )
-    );
+    ),
+
+    DATA_IMPORTER(
+            EnumSet.of(
+                    DATA_IMPORT
+            )
+    ),
+
+    INVENTORY_MANAGER(
+            EnumSet.of(
+                    INVENTORY_CREATE,
+                    INVENTORY_UPDATE
+            )
+    ),
+
+    ;
 
     @Getter
     private final Set<Permission> permissions;
