@@ -2,6 +2,8 @@ package com.martin.bookstore.service;
 
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
+import com.martin.bookstore.criteria.AwardSearchCriteria;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.AwardRequestDto;
 import com.martin.bookstore.dto.response.AwardResponseDto;
 import com.martin.bookstore.entity.Award;
@@ -50,18 +52,12 @@ public class AwardService {
         awardRepository.delete(award);
     }
 
-    public Page<AwardResponseDto> filterByYear(Integer year, Pageable pageable) {
-        if (year == null) {
-            return awardRepository.findAll(pageable).map(awardMapper::asOutput);
-        }
-        return awardRepository.findAwardsByYear(year, pageable)
-                .map(awardMapper::asOutput);
-    }
-
-
-    public Page<AwardResponseDto> searchByName(String name, Pageable pageable) {
-        return awardRepository.findByNameContainingIgnoreCase(name, pageable)
-                .map(awardMapper::asOutput);
+    public PageResponseDto<AwardResponseDto> getAll(AwardSearchCriteria criteria) {
+        Page<AwardResponseDto> page = awardRepository.findAll(
+                criteria,
+                criteria.buildPageRequest()
+        );
+        return PageResponseDto.from(page);
     }
 
 }

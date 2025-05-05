@@ -1,5 +1,7 @@
 package com.martin.bookstore.controller;
 
+import com.martin.bookstore.criteria.AwardSearchCriteria;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.AwardRequestDto;
 import com.martin.bookstore.dto.response.AwardResponseDto;
 import com.martin.bookstore.service.AwardService;
@@ -44,18 +46,7 @@ public class AwardController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<AwardResponseDto> filterByYear(@RequestParam(required = false) Integer year,
-                                               @RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "10") int size) {
-        return awardService.filterByYear(year, PageRequest.of(page, size));
-    }
-
-
-    @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<AwardResponseDto> searchAwards(@RequestParam String name,
-                                               @RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "10") int size) {
-        return awardService.searchByName(name, PageRequest.of(page, size));
+    public PageResponseDto<AwardResponseDto> getAll(AwardSearchCriteria criteria) {
+        return awardService.getAll(criteria);
     }
 }

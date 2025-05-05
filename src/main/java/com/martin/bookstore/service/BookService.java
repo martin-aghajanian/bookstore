@@ -4,7 +4,6 @@ import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
 import com.martin.bookstore.criteria.BookSearchCriteria;
 import com.martin.bookstore.dto.PageResponseDto;
-import com.martin.bookstore.dto.filters.BookFilterRequestDto;
 import com.martin.bookstore.dto.request.BookRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.entity.*;
@@ -20,11 +19,8 @@ import com.martin.bookstore.repository.PublisherRepository;
 import com.martin.bookstore.repository.SeriesRepository;
 import com.martin.bookstore.entity.Setting;
 import com.martin.bookstore.repository.SettingRepository;
-import com.martin.bookstore.repository.specification.BookSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,7 +174,7 @@ public class BookService {
     }
 
     public PageResponseDto<BookResponseDto> getAll(BookSearchCriteria criteria) {
-        Page page = bookRepository.findAll(
+        Page<BookResponseDto> page = bookRepository.findAll(
                 criteria,
                 criteria.buildPageRequest()
         );
