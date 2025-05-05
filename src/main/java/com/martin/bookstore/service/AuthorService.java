@@ -3,6 +3,8 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.criteria.AuthorSearchCriteria;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.AuthorRequestDto;
 import com.martin.bookstore.dto.response.AuthorResponseDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
@@ -56,16 +58,6 @@ public class AuthorService {
         authorRepository.delete(author);
     }
 
-    public Page<AuthorResponseDto> filterAuthors(Boolean goodreads, String contribution, Pageable pageable) {
-        return authorRepository.filterAuthors(goodreads, contribution, pageable)
-                .map(authorMapper::asOutput);
-    }
-
-    public Page<AuthorResponseDto> searchAuthorsByName(String name, Pageable pageable) {
-        return authorRepository.findByFullNameContainingIgnoreCase(name, pageable)
-                .map(authorMapper::asOutput);
-    }
-
     public Page<BookResponseDto> getBooksByAuthorId(Long authorId, Pageable pageable) {
         Author author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new NotFoundException("Author with id " + authorId + " not found"));
@@ -82,6 +74,14 @@ public class AuthorService {
                 .toList();
 
         return new PageImpl<>(content, pageable, books.size());
+    }
+
+    public PageResponseDto<AuthorResponseDto> getAll(AuthorSearchCriteria criteria) {
+        Page<AuthorResponseDto> page = authorRepository.findAll(
+                criteria,
+                criteria.buildPageRequest()
+        );
+        return PageResponseDto.from(page);
     }
 }
 

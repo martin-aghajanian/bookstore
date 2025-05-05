@@ -1,5 +1,7 @@
 package com.martin.bookstore.controller;
 
+import com.martin.bookstore.criteria.AuthorSearchCriteria;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.AuthorRequestDto;
 import com.martin.bookstore.dto.response.AuthorResponseDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
@@ -45,21 +47,8 @@ public class AuthorController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<AuthorResponseDto> filterAuthors(
-            @RequestParam(required = false) Boolean goodreads,
-            @RequestParam(required = false) String contribution,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return authorService.filterAuthors(goodreads, contribution, PageRequest.of(page, size));
-    }
-
-    @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<AuthorResponseDto> searchAuthors(@RequestParam String name,
-                                                 @RequestParam(defaultValue = "0") int page,
-                                                 @RequestParam(defaultValue = "10") int size) {
-        return authorService.searchAuthorsByName(name, PageRequest.of(page, size));
+    public PageResponseDto<AuthorResponseDto> getAll(AuthorSearchCriteria criteria) {
+        return authorService.getAll(criteria);
     }
 
     @GetMapping("/{id}/books")

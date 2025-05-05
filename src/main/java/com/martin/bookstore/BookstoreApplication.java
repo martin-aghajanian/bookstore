@@ -17,31 +17,4 @@ public class BookstoreApplication {
         SpringApplication.run(BookstoreApplication.class, args);
     }
 
-//    @Bean
-//    public CommandLineRunner commandLineRunner(
-//            AuthenticationService service
-//    ) {
-//        return args -> {
-//            var admin = RegisterRequest.builder()
-//                    .firstName("admin")
-//                    .lastName("admin")
-//                    .email("admin@mail.com")
-//                    .username("admin")
-//                    .password("password")
-//                    .role(ADMIN)
-//                    .build();
-//            System.out.println("admin token: " + service.register(admin).getAccessToken());
-//
-//            var manager = RegisterRequest.builder()
-//                    .firstName("manager")
-//                    .lastName("manager")
-//                    .username("manager")
-//                    .email("manager@mail.com")
-//                    .password("password")
-//                    .role(MANAGER)
-//                    .build();
-//            System.out.println("Manager token: " + service.register(manager).getAccessToken());
-//
-//        };
-//    }
 }

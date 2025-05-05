@@ -1,5 +1,7 @@
 package com.martin.bookstore.repository;
 
+import com.martin.bookstore.criteria.AuthorSearchCriteria;
+import com.martin.bookstore.dto.response.AuthorResponseDto;
 import com.martin.bookstore.entity.Author;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,15 +23,14 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
     List<Author> findByGoodReadsAuthor(boolean goodReadsAuthor);
 
     @Query("""
-        SELECT DISTINCT a FROM Author a
-        JOIN a.bookAuthor ba
-        WHERE (:goodreads IS NULL OR a.goodReadsAuthor = :goodreads)
-        AND (:name = '' OR (LOWER(a.fullName) LIKE LOWER(CONCAT('%', :name, '%'))))
-        AND (:contribution IS NULL OR LOWER(ba.contribution) LIKE LOWER(CONCAT('%', :contribution, '%')))
-    """)
-    Page<Author> filterAuthors(@Param("goodreads") Boolean goodreads,
-                               @Param("contribution") String contribution,
-                               Pageable pageable);
-
-    Page<Author> findByFullNameContainingIgnoreCase(String name, Pageable pageable);
+    select new com.martin.bookstore.dto.response.AuthorResponseDto(
+        a.id,
+        a.fullName,
+        a.goodReadsAuthor
+    )
+    from Author a
+    where (:#{#criteria.fullName} is null or a.fullName like concat('%', :#{#criteria.fullName}, '%'))
+    and (:#{#criteria.goodReadsAuthor} is null or a.goodReadsAuthor = :#{#criteria.goodReadsAuthor})
+""")
+    Page<AuthorResponseDto> findAll(AuthorSearchCriteria criteria, Pageable pageable);
 }

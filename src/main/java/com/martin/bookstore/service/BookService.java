@@ -161,6 +161,7 @@ public class BookService {
         return bookMapper.asOutput(bookRepository.save(book));
     }
 
+    @Transactional
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book with id " + id + " not found"));
