@@ -1,5 +1,6 @@
 package com.martin.bookstore.controller;
 
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.GenreRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.GenreResponseDto;
@@ -52,12 +53,11 @@ public class GenreController {
 
     @GetMapping("/{id}/books")
     @ResponseStatus(HttpStatus.OK)
-    public Page<BookResponseDto> getBooksByGenre(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    public PageResponseDto<BookResponseDto> getBooksByGenre(
+            @PathVariable("id") Long id,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return genreService.getBooksByGenre(id, pageable);
+        return genreService.getBooksByGenre(id, page, size);
     }
 }

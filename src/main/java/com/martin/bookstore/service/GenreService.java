@@ -3,15 +3,19 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.GenreRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.GenreResponseDto;
+import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.Genre;
 import com.martin.bookstore.core.mapper.GenreMapper;
+import com.martin.bookstore.repository.BookGenreRepository;
 import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.GenreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +26,7 @@ import java.util.List;
 public class GenreService {
 
     private final GenreRepository genreRepository;
+    private final BookGenreRepository bookGenreRepository;
     private final GenreMapper genreMapper;
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
@@ -59,11 +64,15 @@ public class GenreService {
         genreRepository.delete(genre);
     }
 
-    public Page<BookResponseDto> getBooksByGenre(Long genreId, Pageable pageable) {
+
+    public PageResponseDto<BookResponseDto> getBooksByGenre(Long genreId, int page, int size) {
         genreRepository.findById(genreId)
                 .orElseThrow(() -> new NotFoundException("genre with id " + genreId + " not found"));
 
-        return bookRepository.findByGenreId(genreId, pageable)
-                .map(bookMapper::asOutput);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Book> bookPage = bookGenreRepository.findBooksByGenreId(genreId, pageRequest);
+        Page<BookResponseDto> dtoPage = bookPage.map(bookMapper::asOutput);
+
+        return PageResponseDto.from(dtoPage);
     }
 }
