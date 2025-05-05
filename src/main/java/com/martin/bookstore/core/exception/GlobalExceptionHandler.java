@@ -2,6 +2,7 @@ package com.martin.bookstore.core.exception;
 
 import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
 import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,5 +31,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleEmailConflict(EmailAlreadyTakenException ex) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token has expired");
     }
 }
