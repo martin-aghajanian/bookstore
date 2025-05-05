@@ -1,6 +1,7 @@
 package com.martin.bookstore.security.auth;
 
 import com.martin.bookstore.security.user.Role;
+import com.martin.bookstore.security.validation.PasswordMatches;
 import com.martin.bookstore.security.validation.StrongPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@PasswordMatches
 public class RegisterRequest {
 
     @NotBlank(message = "First name cannot be blank")
@@ -32,6 +34,9 @@ public class RegisterRequest {
     @NotBlank(message = "Password cannot be blank")
     @StrongPassword
     private String password;
+
+    @NotBlank(message = "Confirm Password cannot be blank")
+    private String confirmPassword;
 
     private Role role;
 }
