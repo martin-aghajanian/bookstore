@@ -14,8 +14,8 @@ public interface BookAwardRepository extends JpaRepository<BookAward, Long> {
     void deleteAllByBook(Book book);
 
     @Query("""
-        select ba.book 
-        from BookAward ba 
+        select ba.book
+        from BookAward ba
         where ba.award.id = :awardId
     """)
     Page<Book> findBooksByAwardId(@Param("awardId") Long awardId, Pageable pageable);

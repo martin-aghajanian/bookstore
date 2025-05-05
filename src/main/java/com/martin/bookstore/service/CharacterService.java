@@ -3,24 +3,27 @@ package com.martin.bookstore.service;
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
 import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.CharacterRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.CharacterResponseDto;
+import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.core.mapper.CharacterMapper;
+import com.martin.bookstore.repository.BookCharacterRepository;
 import com.martin.bookstore.repository.CharacterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
+    private final BookCharacterRepository bookCharacterRepository;
     private final CharacterMapper characterMapper;
     private final BookMapper bookMapper;
 
@@ -53,11 +56,14 @@ public class CharacterService {
         characterRepository.delete(character);
     }
 
-    public Page<BookResponseDto> getBooksByCharacter(Long characterId, Pageable pageable) {
+    public PageResponseDto<BookResponseDto> getBooksByCharacterId(Long characterId, int page, int size) {
         characterRepository.findById(characterId)
-                .orElseThrow(() -> new NotFoundException("character with id " + characterId + " not found"));
+                .orElseThrow(() -> new NotFoundException("Character with id " + characterId + " not found"));
 
-        return characterRepository.findBooksByCharacterId(characterId, pageable)
-                .map(bookMapper::asOutput);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Book> books = bookCharacterRepository.findBooksByCharacterId(characterId, pageRequest);
+        Page<BookResponseDto> dtoPage = books.map(bookMapper::asOutput);
+
+        return PageResponseDto.from(dtoPage);
     }
 }

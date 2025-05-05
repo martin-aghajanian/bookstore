@@ -1,5 +1,6 @@
 package com.martin.bookstore.controller;
 
+import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.CharacterRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.CharacterResponseDto;
@@ -46,12 +47,11 @@ public class CharacterController {
 
     @GetMapping("/{id}/books")
     @ResponseStatus(HttpStatus.OK)
-    public Page<BookResponseDto> getBooksByCharacter(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    public PageResponseDto<BookResponseDto> getBooksByCharacter(
+            @PathVariable("id") Long id,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return characterService.getBooksByCharacter(id, pageable);
+        return characterService.getBooksByCharacterId(id, page, size);
     }
 }
