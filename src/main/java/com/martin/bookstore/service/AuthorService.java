@@ -13,9 +13,11 @@ import com.martin.bookstore.core.mapper.AuthorMapper;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.BookAuthor;
 import com.martin.bookstore.repository.AuthorRepository;
+import com.martin.bookstore.repository.BookAuthorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ import java.util.List;
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
+    private final BookAuthorRepository bookAuthorRepository;
     private final AuthorMapper authorMapper;
     private final BookMapper bookMapper;
 
@@ -58,22 +61,11 @@ public class AuthorService {
         authorRepository.delete(author);
     }
 
-    public Page<BookResponseDto> getBooksByAuthorId(Long authorId, Pageable pageable) {
-        Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException("Author with id " + authorId + " not found"));
-
-        List<Book> books = author.getBookAuthor().stream()
-                .map(BookAuthor::getBook)
-                .toList();
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), books.size());
-
-        List<BookResponseDto> content = books.subList(start, end).stream()
-                .map(bookMapper::asOutput)
-                .toList();
-
-        return new PageImpl<>(content, pageable, books.size());
+    public PageResponseDto<BookResponseDto> getBooksByAuthorId(Long authorId, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Book> bookPage = bookAuthorRepository.findBooksByAuthorId(authorId, pageRequest);
+        Page<BookResponseDto> dtoPage = bookPage.map(bookMapper::asOutput);
+        return PageResponseDto.from(dtoPage);
     }
 
     public PageResponseDto<AuthorResponseDto> getAll(AuthorSearchCriteria criteria) {

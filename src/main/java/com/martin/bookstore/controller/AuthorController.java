@@ -7,8 +7,6 @@ import com.martin.bookstore.dto.response.AuthorResponseDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.service.AuthorService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,10 +51,10 @@ public class AuthorController {
 
     @GetMapping("/{id}/books")
     @ResponseStatus(HttpStatus.OK)
-    public Page<BookResponseDto> getBooksByAuthor(@PathVariable Long id,
+    public PageResponseDto<BookResponseDto> getBooksByAuthor(@PathVariable Long id,
                                                   @RequestParam(defaultValue = "0") int page,
                                                   @RequestParam(defaultValue = "10") int size) {
-        return authorService.getBooksByAuthorId(id, PageRequest.of(page, size));
+        return authorService.getBooksByAuthorId(id, page, size);
     }
 
 }
