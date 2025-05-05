@@ -4,6 +4,7 @@ import com.martin.bookstore.criteria.AwardSearchCriteria;
 import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.AwardRequestDto;
 import com.martin.bookstore.dto.response.AwardResponseDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.service.AwardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,5 +49,15 @@ public class AwardController {
     @ResponseStatus(HttpStatus.OK)
     public PageResponseDto<AwardResponseDto> getAll(AwardSearchCriteria criteria) {
         return awardService.getAll(criteria);
+    }
+
+    @GetMapping("/{id}/books")
+    @ResponseStatus(HttpStatus.OK)
+    public PageResponseDto<BookResponseDto> getBooksByAward(
+            @PathVariable("id") Long id,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ) {
+        return awardService.getBooksByAwardId(id, page, size);
     }
 }

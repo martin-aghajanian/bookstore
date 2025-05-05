@@ -2,15 +2,21 @@ package com.martin.bookstore.service;
 
 import com.martin.bookstore.core.exception.DeleteNotAllowedException;
 import com.martin.bookstore.core.exception.NotFoundException;
+import com.martin.bookstore.core.mapper.BookMapper;
 import com.martin.bookstore.criteria.AwardSearchCriteria;
+import com.martin.bookstore.criteria.BookSearchCriteria;
 import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.request.AwardRequestDto;
 import com.martin.bookstore.dto.response.AwardResponseDto;
+import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.entity.Award;
 import com.martin.bookstore.core.mapper.AwardMapper;
+import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.repository.AwardRepository;
+import com.martin.bookstore.repository.BookAwardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +28,8 @@ public class AwardService {
 
     private final AwardRepository awardRepository;
     private final AwardMapper awardMapper;
+    private final BookAwardRepository bookAwardRepository;
+    private final BookMapper bookMapper;
 
     public AwardResponseDto getAwardById(Long id) {
         return awardRepository.findById(id)
@@ -58,6 +66,17 @@ public class AwardService {
                 criteria.buildPageRequest()
         );
         return PageResponseDto.from(page);
+    }
+
+    public PageResponseDto<BookResponseDto> getBooksByAwardId(Long awardId, int page, int size) {
+        awardRepository.findById(awardId)
+                .orElseThrow(() -> new NotFoundException("Award with id " + awardId + " not found"));
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Book> bookPage = bookAwardRepository.findBooksByAwardId(awardId, pageRequest);
+        Page<BookResponseDto> dtoPage = bookPage.map(bookMapper::asOutput);
+
+        return PageResponseDto.from(dtoPage);
     }
 
 }
