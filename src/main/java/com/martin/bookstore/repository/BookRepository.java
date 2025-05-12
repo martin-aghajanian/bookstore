@@ -12,6 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
+
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     Page<Book> findByEditionId(Long editionId, Pageable pageable);
@@ -85,4 +88,11 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     Page<BookResponseDto> findAll(BookSearchCriteria criteria, Pageable pageable);
 
     Page<Book> findByPublisherId(Long publisherId, PageRequest pageRequest);
+
+    @Query("""
+        select b
+        from Book b
+        where lower(b.title) in :titles
+""")
+    Page<Book> findByTitleInIgnoreCase(@Param("titles") Collection<String> lowerCaseTitles, Pageable pageable);
 }

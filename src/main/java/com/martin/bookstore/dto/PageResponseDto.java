@@ -1,13 +1,17 @@
 package com.martin.bookstore.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PageResponseDto<T> {
 
     private List<T> content;
@@ -26,5 +30,14 @@ public class PageResponseDto<T> {
         pageResponseDto.setTotalElements(page.getTotalElements());
 
         return pageResponseDto;
+    }
+
+    public static <T> PageResponseDto<T> empty(int page, int size) {
+        return PageResponseDto.<T>builder()
+                .content(Collections.emptyList())
+                .pageNumber(page)
+                .pageSize(size)
+                .totalElements(0L)
+                .build();
     }
 }
