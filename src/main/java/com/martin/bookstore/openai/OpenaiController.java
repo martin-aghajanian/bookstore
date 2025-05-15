@@ -3,6 +3,7 @@ package com.martin.bookstore.openai;
 import com.martin.bookstore.dto.PageResponseDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ public class OpenaiController {
     private final ChatBookSuggestionService suggestionService;
 
     @GetMapping("/suggest")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public PageResponseDto<BookResponseDto> suggestBooks(
             @RequestParam String message,
             @RequestParam(defaultValue = "0") int page,
@@ -27,8 +29,9 @@ public class OpenaiController {
     }
 
     @GetMapping("/test")
+    @PreAuthorize("hasAuthority('admin:read')")
     public ResponseEntity<String> test(
-            @RequestParam(defaultValue = "Hello from the Bookstore!") String prompt
+            @RequestParam(defaultValue = "hello") String prompt
     ) {
         String aiResponse = openAIService.getTestCompletion(prompt);
         return ResponseEntity.ok(aiResponse);
