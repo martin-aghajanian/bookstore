@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +41,11 @@ public enum Role {
 
     DATA_IMPORTER(
             EnumSet.of(
-                    DATA_IMPORT
+                    DATA_IMPORT,
+                    DATA_READ,
+                    DATA_UPDATE,
+                    DATA_CREATE,
+                    DATA_DELETE
             )
     ),
 
