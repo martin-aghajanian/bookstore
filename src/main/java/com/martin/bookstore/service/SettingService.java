@@ -1,13 +1,13 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.core.exception.DeleteNotAllowedException;
-import com.martin.bookstore.core.exception.NotFoundException;
-import com.martin.bookstore.core.mapper.BookMapper;
+import com.martin.bookstore.exception.DeleteNotAllowedException;
+import com.martin.bookstore.exception.NotFoundException;
+import com.martin.bookstore.mapper.BookMapper;
 import com.martin.bookstore.dto.request.SettingRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.SettingResponseDto;
 import com.martin.bookstore.entity.Setting;
-import com.martin.bookstore.core.mapper.SettingMapper;
+import com.martin.bookstore.mapper.SettingMapper;
 import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.SettingRepository;
 import lombok.RequiredArgsConstructor;

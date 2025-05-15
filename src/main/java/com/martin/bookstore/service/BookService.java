@@ -1,12 +1,12 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.core.exception.NotFoundException;
-import com.martin.bookstore.core.mapper.*;
+import com.martin.bookstore.exception.NotFoundException;
 import com.martin.bookstore.criteria.BookSearchCriteria;
-import com.martin.bookstore.dto.PageResponseDto;
+import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.dto.request.BookRequestDto;
 import com.martin.bookstore.dto.response.*;
 import com.martin.bookstore.entity.*;
+import com.martin.bookstore.mapper.*;
 import com.martin.bookstore.repository.*;
 import com.martin.bookstore.entity.Character;
 import com.martin.bookstore.repository.CharacterRepository;

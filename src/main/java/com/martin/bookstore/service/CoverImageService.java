@@ -1,10 +1,10 @@
 // File: com/martin/bookstore/service/CoverImageService.java
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.core.enums.CoverImageFileName;
-import com.martin.bookstore.core.enums.CoverImageSize;
-import com.martin.bookstore.core.enums.FileDownloadStatus;
-import com.martin.bookstore.core.enums.FileType;
+import com.martin.bookstore.enums.CoverImageFileName;
+import com.martin.bookstore.enums.CoverImageSize;
+import com.martin.bookstore.enums.FileDownloadStatus;
+import com.martin.bookstore.enums.FileType;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.BookFileInfo;
 import com.martin.bookstore.entity.FileInfo;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;

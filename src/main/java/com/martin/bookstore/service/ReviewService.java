@@ -1,7 +1,7 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.core.exception.NotFoundException;
-import com.martin.bookstore.core.mapper.ReviewMapper;
+import com.martin.bookstore.exception.NotFoundException;
+import com.martin.bookstore.mapper.ReviewMapper;
 import com.martin.bookstore.dto.request.ReviewRequestDto;
 import com.martin.bookstore.dto.response.ReviewResponseDto;
 import com.martin.bookstore.entity.Book;

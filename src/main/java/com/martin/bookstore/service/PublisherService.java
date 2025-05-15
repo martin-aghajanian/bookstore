@@ -1,25 +1,22 @@
 package com.martin.bookstore.service;
 
-import com.martin.bookstore.core.exception.DeleteNotAllowedException;
-import com.martin.bookstore.core.exception.NotFoundException;
-import com.martin.bookstore.core.mapper.BookMapper;
-import com.martin.bookstore.dto.PageResponseDto;
+import com.martin.bookstore.exception.DeleteNotAllowedException;
+import com.martin.bookstore.exception.NotFoundException;
+import com.martin.bookstore.mapper.BookMapper;
+import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.dto.request.PublisherRequestDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
 import com.martin.bookstore.dto.response.PublisherResponseDto;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.Publisher;
-import com.martin.bookstore.core.mapper.PublisherMapper;
+import com.martin.bookstore.mapper.PublisherMapper;
 import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.PublisherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

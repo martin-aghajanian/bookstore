@@ -1,7 +1,7 @@
 package com.martin.bookstore.controller;
 
 import com.martin.bookstore.criteria.AuthorSearchCriteria;
-import com.martin.bookstore.dto.PageResponseDto;
+import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.dto.request.AuthorRequestDto;
 import com.martin.bookstore.dto.response.AuthorResponseDto;
 import com.martin.bookstore.dto.response.BookResponseDto;
