@@ -1,6 +1,7 @@
 package com.martin.bookstore.security.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.martin.bookstore.security.config.JwtAuthProperties;
 import com.martin.bookstore.security.dto.AuthenticationRequest;
 import com.martin.bookstore.security.dto.AuthenticationResponse;
 import com.martin.bookstore.security.dto.RegisterRequest;
@@ -20,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +29,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final JwtAuthProperties jwtAuthProperties;
 
     public AuthenticationResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -78,12 +79,13 @@ public class AuthenticationService {
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String authType = jwtAuthProperties.getAuthType();
         final String refreshToken;
         final String username;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null ||!authHeader.startsWith(authType)) {
             return;
         }
-        refreshToken = authHeader.substring(7);
+        refreshToken = authHeader.substring(authType.length()).trim();
         username = jwtService.extractUsername(refreshToken);
         if (username != null) {
             User user = userRepository.findByUsername(username)

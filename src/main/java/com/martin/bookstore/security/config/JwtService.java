@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${security.jwt.secret-key}")
-    private String secretKey;
-
-    @Value("${security.jwt.access-token.expiration}")
-    private long accessExpiration;
-
-    @Value("${security.jwt.refresh-token.expiration}")
-    private long refreshExpiration;
+    private final JwtAuthProperties jwtAuthProperties;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -44,13 +39,13 @@ public class JwtService {
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
-        return buildToken(extraClaims, userDetails, accessExpiration);
+        return buildToken(extraClaims, userDetails, jwtAuthProperties.getAccessTokenExpiration());
     }
 
     public String generateRefreshToken(
             UserDetails userDetails
     ) {
-        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+        return buildToken(new HashMap<>(), userDetails, jwtAuthProperties.getRefreshTokenExpiration());
     }
 
     private String buildToken(
@@ -91,7 +86,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtAuthProperties.getSecretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
