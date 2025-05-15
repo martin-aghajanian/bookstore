@@ -5,8 +5,6 @@ import com.martin.bookstore.exception.CsvProcessingException;
 import com.martin.bookstore.entity.*;
 import com.martin.bookstore.entity.Character;
 import org.apache.commons.csv.CSVParser;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -23,17 +21,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class CsvUtils {
-
-    @Value("${batch.size:5000}")
-    private int batchSize;
-
-
-    public <T> void batchSave(List<T> entities, JpaRepository<T, ?> repository) {
-        for (int i = 0; i < entities.size(); i += batchSize) {
-            int endIndex = Math.min(i + batchSize, entities.size());
-            repository.saveAll(entities.subList(i, endIndex));
-        }
-    }
 
     public List<String> parseSettings(String input) {
         List<String> settings = new ArrayList<>();
@@ -69,7 +56,7 @@ public class CsvUtils {
                 current.append(ch);
             }
         }
-        if (current.length() > 0) {
+        if (!current.isEmpty()) {
             authors.add(current.toString().trim());
         }
         return authors;
@@ -261,6 +248,7 @@ public class CsvUtils {
                     for (String part : m.group(1).split(",")) {
                         if (part.trim().equalsIgnoreCase("Goodreads Author")) {
                             isGoodreads = true;
+                            break;
                         }
                     }
                 }
@@ -403,24 +391,6 @@ public class CsvUtils {
                 bs.setSetting(setting);
                 bookSettings.add(bs);
             }
-        }
-    }
-
-    public <T> void safeSaveAll(List<T> list, JpaRepository<T, ?> repo, String name) {
-        list.removeIf(Objects::isNull);
-        if (list.isEmpty()) {
-            System.out.println("skipping save for " + name + ": empty list.");
-            return;
-        }
-
-        try {
-            System.out.println("saving " + list.size() + " records to " + name);
-            repo.saveAll(list);
-        } catch (Exception e) {
-            System.err.println("failed to save entities for: " + name);
-            System.err.println("error type: " + e.getClass().getSimpleName());
-            e.printStackTrace();
-            throw e;
         }
     }
 }

@@ -11,7 +11,6 @@ import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.Genre;
 import com.martin.bookstore.mapper.GenreMapper;
 import com.martin.bookstore.repository.BookGenreRepository;
-import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.GenreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +26,6 @@ public class GenreService {
     private final GenreRepository genreRepository;
     private final BookGenreRepository bookGenreRepository;
     private final GenreMapper genreMapper;
-    private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
     public List<GenreResponseDto> getAllGenres() {

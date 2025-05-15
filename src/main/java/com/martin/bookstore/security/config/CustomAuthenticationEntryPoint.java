@@ -2,7 +2,6 @@ package com.martin.bookstore.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.martin.bookstore.security.exception.ExceptionResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+                         AuthenticationException authException) throws IOException {
         final Throwable throwable = authException.getCause() == null ? authException : authException.getCause();
         if (throwable instanceof BadCredentialsException) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

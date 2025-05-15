@@ -11,10 +11,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
 
     @Query("""
-select r
-from Review r
-where r.book.id = :bookId
-order by r.createdAt desc
-""")
+        select r
+        from Review r
+        where r.book.id = :bookId
+        order by r.createdAt desc
+    """)
     List<Review> findByBookIdOrderByCreatedAtDesc(@Param("bookId") Long bookId);
 }

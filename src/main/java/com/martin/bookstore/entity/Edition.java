@@ -16,7 +16,7 @@ public class Edition {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editions_id_seq")
-    @SequenceGenerator(name = "editions_id_seq", sequenceName = "editions_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "editions_id_seq", sequenceName = "editions_id_seq")
     private Long id;
 
     @Column(name = "name")

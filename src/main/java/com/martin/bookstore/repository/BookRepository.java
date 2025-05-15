@@ -13,19 +13,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
-import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     Page<Book> findByEditionId(Long editionId, Pageable pageable);
 
     Page<Book> findByFormatId(Long formatId, Pageable pageable);
-
-    @Query("""
-        SELECT bg.book FROM BookGenre bg
-        WHERE bg.genre.id = :genreId
-    """)
-    Page<Book> findByGenreId(@Param("genreId") Long genreId, Pageable pageable);
 
     Page<Book> findByLanguageId(Long languageId, Pageable pageable);
 

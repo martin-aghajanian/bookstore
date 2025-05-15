@@ -14,7 +14,7 @@ public class BookCharacter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books_characters_id_seq")
-    @SequenceGenerator(name = "books_characters_id_seq", sequenceName = "books_characters_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "books_characters_id_seq", sequenceName = "books_characters_id_seq")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

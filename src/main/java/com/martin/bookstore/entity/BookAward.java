@@ -16,7 +16,7 @@ public class BookAward {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books_awards_id_seq")
-    @SequenceGenerator(name = "books_awards_id_seq", sequenceName = "books_awards_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "books_awards_id_seq", sequenceName = "books_awards_id_seq")
     private Long id;
 
     // Many-to-one association to Book

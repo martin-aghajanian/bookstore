@@ -30,7 +30,6 @@ public enum Permission {
 
     INVENTORY_CREATE("inventory:create"),
     INVENTORY_UPDATE("inventory:update");
-    ;
 
     @Getter
     private final String permission;

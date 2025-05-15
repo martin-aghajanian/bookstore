@@ -16,7 +16,7 @@ import java.util.List;
 public class Publisher {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "publishers_id_seq")
-    @SequenceGenerator(name = "publishers_id_seq", sequenceName = "publishers_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "publishers_id_seq", sequenceName = "publishers_id_seq")
     private Long id;
 
     @Column(name = "name", unique = true, nullable = false)

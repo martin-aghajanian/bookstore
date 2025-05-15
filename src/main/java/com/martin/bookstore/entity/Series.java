@@ -16,7 +16,7 @@ public class Series {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "series_id_seq")
-    @SequenceGenerator(name = "series_id_seq", sequenceName = "series_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "series_id_seq", sequenceName = "series_id_seq")
     private Long id;
 
     @Column(name = "name", unique = true, nullable = false)

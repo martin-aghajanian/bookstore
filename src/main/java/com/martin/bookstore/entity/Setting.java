@@ -16,7 +16,7 @@ public class Setting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "settings_id_seq")
-    @SequenceGenerator(name = "settings_id_seq", sequenceName = "settings_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "settings_id_seq", sequenceName = "settings_id_seq")
     private Long id;
 
     @Column(name = "name", nullable = false)

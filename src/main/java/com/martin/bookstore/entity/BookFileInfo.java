@@ -14,7 +14,7 @@ public class BookFileInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books_file_info_id_seq")
-    @SequenceGenerator(name = "books_file_info_id_seq", sequenceName = "books_file_info_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "books_file_info_id_seq", sequenceName = "books_file_info_id_seq")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -16,7 +16,7 @@ public class Award {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "awards_id_seq")
-    @SequenceGenerator(name = "awards_id_seq", sequenceName = "awards_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "awards_id_seq", sequenceName = "awards_id_seq")
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true)

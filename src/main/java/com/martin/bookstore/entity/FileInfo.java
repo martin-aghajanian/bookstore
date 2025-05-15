@@ -26,7 +26,7 @@ public class FileInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_info_id_seq")
-    @SequenceGenerator(name = "file_info_id_seq", sequenceName = "file_info_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "file_info_id_seq", sequenceName = "file_info_id_seq")
     private Long id;
 
     @Column(name = "file_url", nullable = false)
