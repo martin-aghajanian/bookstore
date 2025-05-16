@@ -2,6 +2,7 @@ package com.martin.bookstore.security.admin;
 
 import com.martin.bookstore.entity.Role;
 import com.martin.bookstore.entity.User;
+import com.martin.bookstore.exception.NotFoundException;
 import com.martin.bookstore.repository.RoleRepository;
 import com.martin.bookstore.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,7 +27,7 @@ public class AdminUserSeeder {
         }
 
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found. Seed roles first."));
+                .orElseThrow(() -> new NotFoundException("ROLE_ADMIN not found. Seed roles first."));
 
         User admin = User.builder()
                 .username(username)

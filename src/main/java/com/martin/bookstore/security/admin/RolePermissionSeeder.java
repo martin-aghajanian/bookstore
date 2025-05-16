@@ -1,11 +1,12 @@
-package com.martin.bookstore.security.user;
+package com.martin.bookstore.security.admin;
 
 import com.martin.bookstore.entity.Permission;
 import com.martin.bookstore.entity.Role;
+import com.martin.bookstore.exception.NotFoundException;
 import com.martin.bookstore.repository.PermissionRepository;
 import com.martin.bookstore.repository.RoleRepository;
-import com.martin.bookstore.security.user.enums.PermissionEnum;
-import com.martin.bookstore.security.user.enums.RoleEnum;
+import com.martin.bookstore.enums.PermissionEnum;
+import com.martin.bookstore.enums.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class RolePermissionSeeder {
 
             Set<Permission> permissions = enumRole.getPermissionEnums().stream()
                     .map(p -> permissionRepository.findByName(p.getPermission())
-                            .orElseThrow(() -> new RuntimeException("Permission not found: " + p.getPermission())))
+                            .orElseThrow(() -> new NotFoundException("Permission not found: " + p.getPermission())))
                     .collect(Collectors.toSet());
 
             Role role = existingRoles.getOrDefault(roleName, Role.builder().name(roleName).build());

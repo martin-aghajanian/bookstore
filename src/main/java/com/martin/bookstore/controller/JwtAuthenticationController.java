@@ -1,6 +1,6 @@
 package com.martin.bookstore.controller;
 
-import com.martin.bookstore.service.AuthenticationService;
+import com.martin.bookstore.service.JwtAuthenticationService;
 import com.martin.bookstore.dto.request.AuthenticationRequest;
 import com.martin.bookstore.dto.response.AuthenticationResponse;
 import com.martin.bookstore.dto.request.RegisterRequest;
@@ -17,23 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/jwt-auth")
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class JwtAuthenticationController {
 
-    private final AuthenticationService authenticationService;
+    private final JwtAuthenticationService jwtAuthenticationService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        return ResponseEntity.ok(authenticationService.register(request));
+        return ResponseEntity.ok(jwtAuthenticationService.register(request));
     }
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @Valid @RequestBody AuthenticationRequest request
     ) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+        return ResponseEntity.ok(jwtAuthenticationService.authenticate(request));
     }
 
     @PostMapping("/refresh-token")
@@ -41,7 +41,7 @@ public class AuthenticationController {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        authenticationService.refreshToken(request, response);
+        jwtAuthenticationService.refreshToken(request, response);
     }
 
 }

@@ -1,6 +1,7 @@
-package com.martin.bookstore.security.user;
+package com.martin.bookstore.security.config;
 
 import com.martin.bookstore.entity.User;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
@@ -62,7 +64,4 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 
-    public User getUser() {
-        return user;
-    }
 }

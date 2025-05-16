@@ -4,6 +4,7 @@ import com.martin.bookstore.dto.request.AuthenticationRequest;
 import com.martin.bookstore.dto.request.RegisterRequest;
 import com.martin.bookstore.exception.DefaultRoleNotFoundException;
 import com.martin.bookstore.exception.EmailAlreadyTakenException;
+import com.martin.bookstore.exception.NotFoundException;
 import com.martin.bookstore.exception.UsernameAlreadyTakenException;
 import com.martin.bookstore.repository.RoleRepository;
 import com.martin.bookstore.entity.User;
@@ -57,7 +58,7 @@ public class SessionAuthenticationService {
         );
 
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         String sessionId = UUID.randomUUID().toString();
 

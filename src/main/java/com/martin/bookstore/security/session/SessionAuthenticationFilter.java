@@ -1,7 +1,7 @@
 package com.martin.bookstore.security.session;
 
 
-import com.martin.bookstore.security.user.CustomUserDetails;
+import com.martin.bookstore.security.config.CustomUserDetails;
 import com.martin.bookstore.entity.User;
 import com.martin.bookstore.repository.UserRepository;
 import jakarta.servlet.FilterChain;

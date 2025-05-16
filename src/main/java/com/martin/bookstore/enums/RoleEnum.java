@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.user.enums;
+package com.martin.bookstore.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.martin.bookstore.security.user.enums.PermissionEnum.*;
+import static com.martin.bookstore.enums.PermissionEnum.*;
 
 @RequiredArgsConstructor
 public enum RoleEnum {

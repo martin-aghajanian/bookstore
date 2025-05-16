@@ -1,7 +1,7 @@
 package com.martin.bookstore.controller;
 
 import com.martin.bookstore.security.admin.ModifyUserAccessRequestDto;
-import com.martin.bookstore.security.user.RolePermissionSeeder;
+import com.martin.bookstore.security.admin.RolePermissionSeeder;
 import com.martin.bookstore.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

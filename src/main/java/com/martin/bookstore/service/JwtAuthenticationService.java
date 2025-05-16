@@ -9,7 +9,7 @@ import com.martin.bookstore.security.config.JwtService;
 import com.martin.bookstore.exception.DefaultRoleNotFoundException;
 import com.martin.bookstore.exception.EmailAlreadyTakenException;
 import com.martin.bookstore.exception.UsernameAlreadyTakenException;
-import com.martin.bookstore.security.user.CustomUserDetails;
+import com.martin.bookstore.security.config.CustomUserDetails;
 import com.martin.bookstore.repository.RoleRepository;
 import com.martin.bookstore.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class JwtAuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;

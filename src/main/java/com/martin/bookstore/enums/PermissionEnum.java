@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.user.enums;
+package com.martin.bookstore.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

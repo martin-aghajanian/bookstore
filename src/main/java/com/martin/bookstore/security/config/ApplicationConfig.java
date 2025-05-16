@@ -1,6 +1,5 @@
 package com.martin.bookstore.security.config;
 
-import com.martin.bookstore.security.user.CustomUserDetailsService;
 import com.martin.bookstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

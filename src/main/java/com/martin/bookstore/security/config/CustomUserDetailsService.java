@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.user;
+package com.martin.bookstore.security.config;
 
 import com.martin.bookstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
