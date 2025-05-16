@@ -1,7 +1,7 @@
 package com.martin.bookstore.security.session;
 
-import com.martin.bookstore.security.dto.AuthenticationRequest;
-import com.martin.bookstore.security.dto.RegisterRequest;
+import com.martin.bookstore.dto.request.AuthenticationRequest;
+import com.martin.bookstore.dto.request.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

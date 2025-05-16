@@ -1,8 +1,9 @@
-package com.martin.bookstore.security.auth;
+package com.martin.bookstore.controller;
 
-import com.martin.bookstore.security.dto.AuthenticationRequest;
-import com.martin.bookstore.security.dto.AuthenticationResponse;
-import com.martin.bookstore.security.dto.RegisterRequest;
+import com.martin.bookstore.service.AuthenticationService;
+import com.martin.bookstore.dto.request.AuthenticationRequest;
+import com.martin.bookstore.dto.response.AuthenticationResponse;
+import com.martin.bookstore.dto.request.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.exception;
+package com.martin.bookstore.exception;
 
 public class EmailAlreadyTakenException extends RuntimeException {
     public EmailAlreadyTakenException(String message) {

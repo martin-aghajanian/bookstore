@@ -1,14 +1,14 @@
-package com.martin.bookstore.security.auth;
+package com.martin.bookstore.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.martin.bookstore.security.config.JwtAuthProperties;
-import com.martin.bookstore.security.dto.AuthenticationRequest;
-import com.martin.bookstore.security.dto.AuthenticationResponse;
-import com.martin.bookstore.security.dto.RegisterRequest;
+import com.martin.bookstore.dto.request.AuthenticationRequest;
+import com.martin.bookstore.dto.response.AuthenticationResponse;
+import com.martin.bookstore.dto.request.RegisterRequest;
 import com.martin.bookstore.security.config.JwtService;
-import com.martin.bookstore.security.exception.DefaultRoleNotFoundException;
-import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
-import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
+import com.martin.bookstore.exception.DefaultRoleNotFoundException;
+import com.martin.bookstore.exception.EmailAlreadyTakenException;
+import com.martin.bookstore.exception.UsernameAlreadyTakenException;
 import com.martin.bookstore.security.user.CustomUserDetails;
 import com.martin.bookstore.repository.RoleRepository;
 import com.martin.bookstore.repository.UserRepository;

@@ -1,7 +1,7 @@
 package com.martin.bookstore.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.martin.bookstore.security.exception.ExceptionResponse;
+import com.martin.bookstore.dto.response.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

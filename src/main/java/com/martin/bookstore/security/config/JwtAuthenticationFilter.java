@@ -1,8 +1,8 @@
 package com.martin.bookstore.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.martin.bookstore.security.exception.ExceptionResponse;
-import com.martin.bookstore.security.exception.InvalidJwtTokenException;
+import com.martin.bookstore.dto.response.ExceptionResponse;
+import com.martin.bookstore.exception.InvalidJwtTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.SignatureException;
 
 @Component
 @RequiredArgsConstructor

@@ -1,9 +1,5 @@
 package com.martin.bookstore.exception;
 
-import com.martin.bookstore.security.exception.DefaultRoleNotFoundException;
-import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
-import com.martin.bookstore.security.exception.InvalidJwtTokenException;
-import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

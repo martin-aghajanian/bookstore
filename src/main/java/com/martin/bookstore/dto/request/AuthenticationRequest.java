@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.dto;
+package com.martin.bookstore.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

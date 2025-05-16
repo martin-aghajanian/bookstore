@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.exception;
+package com.martin.bookstore.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

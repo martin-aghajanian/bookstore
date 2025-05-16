@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.dto;
+package com.martin.bookstore.dto.request;
 
 import com.martin.bookstore.security.validation.PasswordMatches;
 import com.martin.bookstore.security.validation.StrongPassword;

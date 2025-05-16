@@ -1,10 +1,10 @@
 package com.martin.bookstore.security.session;
 
-import com.martin.bookstore.security.dto.AuthenticationRequest;
-import com.martin.bookstore.security.dto.RegisterRequest;
-import com.martin.bookstore.security.exception.DefaultRoleNotFoundException;
-import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
-import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
+import com.martin.bookstore.dto.request.AuthenticationRequest;
+import com.martin.bookstore.dto.request.RegisterRequest;
+import com.martin.bookstore.exception.DefaultRoleNotFoundException;
+import com.martin.bookstore.exception.EmailAlreadyTakenException;
+import com.martin.bookstore.exception.UsernameAlreadyTakenException;
 import com.martin.bookstore.repository.RoleRepository;
 import com.martin.bookstore.entity.User;
 import com.martin.bookstore.repository.UserRepository;
