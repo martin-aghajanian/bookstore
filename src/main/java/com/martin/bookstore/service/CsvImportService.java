@@ -121,17 +121,16 @@ public class CsvImportService {
 
             ConcurrentLinkedQueue<String> failedRecords = new ConcurrentLinkedQueue<>();
 
-            ExecutorService executor = Executors.newFixedThreadPool(4);
-
             List<CSVRecord> records = csvParser.getRecords();
 
-            CountDownLatch latch = new CountDownLatch(records.size());
+            ExecutorService executor = Executors.newFixedThreadPool(8);
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
 
             for (int i = 0; i < records.size(); i++) {
                 CSVRecord record = records.get(i);
                 int recordNumber = i + 1;
 
-                executor.submit(() -> {
+                CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                     try {
                         processRecord(record, recordNumber,
                                 awardDbMap, genreDbMap, characterDbMap, settingDbMap, authorDbMap,
@@ -142,14 +141,12 @@ public class CsvImportService {
                         );
                     } catch (Exception ex) {
                         failedRecords.add("Record #" + recordNumber + ": " + record.toString());
-                    } finally {
-                        latch.countDown();
                     }
-                });
+                }, executor);
+                futures.add(future);
             }
 
-
-            latch.await();
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
             executor.shutdown();
 
             editionRepository.saveAll(new ArrayList<>(editions.values()));
