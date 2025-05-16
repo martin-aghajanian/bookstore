@@ -9,6 +9,7 @@ import com.martin.bookstore.security.config.JwtService;
 import com.martin.bookstore.security.exception.DefaultRoleNotFoundException;
 import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
 import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
+import com.martin.bookstore.security.user.CustomUserDetails;
 import com.martin.bookstore.security.user.RoleRepository;
 import com.martin.bookstore.security.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,8 +55,12 @@ public class AuthenticationService {
                         .orElseThrow(() -> new DefaultRoleNotFoundException("Default role USER not found")))
                 .build();
         userRepository.save(user);
-        String jwtToken = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        String jwtToken = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -72,8 +77,11 @@ public class AuthenticationService {
         );
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow();
-        String jwtToken = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        String jwtToken = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -95,8 +103,10 @@ public class AuthenticationService {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-            if (jwtService.isTokenValid(refreshToken, user)) {
-                String accessToken = jwtService.generateToken(user);
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+
+            if (jwtService.isTokenValid(refreshToken, userDetails)) {
+                String accessToken = jwtService.generateToken(userDetails);
 
                 AuthenticationResponse authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)

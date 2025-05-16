@@ -1,6 +1,7 @@
 package com.martin.bookstore.security.config;
 
 import com.martin.bookstore.security.exception.InvalidJwtTokenException;
+import com.martin.bookstore.security.user.CustomUserDetails;
 import com.martin.bookstore.security.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -55,10 +56,10 @@ public class JwtService {
             UserDetails userDetails,
             long expiration
     ) {
-        User user = (User) userDetails;
+        User user = ((CustomUserDetails) userDetails).getUser();
 
         extraClaims.put("role", user.getRole().getName());
-        extraClaims.put("permissions", user.getAuthorities()
+        extraClaims.put("permissions", userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList());
