@@ -1,10 +1,12 @@
 package com.martin.bookstore.security.user;
 
+import com.martin.bookstore.entity.Permission;
+import com.martin.bookstore.entity.Role;
+import com.martin.bookstore.repository.PermissionRepository;
+import com.martin.bookstore.repository.RoleRepository;
 import com.martin.bookstore.security.user.enums.PermissionEnum;
 import com.martin.bookstore.security.user.enums.RoleEnum;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

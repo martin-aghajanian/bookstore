@@ -1,5 +1,6 @@
-package com.martin.bookstore.security.user;
+package com.martin.bookstore.controller;
 
+import com.martin.bookstore.security.user.RolePermissionSeeder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;

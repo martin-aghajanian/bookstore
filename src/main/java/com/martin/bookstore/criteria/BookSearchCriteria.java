@@ -28,6 +28,6 @@ public class BookSearchCriteria extends SearchCriteria{
     @Override
     public PageRequest buildPageRequest() {
         return super.buildPageRequest()
-                .withSort(Sort.by("title").ascending());
+                .withSort(Sort.by(sortBy).ascending());
     }
 }

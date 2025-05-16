@@ -1,5 +1,9 @@
 package com.martin.bookstore.security.user;
 
+import com.martin.bookstore.entity.Role;
+import com.martin.bookstore.entity.User;
+import com.martin.bookstore.repository.RoleRepository;
+import com.martin.bookstore.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

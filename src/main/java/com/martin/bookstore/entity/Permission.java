@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.user;
+package com.martin.bookstore.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

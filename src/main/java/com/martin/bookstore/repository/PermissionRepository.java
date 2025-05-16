@@ -1,5 +1,6 @@
-package com.martin.bookstore.security.user;
+package com.martin.bookstore.repository;
 
+import com.martin.bookstore.entity.Permission;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

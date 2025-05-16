@@ -2,7 +2,7 @@ package com.martin.bookstore.security.config;
 
 import com.martin.bookstore.security.exception.InvalidJwtTokenException;
 import com.martin.bookstore.security.user.CustomUserDetails;
-import com.martin.bookstore.security.user.User;
+import com.martin.bookstore.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
