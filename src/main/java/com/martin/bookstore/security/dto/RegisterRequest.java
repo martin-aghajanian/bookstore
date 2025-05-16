@@ -1,6 +1,5 @@
 package com.martin.bookstore.security.dto;
 
-import com.martin.bookstore.security.user.Role;
 import com.martin.bookstore.security.validation.PasswordMatches;
 import com.martin.bookstore.security.validation.StrongPassword;
 import jakarta.validation.constraints.Email;
@@ -36,6 +35,4 @@ public class RegisterRequest {
 
     @NotBlank(message = "Confirm Password cannot be blank")
     private String confirmPassword;
-
-    private Role role;
 }

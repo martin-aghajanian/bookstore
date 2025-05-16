@@ -6,8 +6,10 @@ import com.martin.bookstore.security.dto.AuthenticationRequest;
 import com.martin.bookstore.security.dto.AuthenticationResponse;
 import com.martin.bookstore.security.dto.RegisterRequest;
 import com.martin.bookstore.security.config.JwtService;
+import com.martin.bookstore.security.exception.DefaultRoleNotFoundException;
 import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
 import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
+import com.martin.bookstore.security.user.RoleRepository;
 import com.martin.bookstore.security.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +28,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -47,7 +50,8 @@ public class AuthenticationService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(roleRepository.findByName("ROLE_USER")
+                        .orElseThrow(() -> new DefaultRoleNotFoundException("Default role USER not found")))
                 .build();
         userRepository.save(user);
         String jwtToken = jwtService.generateToken(user);

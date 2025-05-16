@@ -2,6 +2,7 @@ package com.martin.bookstore.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.martin.bookstore.security.exception.ExceptionResponse;
+import com.martin.bookstore.security.exception.InvalidJwtTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.SignatureException;
 
 @Component
 @RequiredArgsConstructor
@@ -68,6 +70,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .withStatus(HttpStatus.UNAUTHORIZED)
                     .withMessage(ex.getMessage())
                     .build());
+            return;
+        } catch (InvalidJwtTokenException ex) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"status\":\"UNAUTHORIZED\",\"message\":\"" + ex.getMessage() + "\"}");
             return;
         }
 

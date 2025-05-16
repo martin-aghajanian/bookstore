@@ -21,7 +21,7 @@ public class OpenaiController {
     private final ChatBookSuggestionService suggestionService;
 
     @GetMapping("/suggest")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('user:read', 'content:read', 'admin:read')")
     public PageResponseDto<BookResponseDto> suggestBooks(
             @RequestParam String message,
             @RequestParam(defaultValue = "0") int page,

@@ -1,6 +1,8 @@
 package com.martin.bookstore.exception;
 
+import com.martin.bookstore.security.exception.DefaultRoleNotFoundException;
 import com.martin.bookstore.security.exception.EmailAlreadyTakenException;
+import com.martin.bookstore.security.exception.InvalidJwtTokenException;
 import com.martin.bookstore.security.exception.UsernameAlreadyTakenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
@@ -49,5 +51,15 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(DefaultRoleNotFoundException.class)
+    public ResponseEntity<String> handleDefaultRoleNotFound(DefaultRoleNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidJwtTokenException.class)
+    public ResponseEntity<String> handleInvalidJwtToken(InvalidJwtTokenException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT Token.");
     }
 }

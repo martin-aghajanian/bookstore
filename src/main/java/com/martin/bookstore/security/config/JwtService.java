@@ -1,11 +1,14 @@
 package com.martin.bookstore.security.config;
 
+import com.martin.bookstore.security.exception.InvalidJwtTokenException;
+import com.martin.bookstore.security.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +55,14 @@ public class JwtService {
             UserDetails userDetails,
             long expiration
     ) {
+        User user = (User) userDetails;
+
+        extraClaims.put("role", user.getRole().getName());
+        extraClaims.put("permissions", user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList());
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -76,12 +87,16 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts
+                    .parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.security.SignatureException ex) {
+            throw new InvalidJwtTokenException("Invalid JWT signature");
+        }
     }
 
     private Key getSignInKey() {
