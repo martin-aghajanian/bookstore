@@ -24,6 +24,11 @@ public class CustomUserDetails implements UserDetails {
                     authorities.add(new SimpleGrantedAuthority(p.getName()))
             );
         }
+
+        user.getPermissions().forEach(p ->
+                authorities.add(new SimpleGrantedAuthority(p.getName()))
+        );
+
         return authorities;
     }
 

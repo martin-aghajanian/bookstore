@@ -1,4 +1,4 @@
-package com.martin.bookstore.security.user;
+package com.martin.bookstore.security.admin;
 
 import com.martin.bookstore.entity.Role;
 import com.martin.bookstore.entity.User;
@@ -22,7 +22,6 @@ public class AdminUserSeeder {
         String username = "admin_martin";
 
         if (userRepository.existsByUsername(username)) {
-            System.out.println("✅ Admin user already exists.");
             return;
         }
 
@@ -34,12 +33,11 @@ public class AdminUserSeeder {
                 .email("martin.aghajanian@gmail.com")
                 .firstName("Martin")
                 .lastName("Aghajanian")
-                .password(passwordEncoder.encode("Admin123!")) // replace this with a secure password
+                .password(passwordEncoder.encode("Admin123!"))
                 .role(adminRole)
                 .build();
 
         userRepository.save(admin);
-        System.out.println("✅ Admin user created: " + username);
     }
 }
 

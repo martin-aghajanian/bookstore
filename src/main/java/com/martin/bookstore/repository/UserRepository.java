@@ -1,10 +1,6 @@
 package com.martin.bookstore.repository;
 
-import com.martin.bookstore.criteria.UserSearchCriteria;
 import com.martin.bookstore.entity.User;
-import com.martin.bookstore.dto.response.UserResponseDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,18 +30,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
         where u.id = :id
     """)
     Optional<User> findByIdWithRole(Long id);
-
-    @Query("""
-        select new com.martin.bookstore.security.user.UserResponseDto(
-                    u.id,
-                    u.username,
-                    u.email,
-                    u.role
-                )
-        from User u
-        where (:#{#criteria.username} is null or lower(u.username) like concat('%', lower(:#{#criteria.username}), '%'))
-        and (:#{#criteria.email} is null or lower(u.email) like concat('%', lower(:#{#criteria.email}), '%'))
-        and (:#{#criteria.role} is null or lower(u.role) = lower(:#{#criteria.role}))
-    """)
-    Page<UserResponseDto> findAll(UserSearchCriteria criteria, Pageable pageable);
 }
