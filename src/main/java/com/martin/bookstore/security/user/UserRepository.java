@@ -22,4 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     """)
     Optional<User> findByUsernameWithRoleAndPermissions(@Param("username") String username);
 
+    @Query("""
+        select u
+        from User u
+        join fetch u.role
+        where u.id = :id
+    """)
+    Optional<User> findByIdWithRole(Long id);
 }

@@ -1,5 +1,8 @@
 package com.martin.bookstore.security.config;
 
+import com.martin.bookstore.security.session.SessionAuthenticationFilter;
+import com.martin.bookstore.security.session.SessionLogoutHandler;
+import com.martin.bookstore.security.user.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -22,14 +24,20 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final UserRepository userRepository;
     private final AuthenticationProvider authenticationProvider;
-    private final LogoutHandler logoutHandler;
+    private final SessionLogoutHandler sessionLogoutHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    private final SessionAuthenticationFilter sessionAuthFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
         http
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
@@ -45,15 +53,17 @@ public class SecurityConfiguration {
                                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .logout(logout -> logout
+//                        .logoutUrl("/api/v1/auth/logout")
+//                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+//                )
+                .addFilterBefore(sessionAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
-                        .logoutUrl("/api/v1/auth/logout")
-                        .addLogoutHandler(logoutHandler)
-                        .logoutSuccessHandler((
-                                request,
-                                response,
-                                authentication
-                                ) -> SecurityContextHolder.clearContext()
+                        .logoutUrl("/api/v1/session-auth/logout")
+                        .addLogoutHandler(sessionLogoutHandler)
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                SecurityContextHolder.clearContext()
                         )
                 );
 
