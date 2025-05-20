@@ -62,15 +62,13 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
         left join b.language l
         left join b.publisher p
         left join b.format f
+        inner join b.bookGenres bg
+            inner join b.bookAuthor ba
         where (:#{#criteria.query} is null
                or lower(b.title) like concat('%', lower(:#{#criteria.query}), '%')
                or lower(b.description) like concat('%', lower(:#{#criteria.query}), '%'))
-          and (:#{#criteria.genreId} is null or exists (
-                   select 1 from BookGenre bg where bg.book = b and bg.genre.id = :#{#criteria.genreId}
-               ))
-          and (:#{#criteria.authorId}    is null or exists (
-                   select 1 from BookAuthor ba where ba.book = b and ba.author.id = :#{#criteria.authorId}
-               ))
+          and (:#{#criteria.genreId} is null or bg.genre.id = :#{#criteria.genreId})
+          and (:#{#criteria.authorId}    is null or ba.author.id = :#{#criteria.authorId})
           and b.publishDate >= coalesce(:#{#criteria.minDate}, b.publishDate)
           and b.publishDate <= coalesce(:#{#criteria.maxDate}, b.publishDate)
           and b.pages >= coalesce(:#{#criteria.minPages}, b.pages)
