@@ -3,6 +3,7 @@ package com.martin.bookstore.controller;
 import com.martin.bookstore.dto.request.ReviewRequestDto;
 import com.martin.bookstore.dto.response.ReviewResponseDto;
 import com.martin.bookstore.service.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,7 +23,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReviewResponseDto addReview(
             @PathVariable Long bookId,
-            @RequestBody ReviewRequestDto dto) {
+            @Valid @RequestBody ReviewRequestDto dto) {
         return reviewService.addReview(bookId, dto);
     }
 
