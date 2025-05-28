@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
@@ -91,4 +92,25 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
         where lower(b.title) in :titles
 """)
     Page<Book> findByTitleInIgnoreCase(@Param("titles") Collection<String> lowerCaseTitles, Pageable pageable);
+
+    @Query("""
+    select distinct b from Book b
+    left join BookAuthor ba on ba.book.id = b.id
+    left join Author a on ba.author.id = a.id
+    left join BookGenre bg on bg.book.id = b.id
+    left join Genre g on bg.genre.id = g.id
+    left join b.series s
+    where b.id <> :bookId and (
+        a.id in :authorIds or
+        g.id in :genreIds or
+        (:seriesId is not null and s.id = :seriesId)
+    )
+""")
+    List<Book> findSimilarBooks(
+            @Param("bookId") Long bookId,
+            @Param("authorIds") List<Long> authorIds,
+            @Param("genreIds") List<Long> genreIds,
+            @Param("seriesId") Long seriesId,
+            Pageable pageable
+    );
 }

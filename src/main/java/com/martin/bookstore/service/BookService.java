@@ -21,6 +21,7 @@ import com.martin.bookstore.entity.Setting;
 import com.martin.bookstore.repository.SettingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -232,5 +233,33 @@ public class BookService {
                 .map(characterMapper::asOutput)
                 .collect(Collectors.toList());
     }
+
+    public List<BookResponseDto> findSimilarBooks(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("Book not found with id " + bookId));
+
+        List<Long> authorIds = book.getBookAuthor().stream()
+                .map(bookAuthor -> bookAuthor.getAuthor().getId())
+                .collect(Collectors.toList());
+
+        List<Long> genreIds = book.getBookGenres().stream()
+                .map(bookGenre -> bookGenre.getGenre().getId())
+                .collect(Collectors.toList());
+
+        Long seriesId = book.getSeries() != null ? book.getSeries().getId() : null;
+
+        List<Book> similarBooks = bookRepository.findSimilarBooks(
+                bookId,
+                authorIds.isEmpty() ? List.of(-1L) : authorIds,
+                genreIds.isEmpty() ? List.of(-1L) : genreIds,
+                seriesId,
+                PageRequest.of(0, 10)
+        );
+
+        return similarBooks.stream()
+                .map(bookMapper::asOutput)
+                .collect(Collectors.toList());
+    }
+
 
 }

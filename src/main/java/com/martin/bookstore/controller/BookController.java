@@ -89,5 +89,10 @@ public class BookController {
         return bookService.getCharactersByBookId(id);
     }
 
-
+    @PreAuthorize("permitAll()")
+    @GetMapping("/{id}/similar")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookResponseDto> getSimilarBooks(@PathVariable Long id) {
+        return bookService.findSimilarBooks(id);
+    }
 }
