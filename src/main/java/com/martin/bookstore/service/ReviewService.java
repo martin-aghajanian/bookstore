@@ -1,5 +1,6 @@
 package com.martin.bookstore.service;
 
+import com.martin.bookstore.entity.User;
 import com.martin.bookstore.exception.NotFoundException;
 import com.martin.bookstore.mapper.ReviewMapper;
 import com.martin.bookstore.dto.request.ReviewRequestDto;
@@ -8,6 +9,8 @@ import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.Review;
 import com.martin.bookstore.repository.BookRepository;
 import com.martin.bookstore.repository.ReviewRepository;
+import com.martin.bookstore.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,15 +25,22 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final BookRepository bookRepository;
     private final ReviewMapper reviewMapper;
+    private final UserRepository userRepository;
 
     @Transactional
     public ReviewResponseDto addReview(Long bookId, ReviewRequestDto dto) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new NotFoundException("Book not found: " + bookId));
 
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found: " + username));
+
         Review review = reviewMapper.asEntity(dto);
         review.setBook(book);
         review.setCreatedAt(LocalDateTime.now());
+        review.setUser(user);
+
         reviewRepository.save(review);
 
         updateBookMetrics(book, dto.getRating());

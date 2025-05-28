@@ -11,5 +11,6 @@ public interface ReviewMapper {
     Review asEntity(ReviewRequestDto dto);
 
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "username", source = "user.username")
     ReviewResponseDto asDto(Review review);
 }
