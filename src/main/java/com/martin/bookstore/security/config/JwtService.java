@@ -57,11 +57,11 @@ public class JwtService {
     ) {
         User user = ((CustomUserDetails) userDetails).getUser();
 
-        extraClaims.put("role", user.getRole().getName());
-        extraClaims.put("permissions", userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList());
+//        extraClaims.put("role", user.getRole().getName());
+//        extraClaims.put("permissions", userDetails.getAuthorities()
+//                .stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .toList());
 
         return Jwts
                 .builder()

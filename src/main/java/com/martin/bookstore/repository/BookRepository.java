@@ -31,7 +31,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     Page<Book> findBySettingId(@Param("settingId") Long settingId, Pageable pageable);
 
     @Query("""
-        select new com.martin.bookstore.dto.response.BookResponseDto(
+        select distinct new com.martin.bookstore.dto.response.BookResponseDto(
             b.id,
             b.isbn,
             b.title,
@@ -62,13 +62,18 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
         left join b.language l
         left join b.publisher p
         left join b.format f
-        inner join b.bookGenres bg
-            inner join b.bookAuthor ba
+        left join b.bookGenres bg
+        left join b.bookAuthor ba
         where (:#{#criteria.query} is null
                or lower(b.title) like concat('%', lower(:#{#criteria.query}), '%')
                or lower(b.description) like concat('%', lower(:#{#criteria.query}), '%'))
           and (:#{#criteria.genreId} is null or bg.genre.id = :#{#criteria.genreId})
           and (:#{#criteria.authorId}    is null or ba.author.id = :#{#criteria.authorId})
+          and (:#{#criteria.editionId} is null or e.id = :#{#criteria.editionId})
+          and (:#{#criteria.seriesId} is null or s.id = :#{#criteria.seriesId})
+          and (:#{#criteria.languageId} is null or l.id = :#{#criteria.languageId})
+          and (:#{#criteria.publisherId} is null or p.id = :#{#criteria.publisherId})
+          and (:#{#criteria.formatId} is null or f.id = :#{#criteria.formatId})
           and b.publishDate >= coalesce(:#{#criteria.minDate}, b.publishDate)
           and b.publishDate <= coalesce(:#{#criteria.maxDate}, b.publishDate)
           and b.pages >= coalesce(:#{#criteria.minPages}, b.pages)

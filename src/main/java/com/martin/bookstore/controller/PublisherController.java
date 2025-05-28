@@ -19,13 +19,13 @@ public class PublisherController {
 
     private final PublisherService publisherService;
 
-    @PreAuthorize("permitAll()")
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Page<PublisherResponseDto> getAllPublishers(@RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "10") int size) {
-        return publisherService.getAllPublishers(PageRequest.of(page, size));
-    }
+//    @PreAuthorize("permitAll()")
+//    @GetMapping
+//    @ResponseStatus(HttpStatus.OK)
+//    public Page<PublisherResponseDto> getAllPublishers(@RequestParam(defaultValue = "0") int page,
+//                                                       @RequestParam(defaultValue = "10") int size) {
+//        return publisherService.getAllPublishers(PageRequest.of(page, size));
+//    }
 
     @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
@@ -55,7 +55,7 @@ public class PublisherController {
         publisherService.deletePublisher(id);
     }
 
-    @GetMapping("/search")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<PublisherResponseDto> searchPublishers(@RequestParam String name,
                                                        @RequestParam(defaultValue = "0") int page,

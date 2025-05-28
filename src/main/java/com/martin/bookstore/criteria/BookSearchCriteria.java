@@ -16,6 +16,8 @@ public class BookSearchCriteria extends SearchCriteria{
     private Long languageId;
     private Long formatId;
     private Long seriesId;
+    private Long editionId;
+    private Long publisherId;
     private LocalDate minDate;
     private LocalDate maxDate;
     private Integer minPages;
@@ -27,7 +29,8 @@ public class BookSearchCriteria extends SearchCriteria{
 
     @Override
     public PageRequest buildPageRequest() {
+        Sort.Direction sortDirection = Sort.Direction.fromOptionalString(direction).orElse(Sort.Direction.ASC);
         return super.buildPageRequest()
-                .withSort(Sort.by(sortBy).ascending());
+                .withSort(Sort.by(sortDirection, sortBy));
     }
 }

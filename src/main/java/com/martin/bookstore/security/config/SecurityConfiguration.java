@@ -53,19 +53,19 @@ public class SecurityConfiguration {
                                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//                .logout(logout -> logout
-//                        .logoutUrl("/api/v1/auth/logout")
-//                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
-//                )
-                .addFilterBefore(sessionAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
-                        .logoutUrl("/api/v1/session-auth/logout")
-                        .addLogoutHandler(sessionLogoutHandler)
-                        .logoutSuccessHandler((request, response, authentication) ->
-                                SecurityContextHolder.clearContext()
-                        )
+                        .logoutUrl("/api/v1/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
                 );
+//                .addFilterBefore(sessionAuthFilter, UsernamePasswordAuthenticationFilter.class)
+//                .logout(logout -> logout
+//                        .logoutUrl("/api/v1/session-auth/logout")
+//                        .addLogoutHandler(sessionLogoutHandler)
+//                        .logoutSuccessHandler((request, response, authentication) ->
+//                                SecurityContextHolder.clearContext()
+//                        )
+//                );
 
         return http.build();
     }

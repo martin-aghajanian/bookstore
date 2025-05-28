@@ -75,9 +75,8 @@ public class CsvImportService {
 
             Map<String, Setting> settingDbMap = new ConcurrentHashMap<>(settingRepository.findAll()
                     .stream().collect(Collectors.toMap(Setting::getName, s -> s)));
-
             Map<String, Author> authorDbMap = new ConcurrentHashMap<>(authorRepository.findAll()
-                    .stream().collect(Collectors.toMap(Author::getFullName, a -> a)));
+                    .stream().collect(Collectors.toMap(Author::getFullName, a -> a, (a1, a2) -> a1)));
 
             Map<String, Edition> editionDbMap = new ConcurrentHashMap<>(editionRepository.findAll()
                     .stream().collect(Collectors.toMap(Edition::getName, e -> e)));
@@ -121,16 +120,17 @@ public class CsvImportService {
 
             ConcurrentLinkedQueue<String> failedRecords = new ConcurrentLinkedQueue<>();
 
+            ExecutorService executor = Executors.newFixedThreadPool(4);
+
             List<CSVRecord> records = csvParser.getRecords();
 
-            ExecutorService executor = Executors.newFixedThreadPool(8);
-            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            CountDownLatch latch = new CountDownLatch(records.size());
 
             for (int i = 0; i < records.size(); i++) {
                 CSVRecord record = records.get(i);
                 int recordNumber = i + 1;
 
-                CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                executor.submit(() -> {
                     try {
                         processRecord(record, recordNumber,
                                 awardDbMap, genreDbMap, characterDbMap, settingDbMap, authorDbMap,
@@ -141,12 +141,14 @@ public class CsvImportService {
                         );
                     } catch (Exception ex) {
                         failedRecords.add("Record #" + recordNumber + ": " + record.toString());
+                    } finally {
+                        latch.countDown();
                     }
-                }, executor);
-                futures.add(future);
+                });
             }
 
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+            latch.await();
             executor.shutdown();
 
             editionRepository.saveAll(new ArrayList<>(editions.values()));

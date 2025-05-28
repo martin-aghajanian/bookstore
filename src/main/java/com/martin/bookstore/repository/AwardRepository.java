@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface AwardRepository extends JpaRepository<Award, Long> {
 
     @Query("""
-        select new com.martin.bookstore.dto.response.AwardResponseDto(
+        select distinct new com.martin.bookstore.dto.response.AwardResponseDto(
             a.id,
             a.name
         )
