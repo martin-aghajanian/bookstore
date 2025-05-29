@@ -58,4 +58,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleInvalidJwtToken(InvalidJwtTokenException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT Token.");
     }
+
+    @ExceptionHandler(WishlistNotFoundException.class)
+    public ResponseEntity<String> handleWishlistNotFound(WishlistNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }
