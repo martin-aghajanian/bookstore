@@ -63,4 +63,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleWishlistNotFound(WishlistNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(BookMissingPriceException.class)
+    public ResponseEntity<String> handleBookMissingPrice(BookMissingPriceException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
