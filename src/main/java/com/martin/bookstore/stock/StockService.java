@@ -1,9 +1,12 @@
 package com.martin.bookstore.stock;
 
+import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.exception.NotFoundException;
 import com.martin.bookstore.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,5 +100,11 @@ public class StockService {
             throw new NotFoundException("Stock not found for book with id " + bookId);
         }
         return stockMapper.asOutput(stock);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponseDto<LowStockBookResponseDto> getLowStockBooks(int threshold, Pageable pageable) {
+        Page<LowStockBookResponseDto> page = stockRepository.findLowStockBooks(threshold, pageable);
+        return PageResponseDto.from(page);
     }
 }
