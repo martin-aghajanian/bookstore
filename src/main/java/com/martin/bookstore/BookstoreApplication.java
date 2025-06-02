@@ -6,6 +6,7 @@ import com.martin.bookstore.security.session.SessionAuthProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @SpringBootApplication
@@ -16,6 +17,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
                 SessionAuthProperties.class
         }
 )
+@EnableScheduling
 public class BookstoreApplication {
 
     public static void main(String[] args) {

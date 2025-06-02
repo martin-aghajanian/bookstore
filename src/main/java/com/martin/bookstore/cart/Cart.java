@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,4 +26,13 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> items = new HashSet<>();
+
+    @Column(name = "last_modified", nullable = false)
+    private LocalDateTime lastModified;
+
+    @PrePersist
+    @PreUpdate
+    public void updateTimestamp() {
+        this.lastModified = LocalDateTime.now();
+    }
 }
