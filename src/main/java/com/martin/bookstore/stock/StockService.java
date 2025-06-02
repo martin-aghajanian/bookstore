@@ -107,4 +107,23 @@ public class StockService {
         Page<LowStockBookResponseDto> page = stockRepository.findLowStockBooks(threshold, pageable);
         return PageResponseDto.from(page);
     }
+
+    @Transactional
+    public StockResponseDto updateStock(Long bookId, StockUpdateRequestDto dto) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("Book not found with id " + bookId));
+
+        Stock stock = stockRepository.findByBookId(bookId);
+        if (stock == null) {
+            stock = new Stock();
+            stock.setBook(book);
+        }
+
+        stock.setQuantityAvailable(dto.getQuantityAvailable());
+        stock.setQuantityReserved(dto.getQuantityReserved());
+        stock.setQuantitySold(dto.getQuantitySold());
+
+        stockRepository.save(stock);
+        return stockMapper.asOutput(stock);
+    }
 }

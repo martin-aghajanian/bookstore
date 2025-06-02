@@ -2,6 +2,7 @@ package com.martin.bookstore.stock;
 
 import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.repository.BookRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,15 @@ public class StockController {
             @RequestParam(defaultValue = "20") int size
     ) {
         return stockService.getLowStockBooks(threshold, PageRequest.of(page, size));
+    }
+
+    @PutMapping("/{bookId}")
+    @ResponseStatus(HttpStatus.OK)
+    public StockResponseDto updateStock(
+            @PathVariable Long bookId,
+            @RequestBody @Valid StockUpdateRequestDto dto
+    ) {
+        return stockService.updateStock(bookId, dto);
     }
 }
 
