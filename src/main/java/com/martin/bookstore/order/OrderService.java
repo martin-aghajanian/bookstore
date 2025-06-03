@@ -3,17 +3,22 @@ package com.martin.bookstore.order;
 import com.martin.bookstore.cart.Cart;
 import com.martin.bookstore.cart.CartItem;
 import com.martin.bookstore.cart.CartRepository;
+import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.User;
 import com.martin.bookstore.exception.NotFoundException;
 import com.martin.bookstore.security.config.CustomUserDetails;
 import com.martin.bookstore.stock.Stock;
 import com.martin.bookstore.stock.StockRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,5 +86,18 @@ public class OrderService {
         );
 
         return OrderMapper.toDto(savedOrder);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponseDto<OrderResponseDto> getUserOrders(int page, int size) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Order> orders = orderRepository.findByUser(user, pageable);
+
+        Page<OrderResponseDto> mapped = orders.map(OrderMapper::toDto);
+        return PageResponseDto.from(mapped);
     }
 }

@@ -1,5 +1,6 @@
 package com.martin.bookstore.order;
 
+import com.martin.bookstore.dto.response.PageResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,5 +19,14 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponseDto placeOrder(@Valid @RequestBody OrderRequestDto requestDto) {
         return orderService.placeOrder(requestDto);
+    }
+
+    @PreAuthorize("hasAuthority('user:read')")
+    @GetMapping
+    public PageResponseDto<OrderResponseDto> getUserOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return orderService.getUserOrders(page, size);
     }
 }
