@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -31,12 +32,15 @@ public class CartExpirationCleaner implements CommandLineRunner {
     @Transactional
     public void cleanExpiredCarts() {
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
-        cartRepository.findAll().stream()
+        List<Cart> expiredCarts = cartRepository.findAll().stream()
                 .filter(cart -> cart.getLastModified().isBefore(oneHourAgo))
-                .forEach(cart -> {
-                    cart.getItems().forEach(item -> stockService.releaseReserved(item.getBook(), item.getQuantity()));
-                    cart.getItems().clear();
-                    cartRepository.delete(cart);
-                });
+                .toList();
+
+        for (Cart cart : expiredCarts) {
+            cart.getItems().forEach(item ->
+                    stockService.releaseReserved(item.getBook(), item.getQuantity())
+            );
+            cart.getItems().clear();
+        }
     }
 }
