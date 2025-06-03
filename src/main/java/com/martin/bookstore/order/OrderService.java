@@ -7,14 +7,18 @@ import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.User;
 import com.martin.bookstore.exception.NotFoundException;
+import com.martin.bookstore.exception.OrderAccessDeniedException;
+import com.martin.bookstore.exception.OrderCancellationNotAllowedException;
 import com.martin.bookstore.security.config.CustomUserDetails;
 import com.martin.bookstore.stock.Stock;
 import com.martin.bookstore.stock.StockRepository;
+import com.martin.bookstore.stock.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,7 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
     private final StockRepository stockRepository;
+    private final StockService stockService;
 
     @Transactional
     public OrderResponseDto placeOrder(OrderRequestDto dto) {
@@ -103,8 +108,16 @@ public class OrderService {
 
     @Transactional
     public void payForOrder(Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found with id " + orderId));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You can only pay for your own orders.");
+        }
 
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new IllegalStateException("Order is not in a payable state.");
@@ -113,6 +126,10 @@ public class OrderService {
         // payment simulation
         mockCardPayment(order);
 
+        for (OrderItem item : order.getOrderItems()) {
+            stockService.finalizePurchase(item.getBook(), item.getQuantity());
+        }
+
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
     }
@@ -120,5 +137,31 @@ public class OrderService {
     private void mockCardPayment(Order order) {
         // pretend this sends the card number to a bank api
         System.out.println("simulating card payment for order " + order.getId());
+    }
+
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found with id " + orderId));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new OrderAccessDeniedException("You can only cancel your own orders.");
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new OrderCancellationNotAllowedException("Only pending orders can be cancelled.");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        for (OrderItem item : order.getOrderItems()) {
+            stockService.releaseReserved(item.getBook(), item.getQuantity());
+        }
+
+        orderRepository.save(order);
     }
 }

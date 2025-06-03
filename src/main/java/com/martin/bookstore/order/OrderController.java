@@ -36,4 +36,11 @@ public class OrderController {
     public void payForOrder(@PathVariable Long id) {
         orderService.payForOrder(id);
     }
+
+    @PreAuthorize("hasAuthority('user:update')")
+    @PatchMapping("/{id}/cancel")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelOrder(@PathVariable Long id) {
+        orderService.cancelOrder(id);
+    }
 }
