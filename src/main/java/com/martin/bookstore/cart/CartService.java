@@ -71,7 +71,7 @@ public class CartService {
         return cartMapper.toCartFullResponseDto(cart);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CartFullResponseDto getUserCart() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
