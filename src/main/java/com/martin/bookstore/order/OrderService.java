@@ -6,9 +6,7 @@ import com.martin.bookstore.cart.CartRepository;
 import com.martin.bookstore.dto.response.PageResponseDto;
 import com.martin.bookstore.entity.Book;
 import com.martin.bookstore.entity.User;
-import com.martin.bookstore.exception.NotFoundException;
-import com.martin.bookstore.exception.OrderAccessDeniedException;
-import com.martin.bookstore.exception.OrderCancellationNotAllowedException;
+import com.martin.bookstore.exception.*;
 import com.martin.bookstore.security.config.CustomUserDetails;
 import com.martin.bookstore.stock.Stock;
 import com.martin.bookstore.stock.StockRepository;
@@ -46,7 +44,7 @@ public class OrderService {
                 new NotFoundException("Cart not found for user"));
 
         if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new EmptyCartException("Cart is empty");
         }
 
         List<OrderItem> orderItems = new ArrayList<>();
@@ -56,16 +54,16 @@ public class OrderService {
             CartItem cartItem = cart.getItems().stream()
                     .filter(ci -> ci.getBook().getId().equals(selected.getBookId()))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Selected book not found in cart: " + selected.getBookId()));
+                    .orElseThrow(() -> new BookNotInCartException("Selected book not found in cart: " + selected.getBookId()));
 
             if (!selected.getQuantity().equals(cartItem.getQuantity())) {
-                throw new RuntimeException("Mismatch in quantity for book ID: " + selected.getBookId());
+                throw new InvalidOrderQuantityException("Mismatch in quantity for book ID: " + selected.getBookId());
             }
 
             Book book = cartItem.getBook();
             Stock stock = stockRepository.findByBookId(book.getId());
             if (stock == null || stock.getQuantityReserved() < cartItem.getQuantity()) {
-                throw new RuntimeException("Insufficient reserved stock for book: " + book.getTitle());
+                throw new InsufficientStockException("Insufficient reserved stock for book: " + book.getTitle());
             }
 
             stock.setQuantityReserved(stock.getQuantityReserved() - cartItem.getQuantity());
@@ -116,11 +114,11 @@ public class OrderService {
                 .orElseThrow(() -> new NotFoundException("Order not found with id " + orderId));
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("You can only pay for your own orders.");
+            throw new OrderAccessDeniedException("You can only pay for your own orders.");
         }
 
         if (order.getStatus() != OrderStatus.PENDING) {
-            throw new IllegalStateException("Order is not in a payable state.");
+            throw new OrderPaymentNotAllowedException("Order is not in a payable state.");
         }
 
         // payment simulation

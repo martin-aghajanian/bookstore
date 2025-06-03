@@ -83,4 +83,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleOrderCancellationNotAllowed(OrderCancellationNotAllowedException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(OrderPaymentNotAllowedException.class)
+    public ResponseEntity<String> handleOrderPaymentNotAllowed(OrderPaymentNotAllowedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(EmptyCartException.class)
+    public ResponseEntity<String> handleEmptyCart(EmptyCartException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(BookNotInCartException.class)
+    public ResponseEntity<String> handleBookNotInCart(BookNotInCartException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidOrderQuantityException.class)
+    public ResponseEntity<String> handleInvalidOrderQuantity(InvalidOrderQuantityException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
