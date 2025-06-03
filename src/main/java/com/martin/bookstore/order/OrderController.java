@@ -29,4 +29,11 @@ public class OrderController {
     ) {
         return orderService.getUserOrders(page, size);
     }
+
+    @PatchMapping("/{id}/pay")
+    @PreAuthorize("hasAuthority('user:update')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void payForOrder(@PathVariable Long id) {
+        orderService.payForOrder(id);
+    }
 }

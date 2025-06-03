@@ -100,4 +100,25 @@ public class OrderService {
         Page<OrderResponseDto> mapped = orders.map(OrderMapper::toDto);
         return PageResponseDto.from(mapped);
     }
+
+    @Transactional
+    public void payForOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found with id " + orderId));
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException("Order is not in a payable state.");
+        }
+
+        // payment simulation
+        mockCardPayment(order);
+
+        order.setStatus(OrderStatus.PAID);
+        orderRepository.save(order);
+    }
+
+    private void mockCardPayment(Order order) {
+        // pretend this sends the card number to a bank api
+        System.out.println("simulating card payment for order " + order.getId());
+    }
 }
