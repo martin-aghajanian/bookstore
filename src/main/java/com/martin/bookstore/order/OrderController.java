@@ -46,10 +46,7 @@ public class OrderController {
 
     @PreAuthorize("hasAuthority('admin:read')")
     @GetMapping("/all")
-    public PageResponseDto<OrderResponseDto> getAllOrders(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return orderService.getAllOrders(page, size);
+    public PageResponseDto<OrderResponseDto> getAllOrders(OrderSearchCriteria criteria) {
+        return orderService.getAllOrders(criteria);
     }
 }

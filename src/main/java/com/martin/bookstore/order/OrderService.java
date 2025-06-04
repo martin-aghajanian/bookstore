@@ -164,9 +164,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponseDto<OrderResponseDto> getAllOrders(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Order> orders = orderRepository.findAll(pageable);
+    public PageResponseDto<OrderResponseDto> getAllOrders(OrderSearchCriteria criteria) {
+        Page<Order> orders = orderRepository.findAll(criteria, criteria.buildPageRequest());
         Page<OrderResponseDto> mapped = orders.map(OrderMapper::toDto);
         return PageResponseDto.from(mapped);
     }
