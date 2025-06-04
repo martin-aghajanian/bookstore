@@ -1,6 +1,5 @@
 package com.martin.bookstore.entity;
 
-import com.martin.bookstore.wishlist.Wishlist;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -46,7 +45,4 @@ public class User{
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
     private Set<Permission> permissions;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Wishlist wishlist;
 }
