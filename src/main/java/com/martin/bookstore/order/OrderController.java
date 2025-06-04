@@ -43,4 +43,13 @@ public class OrderController {
     public void cancelOrder(@PathVariable Long id) {
         orderService.cancelOrder(id);
     }
+
+    @PreAuthorize("hasAuthority('admin:read')")
+    @GetMapping("/all")
+    public PageResponseDto<OrderResponseDto> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return orderService.getAllOrders(page, size);
+    }
 }
