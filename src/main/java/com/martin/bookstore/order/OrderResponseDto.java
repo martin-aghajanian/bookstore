@@ -17,4 +17,5 @@ public class OrderResponseDto {
     private String paymentMethod;
     private String shippingAddress;
     private LocalDateTime createdAt;
+    private String username;
 }

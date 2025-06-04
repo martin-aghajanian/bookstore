@@ -38,6 +38,7 @@ public class OrderMapper {
         dto.setStatus(order.getStatus().name());
         dto.setPaymentMethod(order.getPaymentMethod());
         dto.setShippingAddress(order.getShippingAddress());
+        dto.setUsername(order.getUser().getUsername());
 
         List<OrderItemResponseDto> itemDtos = order.getOrderItems().stream()
                 .map(OrderMapper::toDto)
