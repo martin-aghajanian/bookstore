@@ -1,8 +1,8 @@
 package com.martin.bookstore.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.martin.bookstore.dto.response.ExceptionResponse;
-import com.martin.bookstore.exception.InvalidJwtTokenException;
+import com.martin.bookstore.security.jwt.ExceptionResponse;
+import com.martin.bookstore.shared.exception.InvalidJwtTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;

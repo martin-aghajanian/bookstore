@@ -1,14 +1,13 @@
 package com.martin.bookstore.security.config;
 
-import com.martin.bookstore.exception.InvalidJwtTokenException;
-import com.martin.bookstore.entity.User;
+import com.martin.bookstore.shared.exception.InvalidJwtTokenException;
+import com.martin.bookstore.user.persistence.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 

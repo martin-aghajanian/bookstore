@@ -1,6 +1,6 @@
 package com.martin.bookstore.security.config;
 
-import com.martin.bookstore.entity.User;
+import com.martin.bookstore.user.persistence.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

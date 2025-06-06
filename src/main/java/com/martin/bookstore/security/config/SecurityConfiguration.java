@@ -2,7 +2,7 @@ package com.martin.bookstore.security.config;
 
 import com.martin.bookstore.security.session.SessionAuthenticationFilter;
 import com.martin.bookstore.security.session.SessionLogoutHandler;
-import com.martin.bookstore.repository.UserRepository;
+import com.martin.bookstore.user.persistence.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
 package com.martin.bookstore.security.config;
 
-import com.martin.bookstore.repository.UserRepository;
+import com.martin.bookstore.user.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

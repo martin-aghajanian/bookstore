@@ -1,14 +1,14 @@
 package com.martin.bookstore.security.session;
 
-import com.martin.bookstore.dto.request.AuthenticationRequest;
-import com.martin.bookstore.dto.request.RegisterRequest;
-import com.martin.bookstore.exception.DefaultRoleNotFoundException;
-import com.martin.bookstore.exception.EmailAlreadyTakenException;
-import com.martin.bookstore.exception.NotFoundException;
-import com.martin.bookstore.exception.UsernameAlreadyTakenException;
-import com.martin.bookstore.repository.RoleRepository;
-import com.martin.bookstore.entity.User;
-import com.martin.bookstore.repository.UserRepository;
+import com.martin.bookstore.security.jwt.AuthenticationRequest;
+import com.martin.bookstore.security.jwt.RegisterRequest;
+import com.martin.bookstore.shared.exception.DefaultRoleNotFoundException;
+import com.martin.bookstore.shared.exception.EmailAlreadyTakenException;
+import com.martin.bookstore.shared.exception.NotFoundException;
+import com.martin.bookstore.shared.exception.UsernameAlreadyTakenException;
+import com.martin.bookstore.user.persistence.repository.RoleRepository;
+import com.martin.bookstore.user.persistence.entity.User;
+import com.martin.bookstore.user.persistence.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

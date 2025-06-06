@@ -2,8 +2,8 @@ package com.martin.bookstore.security.session;
 
 
 import com.martin.bookstore.security.config.CustomUserDetails;
-import com.martin.bookstore.entity.User;
-import com.martin.bookstore.repository.UserRepository;
+import com.martin.bookstore.user.persistence.entity.User;
+import com.martin.bookstore.user.persistence.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
